@@ -3,9 +3,9 @@
 // (see accompanying GPPGcopyright.rtf)
 
 // GPPG version 1.3.6
-// Machine:  WIN-M5B3T1D1DA3
-// DateTime: 06.10.2014 16:16:32
-// UserName: sprog
+// Machine:  BASE-PC
+// DateTime: 06.10.2014 20:51:34
+// UserName: Admin
 // Input file <SimpleYacc.y>
 
 // options: no-lines gplex
@@ -253,10 +253,6 @@ public partial class Parser: ShiftReduceParser<ValueType, LexLocation>
 { 
 			CurrentSemanticValue.stVal = ValueStack[ValueStack.Depth-3].stVal; 
 			(CurrentSemanticValue.stVal as VarDefNode).TypeIdent = ValueStack[ValueStack.Depth-1].eVal as IdNode;
-			foreach(var elem in (CurrentSemanticValue.stVal as VarDefNode).Idents)
-				SymbolTable.Add(elem.Name,
-					ParserHelper.ParseType((ValueStack[ValueStack.Depth-1].eVal as IdNode).Name),
-					SymbolKind.var);
 		}
         break;
       case 18: // block -> BEGIN, stlist, END

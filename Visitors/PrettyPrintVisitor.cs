@@ -97,7 +97,7 @@ namespace SimpleLang.Visitors
             w.Expr.Visit(this);
             Text += Environment.NewLine;
             w.StatIf.Visit(this);
-            Text += IndentStr() + "else" + Environment.NewLine;
+            Text += Environment.NewLine + IndentStr() + "else" + Environment.NewLine;
             w.StatIf.Visit(this);
         }
     } 

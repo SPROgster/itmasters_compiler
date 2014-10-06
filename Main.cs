@@ -35,9 +35,9 @@ namespace SimpleCompiler
                     //Console.WriteLine("Количество присваиваний = {0}", avis.Count);
                     //Console.WriteLine("-------------------------------");
 
-                    //var pp = new PrettyPrintVisitor();
-                    //parser.root.Visit(pp);
-                    //Console.WriteLine(pp.Text);
+                    var pp = new PrettyPrintVisitor();
+                    parser.root.Visit(pp);
+                    Console.WriteLine(pp.Text);
 
                     //var vr = new VariableRenameVisitor();
                     //parser.root.Visit(vr);
@@ -46,14 +46,9 @@ namespace SimpleCompiler
                     //Console.WriteLine(pp.Text);
 
                     //Отрабатывают визиторы, проверяющие наличие ошибок
-                    var sne = new SameNameExistsVisitor();
+                    var sne = new CheckVariablesVisitor();
                     parser.root.Visit(sne);
                     foreach (var err in sne.Errors)
-                        Console.WriteLine(err);
-
-                    var un = new UndeclaredNameVisitor();
-                    parser.root.Visit(un);
-                    foreach (var err in un.Errors)
                         Console.WriteLine(err);
 
                     //Генерируем трёхадресный код

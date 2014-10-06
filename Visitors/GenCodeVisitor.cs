@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using ProgramTree;
 
-using SimpleParser;
+using MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
