@@ -35,9 +35,9 @@ namespace SimpleCompiler
                     //Console.WriteLine("Количество присваиваний = {0}", avis.Count);
                     //Console.WriteLine("-------------------------------");
 
-                    //var pp = new PrettyPrintVisitor();
-                    //parser.root.Visit(pp);
-                    //Console.WriteLine(pp.Text);
+                    var pp = new PrettyPrintVisitor();
+                    parser.root.Visit(pp);
+                    Console.WriteLine(pp.Text);
 
                     //var vr = new VariableRenameVisitor();
                     //parser.root.Visit(vr);
@@ -56,27 +56,34 @@ namespace SimpleCompiler
                     foreach (var err in un.Errors)
                         Console.WriteLine(err);
 
+
+                    //var pp = new PrettyPrintVisitor();
+                    //parser.root.Visit(pp);
+                    //Console.WriteLine(pp.Text);
+                    //Console.WriteLine("-------------------------------");
+
                     //Генерируем трёхадресный код
-                    GenCodeVisitor gcv = new GenCodeVisitor();
-                    parser.root.Visit(gcv);
-
+                    var gbv = new GenBlockVisitor();
+                    parser.root.Visit(gbv);
+                    gbv.PrintCommands();
+                    
                     //Причёсываем метки
-                    var Iterator = gcv.Code.First;
-                    while (Iterator != null)
-                    {
-                        if (Iterator.Value.First == null && Iterator.Next != null)
-                        {
-                            Iterator.Next.Value.Label = Iterator.Value.Label;
-                            Iterator = Iterator.Next;
-                            gcv.Code.Remove(Iterator.Previous);
-                        }
-                        else
-                            Iterator = Iterator.Next;
-                    }
+                    //var Iterator = gcv.Code.First;
+                    //while (Iterator != null)
+                    //{
+                    //    if (Iterator.Value.First == null && Iterator.Next != null)
+                    //    {
+                    //        Iterator.Next.Value.Label = Iterator.Value.Label;
+                    //        Iterator = Iterator.Next;
+                    //        gcv.Code.Remove(Iterator.Previous);
+                    //    }
+                    //    else
+                    //        Iterator = Iterator.Next;
+                    //}
 
 
-                    foreach (var ln in gcv.Code)
-                        Console.WriteLine(ln);
+                    //foreach (var ln in gcv.Code)
+                    //    Console.WriteLine(ln);
                 }
             }
             catch (FileNotFoundException)

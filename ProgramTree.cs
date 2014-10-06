@@ -14,12 +14,16 @@ namespace ProgramTree
     }
 
     public abstract class ExprNode : Node // базовый класс для всех выражений
-    {}
+    {
+        public string tmp = "t";
+        public static int tmpNum = 0;
+        public static void inc() { tmpNum++; }
+    }
 
     public class IdNode : ExprNode
     {
         public string Name { get; set; }
-        public IdNode(string name) { Name = name; }
+        public IdNode(string name) { Name = name; tmp = Name; }
 
         public override void Visit(Visitor v)
         {
@@ -30,11 +34,12 @@ namespace ProgramTree
     public class IntNumNode : ExprNode
     {
         public int Num { get; set; }
-        public IntNumNode(int num) { Num = num; }
+        public IntNumNode(int num) { Num = num; tmp = Num.ToString(); }
 
         public override void Visit(Visitor v)
         {
             v.VisitIntNumNode(this);
+
         }
     }
 
@@ -46,9 +51,12 @@ namespace ProgramTree
 
         public BinOpNode(ExprNode left, ExprNode right, BinOpType operation)
         {
+            inc();
+            tmp += tmpNum.ToString();
             Left = left;
             Right = right;
             Op = operation;
+
         }
 
         public override void Visit(Visitor v)
