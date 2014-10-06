@@ -43,8 +43,8 @@ namespace SimpleLang.Visitors
         private Stack<string> NamesValuesStack = new Stack<string>();
         private int TempCounter = 0;
         private int LabelCounter = 0;
-        private const string TempName = "Tmp";
-        private const string LabelName = "Lb";
+        private const string TempName = "_Tmp";
+        private const string LabelName = "_Lb";
 
 
         private string NextTemp()
