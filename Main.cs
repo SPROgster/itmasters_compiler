@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
+using MiddleEnd;
 
 namespace SimpleCompiler
 {
@@ -69,9 +70,13 @@ namespace SimpleCompiler
                             Iterator = Iterator.Next;
                     }
 
-
+                    Console.WriteLine();
+                    Console.WriteLine("Трёхадресный код:");
                     foreach (var ln in gcv.Code)
                         Console.WriteLine(ln);
+
+                    ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
+                    Console.WriteLine("Граф построен!");
                 }
             }
             catch (FileNotFoundException)

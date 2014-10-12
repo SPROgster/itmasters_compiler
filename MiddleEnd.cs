@@ -14,8 +14,95 @@ namespace MiddleEnd
 
     public class ControlFlowGraph
     {
+        //Базовый блок, содержащий первую команду нашего кода
+        public BaseBlock Head;
+
         public ControlFlowGraph(LinkedList<CodeLine> Code)
         {
+            //Итератор для прохода по трёхадресному коду
+            LinkedListNode<CodeLine> Current = Code.First;
+            //Помеченные команды
+            Dictionary<string,CodeLine> Labeled = new Dictionary<string,CodeLine>();
+            //Метки, на которые осуществлялся переход
+            HashSet<string> UsedLabels = new HashSet<string>();
+            //Здесь хранится информация о командах - лидерах
+            HashSet<CodeLine> Leaders = new HashSet<CodeLine>();
+            //Следующая команда - лидер
+            bool NextIsLeader = true;
+            //Первый проход - ищем лидеров
+            while (Current != null)
+            {
+                if (NextIsLeader)
+                {
+                    Leaders.Add(Current.Value);
+                    NextIsLeader = false;
+                }
+                if (Current.Value.Label != null)
+                    Labeled[Current.Value.Label] = Current.Value;
+                switch (Current.Value.Operation)
+                {
+                    case "g": 
+                        UsedLabels.Add(Current.Value.First);
+                        NextIsLeader = true;
+                        break;
+                    case "i": 
+                        UsedLabels.Add(Current.Value.Second);
+                        NextIsLeader = true;
+                        break;
+                }
+                Current = Current.Next;
+            }
+            foreach (string Label in UsedLabels)
+                Leaders.Add(Labeled[Label]);
+            //Второй проход - формируем базовые блоки
+            BaseBlock CurrentBlock = Head = new BaseBlock();
+            CurrentBlock.Code.AddFirst(Code.First.Value);
+            Current = Code.First.Next;
+            //Будем сохранять информацию о том, какие блоки помечены метками и из каких блоков осуществляются переходы
+            Dictionary<string, LinkedList<BaseBlock>> GotoLabelsDest = new Dictionary<string, LinkedList<BaseBlock>>();
+            Dictionary<string,BaseBlock> GotoLabelsSrc = new Dictionary<string,BaseBlock>();
+            while (Current != null)
+            {
+                //Если прошли один блок
+                if (Leaders.Contains(Current.Value))
+                {
+                    //Определяемся с тем, связан ли он со следующим
+                    if (Current.Previous.Value.Operation == "g")
+                    {
+                        if (!GotoLabelsDest.ContainsKey(Current.Previous.Value.First))
+                            GotoLabelsDest[Current.Previous.Value.First] = new LinkedList<BaseBlock>();
+                        GotoLabelsDest[Current.Previous.Value.First].AddLast(CurrentBlock);
+                        CurrentBlock = new BaseBlock();
+                    }
+                    else
+                    {
+                        if (Current.Previous.Value.Operation == "i")
+                        {
+                            if(!GotoLabelsDest.ContainsKey(Current.Previous.Value.Second))
+                                GotoLabelsDest[Current.Previous.Value.Second] = new LinkedList<BaseBlock>();
+                            GotoLabelsDest[Current.Previous.Value.Second].AddLast(CurrentBlock);
+                        }
+                        BaseBlock Tmp = new BaseBlock();
+                        CurrentBlock.Output.AddLast(Tmp);
+                        Tmp.Input.AddLast(CurrentBlock);
+                        CurrentBlock = Tmp;
+                    }
+                    CurrentBlock.Code.AddFirst(Current.Value);
+                    if(Current.Value.Label!=null)
+                        GotoLabelsSrc[Current.Value.Label] = CurrentBlock;
+                }
+                else
+                    CurrentBlock.Code.AddLast(Current.Value);
+                Current = Current.Next;
+            }
+            //Достраиваем связи для переходов на метки
+            foreach (var elem in GotoLabelsSrc)
+                if(GotoLabelsDest.ContainsKey(elem.Key))
+                    foreach (var dest in GotoLabelsDest[elem.Key])
+                    {
+                        dest.Output.AddLast(elem.Value);
+                        elem.Value.Input.AddLast(dest);
+                    }
 
         }
     }
@@ -35,13 +122,13 @@ namespace MiddleEnd
 
         public override string ToString()
         {
+            string ToReturn = Label + (Label != null ? ": " : " ");
             switch (Operation)
             {
-                case "i": return "if " + First + " goto " + Second;
-                case "g": return "goto " + First;
-                default: return
-                    Label + (Label != null ? ": " : " ")
-                    + (First != null ? First + " := " + Second + " " + Operation + " " + Third : "");
+                case "i": return ToReturn +  "if " + First + " goto " + Second;
+                case "g": return ToReturn +  "goto " + First;
+                default: return ToReturn + 
+                    (First != null ? First + " := " + Second + " " + Operation + " " + Third : "");
             }
         }
     }
