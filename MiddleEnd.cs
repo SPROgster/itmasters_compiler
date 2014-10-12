@@ -5,6 +5,21 @@ using System.Text;
 
 namespace MiddleEnd
 {
+    public class BaseBlock
+    {
+        public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
+        public LinkedList<BaseBlock> Input = new LinkedList<BaseBlock>();
+        public LinkedList<BaseBlock> Output = new LinkedList<BaseBlock>();
+    }
+
+    public class ControlFlowGraph
+    {
+        public ControlFlowGraph(LinkedList<CodeLine> Code)
+        {
+
+        }
+    }
+
     public class CodeLine
     {
         public string Label, First, Second, Third, Operation;
