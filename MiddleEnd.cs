@@ -5,6 +5,32 @@ using System.Text;
 
 namespace MiddleEnd
 {
+    public class CodeLine
+    {
+        public string Label, First, Second, Third, Operation;
+
+        public CodeLine(string lab, string fst, string snd, string thrd, string op)
+        {
+            Label = lab;
+            First = fst;
+            Second = snd;
+            Third = thrd;
+            Operation = op;
+        }
+
+        public override string ToString()
+        {
+            switch (Operation)
+            {
+                case "i": return "if " + First + " goto " + Second;
+                case "g": return "goto " + First;
+                default: return
+                    Label + (Label != null ? ": " : " ")
+                    + (First != null ? First + " := " + Second + " " + Operation + " " + Third : "");
+            }
+        }
+    }
+
     public enum SymbolKind { type, var }
     public enum CType { Int, Double, Bool, None };
 
