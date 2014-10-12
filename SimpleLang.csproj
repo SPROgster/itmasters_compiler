@@ -53,6 +53,7 @@
     <Compile Include="SimpleYacc.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
+    <Compile Include="Visitors\Fold.cs" />
     <Compile Include="Visitors\GenCodeVisitor.cs" />
     <Compile Include="Visitors\PrettyPrintVisitor.cs" />
     <Compile Include="Visitors\SameNameExistsVisitor.cs" />

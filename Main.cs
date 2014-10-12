@@ -35,9 +35,9 @@ namespace SimpleCompiler
                     //Console.WriteLine("Количество присваиваний = {0}", avis.Count);
                     //Console.WriteLine("-------------------------------");
 
-                    //var pp = new PrettyPrintVisitor();
-                    //parser.root.Visit(pp);
-                    //Console.WriteLine(pp.Text);
+                    var pp = new PrettyPrintVisitor();
+                    parser.root.Visit(pp);
+                    Console.WriteLine(pp.Text);
 
                     //var vr = new VariableRenameVisitor();
                     //parser.root.Visit(vr);
@@ -59,6 +59,8 @@ namespace SimpleCompiler
                     //Генерируем трёхадресный код
                     GenCodeVisitor gcv = new GenCodeVisitor();
                     parser.root.Visit(gcv);
+
+                    Fold.fold(ref gcv.Code); // Вызов сворачивания констант и алг тождеств
 
                     //Причёсываем метки
                     var Iterator = gcv.Code.First;
