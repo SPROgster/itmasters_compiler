@@ -66,10 +66,8 @@ namespace MiddleEnd
 
             //Второй проход - формируем базовые блоки
             BaseBlock CurrentBlock = new BaseBlock();
-            CurrentBlock.AddFirst(Code.First.Value);
             Blocks.AddLast(CurrentBlock);
-            //Сдвигаемся на следующую команду
-            Current = Code.First.Next;
+            Current = Code.First;
             //Будем сохранять информацию о том, какие блоки помечены метками и из каких блоков осуществляются переходы
             Dictionary<string, LinkedList<BaseBlock>> GotoLabelsDest = new Dictionary<string, LinkedList<BaseBlock>>();
             Dictionary<string,BaseBlock> GotoLabelsSrc = new Dictionary<string,BaseBlock>();
@@ -79,21 +77,21 @@ namespace MiddleEnd
                 if (Leaders.Contains(Current.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
-                    if (Current.Previous.Value.Operation == "g")
+                    if (Current.Value.Operation == "g")
                     {
-                        if (!GotoLabelsDest.ContainsKey(Current.Previous.Value.First))
-                            GotoLabelsDest[Current.Previous.Value.First] = new LinkedList<BaseBlock>();
-                        GotoLabelsDest[Current.Previous.Value.First].AddLast(CurrentBlock);
+                        if (!GotoLabelsDest.ContainsKey(Current.Value.First))
+                            GotoLabelsDest[Current.Value.First] = new LinkedList<BaseBlock>();
+                        GotoLabelsDest[Current.Value.First].AddLast(CurrentBlock);
                         CurrentBlock = new BaseBlock();
                         Blocks.AddLast(CurrentBlock);
                     }
                     else
                     {
-                        if (Current.Previous.Value.Operation == "i")
+                        if (Current.Value.Operation == "i")
                         {
-                            if(!GotoLabelsDest.ContainsKey(Current.Previous.Value.Second))
-                                GotoLabelsDest[Current.Previous.Value.Second] = new LinkedList<BaseBlock>();
-                            GotoLabelsDest[Current.Previous.Value.Second].AddLast(CurrentBlock);
+                            if(!GotoLabelsDest.ContainsKey(Current.Value.Second))
+                                GotoLabelsDest[Current.Value.Second] = new LinkedList<BaseBlock>();
+                            GotoLabelsDest[Current.Value.Second].AddLast(CurrentBlock);
                         }
                         BaseBlock Tmp = new BaseBlock();
                         Outputs[CurrentBlock] = new LinkedList<BaseBlock>();
@@ -111,6 +109,7 @@ namespace MiddleEnd
                     CurrentBlock.AddLast(Current.Value);
                 Current = Current.Next;
             }
+            Blocks.RemoveFirst();//Первый блок пустой
             //Проходим по блокам, помеченным метками
             foreach (var elem in GotoLabelsSrc)
                 //Если на текущую метку осуществлялись переходы

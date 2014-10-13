@@ -104,11 +104,13 @@ namespace SimpleLang.Visitors
             string HeaderLabel = NextLabel();
             string AfterWhileLabel = NextLabel();
 
+            Code.AddLast(new CodeLine(HeaderLabel, null,
+               null, null, null));
             node.Expr.Visit(this);
 
             Code.AddLast(new CodeLine(null, CondVariable,
                 NamesValuesStack.Pop(), null, null));
-            Code.AddLast(new CodeLine(HeaderLabel, CondVariable,
+            Code.AddLast(new CodeLine(null, CondVariable,
                 BodyLabel, null, "i"));
             Code.AddLast(new CodeLine(null, AfterWhileLabel,
                null, null, "g"));
