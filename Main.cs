@@ -56,6 +56,8 @@ namespace SimpleCompiler
                     GenCodeVisitor gcv = new GenCodeVisitor();
                     parser.root.Visit(gcv);
 
+                    Fold.fold(ref gcv.Code); // Вызов сворачивания констант и алг тождеств
+
                     //Причёсываем метки
                     var Iterator = gcv.Code.First;
                     while (Iterator != null)
