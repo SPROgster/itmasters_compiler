@@ -17,9 +17,9 @@ namespace MiddleEnd
 
     public class ControlFlowGraph
     {
-        public LinkedList<BaseBlock> Blocks;
-        public Dictionary<BaseBlock, LinkedList<BaseBlock>> Inputs;
-        public Dictionary<BaseBlock, LinkedList<BaseBlock>> Outputs;
+        private LinkedList<BaseBlock> Blocks;
+        private Dictionary<BaseBlock, LinkedList<BaseBlock>> Inputs;
+        private Dictionary<BaseBlock, LinkedList<BaseBlock>> Outputs;
 
         public ControlFlowGraph(LinkedList<CodeLine> Code)
         {
@@ -73,8 +73,10 @@ namespace MiddleEnd
             Dictionary<string,BaseBlock> GotoLabelsSrc = new Dictionary<string,BaseBlock>();
             while (Current != null)
             {
-                //Если прошли один блок
-                if (Leaders.Contains(Current.Value))
+                //Добавляем текущую команду в текущий блок
+                CurrentBlock.AddLast(Current.Value);
+                //Если эьл конец блока
+                if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
                     if (Current.Value.Operation == "g")
@@ -82,8 +84,11 @@ namespace MiddleEnd
                         if (!GotoLabelsDest.ContainsKey(Current.Value.First))
                             GotoLabelsDest[Current.Value.First] = new LinkedList<BaseBlock>();
                         GotoLabelsDest[Current.Value.First].AddLast(CurrentBlock);
-                        CurrentBlock = new BaseBlock();
-                        Blocks.AddLast(CurrentBlock);
+                        if (Current.Next != null)
+                        {
+                            CurrentBlock = new BaseBlock();
+                            Blocks.AddLast(CurrentBlock);
+                        }
                     }
                     else
                     {
@@ -93,23 +98,22 @@ namespace MiddleEnd
                                 GotoLabelsDest[Current.Value.Second] = new LinkedList<BaseBlock>();
                             GotoLabelsDest[Current.Value.Second].AddLast(CurrentBlock);
                         }
-                        BaseBlock Tmp = new BaseBlock();
-                        Outputs[CurrentBlock] = new LinkedList<BaseBlock>();
-                        Outputs[CurrentBlock].AddLast(Tmp);
-                        Inputs[Tmp] = new LinkedList<BaseBlock>();
-                        Inputs[Tmp].AddLast(CurrentBlock);
-                        CurrentBlock = Tmp;
-                        Blocks.AddLast(CurrentBlock);
+                        if (Current.Next != null)
+                        {
+                            BaseBlock Tmp = new BaseBlock();
+                            Outputs[CurrentBlock] = new LinkedList<BaseBlock>();
+                            Outputs[CurrentBlock].AddLast(Tmp);
+                            Inputs[Tmp] = new LinkedList<BaseBlock>();
+                            Inputs[Tmp].AddLast(CurrentBlock);
+                            CurrentBlock = Tmp;
+                            Blocks.AddLast(CurrentBlock);
+                        }
                     }
-                    CurrentBlock.AddFirst(Current.Value);
-                    if(Current.Value.Label!=null)
-                        GotoLabelsSrc[Current.Value.Label] = CurrentBlock;
+                    if(Current.Next != null && Current.Next.Value.Label!=null)
+                        GotoLabelsSrc[Current.Next.Value.Label] = CurrentBlock;
                 }
-                else
-                    CurrentBlock.AddLast(Current.Value);
                 Current = Current.Next;
             }
-            Blocks.RemoveFirst();//Первый блок пустой
             //Проходим по блокам, помеченным метками
             foreach (var elem in GotoLabelsSrc)
                 //Если на текущую метку осуществлялись переходы
@@ -126,6 +130,23 @@ namespace MiddleEnd
                     }
 
         }
+
+        //Возвращает список базовых блоков, являющихся предшественниками указанного
+        public LinkedList<BaseBlock> GetInputs(BaseBlock block)
+        {
+            return Inputs[block];
+        }
+        //Возвращает список базовых блоков, являющихся дочерними для указанного
+        public LinkedList<BaseBlock> GetOutputs(BaseBlock block)
+        {
+            return Outputs[block];
+        }
+        //Возвращает все блоки
+        public LinkedList<BaseBlock> GetBlocks()
+        {
+            return Blocks;
+        }
+        
     }
 
     public class CodeLine
