@@ -7,14 +7,16 @@ using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
 using MiddleEnd;
+using DefUse;
 
 namespace SimpleCompiler
 {
+    using BaseBlock = LinkedList<CodeLine>;
     public class SimpleCompilerMain
     {
         public static void Main()
         {
-            string FileName = @"..\..\b.txt";
+            string FileName = @"..\..\b2.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -78,6 +80,8 @@ namespace SimpleCompiler
                         Console.WriteLine(ln);
 
                     ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
+                    List<BaseBlock> l=new List<BaseBlock>(CFG.GetBlocks());
+                    Console.WriteLine(DeadOrAlive.IsAlive(l[0],"a",1).ToString());
                     Console.WriteLine("Граф построен!");
                 }
             }
