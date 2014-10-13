@@ -4,36 +4,10 @@ using System.Linq;
 using System.Text;
 using ProgramTree;
 
-using SimpleParser;
+using MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
-
-    public class CodeLine
-    {
-        public string Label, First, Second, Third, Operation;
-
-        public CodeLine(string lab, string fst, string snd, string thrd, string op)
-        {
-            Label = lab;
-            First = fst;
-            Second = snd;
-            Third = thrd;
-            Operation = op;
-        }
-
-        public override string ToString()
-        {
-            switch (Operation)
-            {
-                case "i": return "if " + First + " goto " + Second;
-                case "g": return "goto " + First;
-                default: return
-                    Label + (Label != null ? ": " : " ")
-                    + (First != null ? First + " := " + Second + " " + Operation + " " + Third : "");
-            }
-        }
-    }
 
     class GenCodeVisitor : AutoVisitor
     {
@@ -130,11 +104,13 @@ namespace SimpleLang.Visitors
             string HeaderLabel = NextLabel();
             string AfterWhileLabel = NextLabel();
 
+            Code.AddLast(new CodeLine(HeaderLabel, null,
+               null, null, null));
             node.Expr.Visit(this);
 
             Code.AddLast(new CodeLine(null, CondVariable,
                 NamesValuesStack.Pop(), null, null));
-            Code.AddLast(new CodeLine(HeaderLabel, CondVariable,
+            Code.AddLast(new CodeLine(null, CondVariable,
                 BodyLabel, null, "i"));
             Code.AddLast(new CodeLine(null, AfterWhileLabel,
                null, null, "g"));
