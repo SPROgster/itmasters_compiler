@@ -5,17 +5,21 @@ using System.Text;
 
 namespace MiddleEnd
 {
-    public class BaseBlock
-    {
-        public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
-        public LinkedList<BaseBlock> Input = new LinkedList<BaseBlock>();
-        public LinkedList<BaseBlock> Output = new LinkedList<BaseBlock>();
-    }
+    //public class BaseBlock
+    //{
+    //    public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
+    //    public LinkedList<BaseBlock> Input = new LinkedList<BaseBlock>();
+    //    public LinkedList<BaseBlock> Output = new LinkedList<BaseBlock>();
+    //}
+
+    
+    using BaseBlock = LinkedList<CodeLine>;
 
     public class ControlFlowGraph
     {
-        //Базовый блок, содержащий первую команду нашего кода
-        public BaseBlock Head;
+        public LinkedList<BaseBlock> Blocks;
+        public Dictionary<BaseBlock, LinkedList<BaseBlock>> Inputs;
+        public Dictionary<BaseBlock, LinkedList<BaseBlock>> Outputs;
 
         public ControlFlowGraph(LinkedList<CodeLine> Code)
         {
@@ -54,9 +58,17 @@ namespace MiddleEnd
             }
             foreach (string Label in UsedLabels)
                 Leaders.Add(Labeled[Label]);
+
+            //Инициализируем структуры, описывающие граф
+            Inputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
+            Outputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
+            Blocks = new LinkedList<BaseBlock>();
+
             //Второй проход - формируем базовые блоки
-            BaseBlock CurrentBlock = Head = new BaseBlock();
-            CurrentBlock.Code.AddFirst(Code.First.Value);
+            BaseBlock CurrentBlock = new BaseBlock();
+            CurrentBlock.AddFirst(Code.First.Value);
+            Blocks.AddLast(CurrentBlock);
+            //Сдвигаемся на следующую команду
             Current = Code.First.Next;
             //Будем сохранять информацию о том, какие блоки помечены метками и из каких блоков осуществляются переходы
             Dictionary<string, LinkedList<BaseBlock>> GotoLabelsDest = new Dictionary<string, LinkedList<BaseBlock>>();
@@ -73,6 +85,7 @@ namespace MiddleEnd
                             GotoLabelsDest[Current.Previous.Value.First] = new LinkedList<BaseBlock>();
                         GotoLabelsDest[Current.Previous.Value.First].AddLast(CurrentBlock);
                         CurrentBlock = new BaseBlock();
+                        Blocks.AddLast(CurrentBlock);
                     }
                     else
                     {
@@ -83,25 +96,34 @@ namespace MiddleEnd
                             GotoLabelsDest[Current.Previous.Value.Second].AddLast(CurrentBlock);
                         }
                         BaseBlock Tmp = new BaseBlock();
-                        CurrentBlock.Output.AddLast(Tmp);
-                        Tmp.Input.AddLast(CurrentBlock);
+                        Outputs[CurrentBlock] = new LinkedList<BaseBlock>();
+                        Outputs[CurrentBlock].AddLast(Tmp);
+                        Inputs[Tmp] = new LinkedList<BaseBlock>();
+                        Inputs[Tmp].AddLast(CurrentBlock);
                         CurrentBlock = Tmp;
+                        Blocks.AddLast(CurrentBlock);
                     }
-                    CurrentBlock.Code.AddFirst(Current.Value);
+                    CurrentBlock.AddFirst(Current.Value);
                     if(Current.Value.Label!=null)
                         GotoLabelsSrc[Current.Value.Label] = CurrentBlock;
                 }
                 else
-                    CurrentBlock.Code.AddLast(Current.Value);
+                    CurrentBlock.AddLast(Current.Value);
                 Current = Current.Next;
             }
-            //Достраиваем связи для переходов на метки
+            //Проходим по блокам, помеченным метками
             foreach (var elem in GotoLabelsSrc)
+                //Если на текущую метку осуществлялись переходы
                 if(GotoLabelsDest.ContainsKey(elem.Key))
+                    //Достраиваем связи
                     foreach (var dest in GotoLabelsDest[elem.Key])
                     {
-                        dest.Output.AddLast(elem.Value);
-                        elem.Value.Input.AddLast(dest);
+                        if (!Outputs.ContainsKey(dest))
+                            Outputs[dest] = new LinkedList<BaseBlock>();
+                        Outputs[dest].AddLast(elem.Value);
+                        if (!Inputs.ContainsKey(elem.Value))
+                            Inputs[elem.Value] = new LinkedList<BaseBlock>();
+                        Inputs[elem.Value].AddLast(dest);
                     }
 
         }
