@@ -5,17 +5,21 @@ using System.Text;
 
 namespace MiddleEnd
 {
-    public class BaseBlock
-    {
-        public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
-        public LinkedList<BaseBlock> Input = new LinkedList<BaseBlock>();
-        public LinkedList<BaseBlock> Output = new LinkedList<BaseBlock>();
-    }
+    //public class BaseBlock
+    //{
+    //    public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
+    //    public LinkedList<BaseBlock> Input = new LinkedList<BaseBlock>();
+    //    public LinkedList<BaseBlock> Output = new LinkedList<BaseBlock>();
+    //}
+
+    
+    using BaseBlock = LinkedList<CodeLine>;
 
     public class ControlFlowGraph
     {
-        //Базовый блок, содержащий первую команду нашего кода
-        public BaseBlock Head;
+        private LinkedList<BaseBlock> Blocks;
+        private Dictionary<BaseBlock, LinkedList<BaseBlock>> Inputs;
+        private Dictionary<BaseBlock, LinkedList<BaseBlock>> Outputs;
 
         public ControlFlowGraph(LinkedList<CodeLine> Code)
         {
@@ -54,57 +58,95 @@ namespace MiddleEnd
             }
             foreach (string Label in UsedLabels)
                 Leaders.Add(Labeled[Label]);
+
+            //Инициализируем структуры, описывающие граф
+            Inputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
+            Outputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
+            Blocks = new LinkedList<BaseBlock>();
+
             //Второй проход - формируем базовые блоки
-            BaseBlock CurrentBlock = Head = new BaseBlock();
-            CurrentBlock.Code.AddFirst(Code.First.Value);
-            Current = Code.First.Next;
+            BaseBlock CurrentBlock = new BaseBlock();
+            Blocks.AddLast(CurrentBlock);
+            Current = Code.First;
             //Будем сохранять информацию о том, какие блоки помечены метками и из каких блоков осуществляются переходы
             Dictionary<string, LinkedList<BaseBlock>> GotoLabelsDest = new Dictionary<string, LinkedList<BaseBlock>>();
             Dictionary<string,BaseBlock> GotoLabelsSrc = new Dictionary<string,BaseBlock>();
             while (Current != null)
             {
-                //Если прошли один блок
-                if (Leaders.Contains(Current.Value))
+                //Добавляем текущую команду в текущий блок
+                CurrentBlock.AddLast(Current.Value);
+                //Если эьл конец блока
+                if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
-                    if (Current.Previous.Value.Operation == "g")
+                    if (Current.Value.Operation == "g")
                     {
-                        if (!GotoLabelsDest.ContainsKey(Current.Previous.Value.First))
-                            GotoLabelsDest[Current.Previous.Value.First] = new LinkedList<BaseBlock>();
-                        GotoLabelsDest[Current.Previous.Value.First].AddLast(CurrentBlock);
-                        CurrentBlock = new BaseBlock();
+                        if (!GotoLabelsDest.ContainsKey(Current.Value.First))
+                            GotoLabelsDest[Current.Value.First] = new LinkedList<BaseBlock>();
+                        GotoLabelsDest[Current.Value.First].AddLast(CurrentBlock);
+                        if (Current.Next != null)
+                        {
+                            CurrentBlock = new BaseBlock();
+                            Blocks.AddLast(CurrentBlock);
+                        }
                     }
                     else
                     {
-                        if (Current.Previous.Value.Operation == "i")
+                        if (Current.Value.Operation == "i")
                         {
-                            if(!GotoLabelsDest.ContainsKey(Current.Previous.Value.Second))
-                                GotoLabelsDest[Current.Previous.Value.Second] = new LinkedList<BaseBlock>();
-                            GotoLabelsDest[Current.Previous.Value.Second].AddLast(CurrentBlock);
+                            if(!GotoLabelsDest.ContainsKey(Current.Value.Second))
+                                GotoLabelsDest[Current.Value.Second] = new LinkedList<BaseBlock>();
+                            GotoLabelsDest[Current.Value.Second].AddLast(CurrentBlock);
                         }
-                        BaseBlock Tmp = new BaseBlock();
-                        CurrentBlock.Output.AddLast(Tmp);
-                        Tmp.Input.AddLast(CurrentBlock);
-                        CurrentBlock = Tmp;
+                        if (Current.Next != null)
+                        {
+                            BaseBlock Tmp = new BaseBlock();
+                            Outputs[CurrentBlock] = new LinkedList<BaseBlock>();
+                            Outputs[CurrentBlock].AddLast(Tmp);
+                            Inputs[Tmp] = new LinkedList<BaseBlock>();
+                            Inputs[Tmp].AddLast(CurrentBlock);
+                            CurrentBlock = Tmp;
+                            Blocks.AddLast(CurrentBlock);
+                        }
                     }
-                    CurrentBlock.Code.AddFirst(Current.Value);
-                    if(Current.Value.Label!=null)
-                        GotoLabelsSrc[Current.Value.Label] = CurrentBlock;
+                    if(Current.Next != null && Current.Next.Value.Label!=null)
+                        GotoLabelsSrc[Current.Next.Value.Label] = CurrentBlock;
                 }
-                else
-                    CurrentBlock.Code.AddLast(Current.Value);
                 Current = Current.Next;
             }
-            //Достраиваем связи для переходов на метки
+            //Проходим по блокам, помеченным метками
             foreach (var elem in GotoLabelsSrc)
+                //Если на текущую метку осуществлялись переходы
                 if(GotoLabelsDest.ContainsKey(elem.Key))
+                    //Достраиваем связи
                     foreach (var dest in GotoLabelsDest[elem.Key])
                     {
-                        dest.Output.AddLast(elem.Value);
-                        elem.Value.Input.AddLast(dest);
+                        if (!Outputs.ContainsKey(dest))
+                            Outputs[dest] = new LinkedList<BaseBlock>();
+                        Outputs[dest].AddLast(elem.Value);
+                        if (!Inputs.ContainsKey(elem.Value))
+                            Inputs[elem.Value] = new LinkedList<BaseBlock>();
+                        Inputs[elem.Value].AddLast(dest);
                     }
 
         }
+
+        //Возвращает список базовых блоков, являющихся предшественниками указанного
+        public LinkedList<BaseBlock> GetInputs(BaseBlock block)
+        {
+            return Inputs[block];
+        }
+        //Возвращает список базовых блоков, являющихся дочерними для указанного
+        public LinkedList<BaseBlock> GetOutputs(BaseBlock block)
+        {
+            return Outputs[block];
+        }
+        //Возвращает все блоки
+        public LinkedList<BaseBlock> GetBlocks()
+        {
+            return Blocks;
+        }
+        
     }
 
     public class CodeLine
@@ -128,7 +170,7 @@ namespace MiddleEnd
                 case "i": return ToReturn +  "if " + First + " goto " + Second;
                 case "g": return ToReturn +  "goto " + First;
                 default: return ToReturn + 
-                    (First != null ? First + " := " + Second + " " + Operation + " " + Third : "");
+                    (First != null ? First + " := " + Second + " " + Operation + " " + Third : "nop");
             }
         }
     }
