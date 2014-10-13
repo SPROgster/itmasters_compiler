@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeadOrAlive.cs" />
     <Compile Include="MiddleEnd.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ParserHelper.cs" />
