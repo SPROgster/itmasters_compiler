@@ -94,7 +94,7 @@ namespace SimpleLang.Visitors
                 null, null, "g"));
             //Дальше идёт код, на который переходим после окончания работы цикла
             Code.AddLast(new CodeLine(AfterCycleLabel, null,
-                null, null, null));
+                null, null, "nop"));
         }
 
         public override void VisitWhileNode(WhileNode node)
@@ -115,12 +115,12 @@ namespace SimpleLang.Visitors
             Code.AddLast(new CodeLine(null, AfterWhileLabel,
                null, null, "g"));
             Code.AddLast(new CodeLine(BodyLabel, null,
-               null, null, null));
+               null, null, "nop"));
             node.Stat.Visit(this);
             Code.AddLast(new CodeLine(null, HeaderLabel,
                null, null, "g"));
             Code.AddLast(new CodeLine(AfterWhileLabel, null,
-               null, null, null));
+               null, null, "nop"));
         }
 
         public override void VisitIfNode(IfNode node)
@@ -139,10 +139,10 @@ namespace SimpleLang.Visitors
             Code.AddLast(new CodeLine(null, AfterIfLabel,
                null, null, "g"));
             Code.AddLast(new CodeLine(IfLabel, null,
-               null, null, null));
+               null, null, "nop"));
             node.StatIf.Visit(this);
             Code.AddLast(new CodeLine(AfterIfLabel, null,
-               null, null, null));
+               null, null, "nop"));
         }
     }
 }

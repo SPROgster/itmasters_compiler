@@ -170,7 +170,7 @@ namespace MiddleEnd
                 case "i": return ToReturn +  "if " + First + " goto " + Second;
                 case "g": return ToReturn +  "goto " + First;
                 default: return ToReturn + 
-                    (First != null ? First + " := " + Second + " " + Operation + " " + Third : "");
+                    (First != null ? First + " := " + Second + " " + Operation + " " + Third : "nop");
             }
         }
     }
