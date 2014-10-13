@@ -57,18 +57,18 @@ namespace SimpleCompiler
                     parser.root.Visit(gcv);
 
                     //Причёсываем метки
-                    var Iterator = gcv.Code.First;
-                    while (Iterator != null)
-                    {
-                        if (Iterator.Value.First == null && Iterator.Next != null)
-                        {
-                            Iterator.Next.Value.Label = Iterator.Value.Label;
-                            Iterator = Iterator.Next;
-                            gcv.Code.Remove(Iterator.Previous);
-                        }
-                        else
-                            Iterator = Iterator.Next;
-                    }
+                    //var Iterator = gcv.Code.First;
+                    //while (Iterator != null)
+                    //{
+                    //    if (Iterator.Value.First == null && Iterator.Next != null)
+                    //    {
+                    //        Iterator.Next.Value.Label = Iterator.Value.Label;
+                    //        Iterator = Iterator.Next;
+                    //        gcv.Code.Remove(Iterator.Previous);
+                    //    }
+                    //    else
+                    //        Iterator = Iterator.Next;
+                    //}
 
                     Console.WriteLine();
                     Console.WriteLine("Трёхадресный код:");
