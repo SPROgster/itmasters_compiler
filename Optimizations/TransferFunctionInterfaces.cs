@@ -5,6 +5,8 @@ using System.Text;
 
 namespace SimpleLang
 {
+    //В процессе написания
+
     public interface IndexedSet<T>
     {
         T Get(int index);
@@ -17,7 +19,7 @@ namespace SimpleLang
 
         public BitSet(int size)
         {
-            Elems = new bool[size];
+            Elems = Enumerable.Repeat(false, size).ToArray();
         }
 
         public bool Get(int index)
