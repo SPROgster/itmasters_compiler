@@ -51,14 +51,14 @@ namespace DefUse
                 if (bl2[i].Second != null && bl2[i].Second.Equals(id))
                 {
                     alive = true;
+                }                
+                if (bl2[i].First != null && bl2[i].First.Equals(id))
+                {
+                    alive = false;
                 }
                 if (i == line)
                 {
                     return alive;
-                }
-                if (bl2[i].First != null && bl2[i].First.Equals(id))
-                {
-                    alive = false;
                 }
             }
             return alive;
