@@ -32,16 +32,36 @@ namespace DefUse
         public static bool IsAlive(BaseBlock bl, string id, int line)
         {
             List<CodeLine> bl2 = new List<CodeLine>(bl);
-            List<Tuple<string, string, int>> l2=GenerateDefUse(bl2);
-            var l3=l2.Where(t=>t.Item1.Equals(id));
-            l3.Reverse();
-            foreach (Tuple<string, string, int> item in l3)
+            bool alive;
+            if (id.Length >= 2 && id.Substring(0, 2).Equals("_t"))
             {
-                Console.WriteLine(item);
+                alive = false;
+            }
+            else
+            {
+                alive = true;
             }
 
-            return true;
-
+            for (int i = bl2.Count - 1; i >= 0; i--)
+            {
+                if (bl2[i].Third != null && bl2[i].Third.Equals(id))
+                {
+                    alive = true;
+                }
+                if (bl2[i].Second != null && bl2[i].Second.Equals(id))
+                {
+                    alive = true;
+                }
+                if (i == line)
+                {
+                    return alive;
+                }
+                if (bl2[i].First != null && bl2[i].First.Equals(id))
+                {
+                    alive = false;
+                }
+            }
+            return alive;
         }
     }
 }
