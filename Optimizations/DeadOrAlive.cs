@@ -1,13 +1,12 @@
-﻿using System;
+﻿using MiddleEnd;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MiddleEnd;
 
 namespace DefUse
 {
     using BaseBlock = LinkedList<CodeLine>;
-    class DeadOrAlive
+
+    internal class DeadOrAlive
     {
         public static List<Tuple<string, string, int>> GenerateDefUse(List<CodeLine> l)
         {
