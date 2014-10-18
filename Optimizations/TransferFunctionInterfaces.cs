@@ -5,7 +5,6 @@ using System.Text;
 
 namespace SimpleLang
 {
-    //В процессе написания
 
     public interface IndexedSet<T>
     {
@@ -41,6 +40,7 @@ namespace SimpleLang
     interface SetTransferFunction<S>:TransferFunction<IndexedSet<S>>
     {}
 
-    //class ConcreteTransferFunctionWithBitSet
+    //public class ConcreteTransferFunctionWithBitSet:SetTransferFunction<BitSet>
+    //{}
 
 }
