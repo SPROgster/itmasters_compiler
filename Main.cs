@@ -74,6 +74,8 @@ namespace SimpleCompiler
                     //        Iterator = Iterator.Next;
                     //}
 
+                    Correct3AddressCode.RemoveEmptyLabel(ref gcv.Code);
+
                     Console.WriteLine();
                     Console.WriteLine("Трёхадресный код:");
                     foreach (var ln in gcv.Code)

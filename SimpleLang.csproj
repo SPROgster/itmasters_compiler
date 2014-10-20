@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Optimizations\Correct3AddressCode.cs" />
     <Compile Include="Optimizations\DeadOrAlive.cs" />
     <Compile Include="InternalStructures\MiddleEnd.cs" />
     <Compile Include="Main.cs" />
