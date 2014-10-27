@@ -7,14 +7,16 @@ using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
 using MiddleEnd;
+using DefUse;
 
 namespace SimpleCompiler
 {
+    using BaseBlock = LinkedList<CodeLine>;
     public class SimpleCompilerMain
     {
         public static void Main()
         {
-            string FileName = @"..\..\b.txt";
+            string FileName = @"..\..\b2.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -56,19 +58,23 @@ namespace SimpleCompiler
                     GenCodeVisitor gcv = new GenCodeVisitor();
                     parser.root.Visit(gcv);
 
+                    Fold.fold(ref gcv.Code); // Вызов сворачивания констант и алг тождеств
+
                     //Причёсываем метки
-                    var Iterator = gcv.Code.First;
-                    while (Iterator != null)
-                    {
-                        if (Iterator.Value.First == null && Iterator.Next != null)
-                        {
-                            Iterator.Next.Value.Label = Iterator.Value.Label;
-                            Iterator = Iterator.Next;
-                            gcv.Code.Remove(Iterator.Previous);
-                        }
-                        else
-                            Iterator = Iterator.Next;
-                    }
+                    //var Iterator = gcv.Code.First;
+                    //while (Iterator != null)
+                    //{
+                    //    if (Iterator.Value.First == null && Iterator.Next != null)
+                    //    {
+                    //        Iterator.Next.Value.Label = Iterator.Value.Label;
+                    //        Iterator = Iterator.Next;
+                    //        gcv.Code.Remove(Iterator.Previous);
+                    //    }
+                    //    else
+                    //        Iterator = Iterator.Next;
+                    //}
+
+                    Correct3AddressCode.RemoveEmptyLabel(ref gcv.Code);
 
                     Console.WriteLine();
                     Console.WriteLine("Трёхадресный код:");
@@ -76,6 +82,8 @@ namespace SimpleCompiler
                         Console.WriteLine(ln);
 
                     ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
+                    List<BaseBlock> l=new List<BaseBlock>(CFG.GetBlocks());
+                    Console.WriteLine(DeadOrAlive.IsAlive(l[0],"a",1).ToString());
                     Console.WriteLine("Граф построен!");
                 }
             }

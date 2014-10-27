@@ -105,7 +105,7 @@ namespace SimpleLang.Visitors
             string AfterWhileLabel = NextLabel();
 
             Code.AddLast(new CodeLine(HeaderLabel, null,
-               null, null, null));
+               null, null, "nop"));
             node.Expr.Visit(this);
 
             Code.AddLast(new CodeLine(null, CondVariable,
