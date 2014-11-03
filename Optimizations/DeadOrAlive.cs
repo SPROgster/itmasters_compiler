@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace DefUse
 {
-    using BaseBlock = LinkedList<CodeLine>;
 
     internal class DeadOrAlive
     {
@@ -31,7 +30,7 @@ namespace DefUse
 
         public static bool IsAlive(BaseBlock bl, string id, int line)
         {
-            List<CodeLine> bl2 = new List<CodeLine>(bl);
+            List<CodeLine> bl2 = new List<CodeLine>(bl.Code);
             bool alive;
             if (id.Length >= 2 && id.Substring(0, 2).Equals("_t"))
             {

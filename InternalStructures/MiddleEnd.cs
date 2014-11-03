@@ -4,16 +4,24 @@ using System.Linq;
 using System.Text;
 
 namespace MiddleEnd
-{
-    //public class BaseBlock
-    //{
-    //    public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
-    //    public LinkedList<BaseBlock> Input = new LinkedList<BaseBlock>();
-    //    public LinkedList<BaseBlock> Output = new LinkedList<BaseBlock>();
-    //}
+{   
+    public class BaseBlock: ICloneable
+    {
+        public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
+        
+        public void Add(CodeLine val)
+        {
+            Code.AddLast(val);
+        }
 
-    
-    using BaseBlock = LinkedList<CodeLine>;
+        public object Clone()
+        {
+            var NewBlock = new BaseBlock();
+            foreach(var cl in Code)
+                NewBlock.Add((CodeLine)cl.Clone());
+            return NewBlock;
+        }
+    }
 
     public class ControlFlowGraph
     {
@@ -74,7 +82,7 @@ namespace MiddleEnd
             while (Current != null)
             {
                 //Добавляем текущую команду в текущий блок
-                CurrentBlock.AddLast(Current.Value);
+                CurrentBlock.Add(Current.Value);
                 //Если эьл конец блока
                 if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
@@ -149,7 +157,7 @@ namespace MiddleEnd
         
     }
 
-    public class CodeLine
+    public class CodeLine: ICloneable
     {
         public string Label, First, Second, Third, Operation;
 
@@ -172,6 +180,11 @@ namespace MiddleEnd
                 default: return ToReturn + 
                     (First != null ? First + " := " + Second + " " + Operation + " " + Third : "nop");
             }
+        }
+
+        public object Clone()
+        {
+            return new CodeLine(Label, First, Second, Third, Operation);
         }
     }
 

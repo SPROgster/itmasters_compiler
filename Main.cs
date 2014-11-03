@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
+
 using MiddleEnd;
 using DefUse;
 
 namespace SimpleCompiler
 {
-    using BaseBlock = LinkedList<CodeLine>;
     public class SimpleCompilerMain
     {
         public static void Main()
@@ -82,9 +82,10 @@ namespace SimpleCompiler
                         Console.WriteLine(ln);
 
                     ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
-                    List<BaseBlock> l=new List<BaseBlock>(CFG.GetBlocks());
-                    Console.WriteLine(DeadOrAlive.IsAlive(l[0],"a",1).ToString());
                     Console.WriteLine("Граф построен!");
+
+                    List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
+                    Console.WriteLine(DeadOrAlive.IsAlive(l[0],"a",1).ToString());
                 }
             }
             catch (FileNotFoundException)
