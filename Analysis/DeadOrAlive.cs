@@ -1,8 +1,9 @@
-﻿using MiddleEnd;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace DefUse
+using SimpleLang.MiddleEnd;
+
+namespace SimpleLang.Analysis
 {
 
     internal class DeadOrAlive

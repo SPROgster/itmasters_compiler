@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MiddleEnd
+namespace SimpleLang.MiddleEnd
 {   
     public class BaseBlock: ICloneable
     {

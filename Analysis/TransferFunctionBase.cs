@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SimpleLang
+using SimpleLang.MiddleEnd;
+
+namespace SimpleLang.Analysis
 {
 
     public interface IndexedSet<T>
@@ -64,6 +66,19 @@ namespace SimpleLang
     public interface TransferFunction<T>
     {
         T Transfer(T input);
+    }
+
+    public abstract class Context<T>
+    {
+        protected BaseBlock Block;
+        protected ControlFlowGraph Graph;
+        public T Info;
+
+        protected Context(ControlFlowGraph cfg, BaseBlock block)
+        {
+            Block = block;
+            Graph = cfg;
+        }
     }
 
     //public class MyCoolTransferFunctionWithBitSet:TransferFunction<BitSet>

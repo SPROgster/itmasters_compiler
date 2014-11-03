@@ -4,7 +4,7 @@
 
 // GPPG version 1.3.6
 // Machine:  BASE-PC
-// DateTime: 06.10.2014 20:51:34
+// DateTime: 03.11.2014 18:10:36
 // UserName: Admin
 // Input file <SimpleYacc.y>
 
@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using QUT.Gppg;
-using ProgramTree;
+using SimpleLang.MiddleEnd;
 
 namespace SimpleParser
 {

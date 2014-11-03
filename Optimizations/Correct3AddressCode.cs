@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using SimpleLang.MiddleEnd;
 
-using MiddleEnd;
-
-namespace SimpleLang.Visitors
+namespace SimpleLang.Optimizations
 {
     
     // класс для причёсывния трёхадресного кода

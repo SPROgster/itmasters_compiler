@@ -17,7 +17,7 @@
 			public BlockNode blVal;
        }
 
-%using ProgramTree;
+%using SimpleLang.MiddleEnd;
 
 %namespace SimpleParser
 

@@ -7,8 +7,9 @@ using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
 
-using MiddleEnd;
-using DefUse;
+using SimpleLang.MiddleEnd;
+using SimpleLang.Optimizations;
+using SimpleLang.Analysis;
 
 namespace SimpleCompiler
 {

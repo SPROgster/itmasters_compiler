@@ -3,7 +3,7 @@ using System;
 using SimpleLang.Visitors;
 using SimpleParser;
 
-namespace ProgramTree
+namespace SimpleLang.MiddleEnd
 {
     public enum AssignType { Assign, AssignPlus, AssignMinus, AssignMult, AssignDivide };
     public enum BinOpType { Plus, Minus, Div, Mult, Less, Greater, Equal, LEqual, GEqual, NEqual };

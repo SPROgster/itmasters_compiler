@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using MiddleEnd;
+using SimpleLang.MiddleEnd;
 
-namespace SimpleLang.Visitors
+namespace SimpleLang.Optimizations
 {
     class Fold
     {
