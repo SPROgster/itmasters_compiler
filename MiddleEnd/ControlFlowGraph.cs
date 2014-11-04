@@ -83,7 +83,7 @@ namespace SimpleLang.MiddleEnd
             {
                 //Добавляем текущую команду в текущий блок
                 CurrentBlock.Add(Current.Value);
-                //Если эьл конец блока
+                //Если это конец блока
                 if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
@@ -122,6 +122,14 @@ namespace SimpleLang.MiddleEnd
                 }
                 Current = Current.Next;
             }
+            //Теперь для всех блоков точно существуют списки входов и выходов
+            foreach (BaseBlock bl in Blocks)
+            {
+                if(!Inputs.ContainsKey(bl))
+                    Inputs[bl] = new LinkedList<BaseBlock>();
+                if (!Outputs.ContainsKey(bl))
+                    Outputs[bl] = new LinkedList<BaseBlock>();
+            }
             //Проходим по блокам, помеченным метками
             foreach (var elem in GotoLabelsSrc)
                 //Если на текущую метку осуществлялись переходы
@@ -129,14 +137,26 @@ namespace SimpleLang.MiddleEnd
                     //Достраиваем связи
                     foreach (var dest in GotoLabelsDest[elem.Key])
                     {
-                        if (!Outputs.ContainsKey(dest))
-                            Outputs[dest] = new LinkedList<BaseBlock>();
                         Outputs[dest].AddLast(elem.Value);
-                        if (!Inputs.ContainsKey(elem.Value))
-                            Inputs[elem.Value] = new LinkedList<BaseBlock>();
                         Inputs[elem.Value].AddLast(dest);
                     }
-
+            //Создаём фиктивный блок "вход"
+            BaseBlock EndBlock = new BaseBlock();
+            Inputs[EndBlock] = new LinkedList<BaseBlock>();
+            Outputs[EndBlock] = new LinkedList<BaseBlock>();
+            Outputs[EndBlock].AddLast(Blocks.First());
+            Blocks.AddFirst(EndBlock);
+            //Создаём фиктивный блок "выход"
+            EndBlock = new BaseBlock();
+            Inputs[EndBlock] = new LinkedList<BaseBlock>();
+            Outputs[EndBlock] = new LinkedList<BaseBlock>();
+            foreach(BaseBlock bl in Blocks)
+                if (Outputs[bl].Count == 0)
+                {
+                    Outputs[bl].AddLast(EndBlock);
+                    Inputs[EndBlock].AddLast(bl);
+                }
+            Blocks.AddLast(EndBlock);
         }
 
         //Возвращает список базовых блоков, являющихся предшественниками указанного
@@ -154,7 +174,18 @@ namespace SimpleLang.MiddleEnd
         {
             return Blocks;
         }
-        
+
+        //Возвращает блок "вход"
+        public BaseBlock GetStart()
+        {
+            return Blocks.First();
+        }
+
+        //Возвращает блок "выход"
+        public BaseBlock GetEnd()
+        {
+            return Blocks.Last();
+        }
     }
 
     public class CodeLine: ICloneable
