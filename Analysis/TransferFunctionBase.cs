@@ -13,6 +13,8 @@ namespace SimpleLang.Analysis
         ISet<T> Intersect(ISet<T> b);
         ISet<T> Union(ISet<T> b);
         ISet<T> Subtract(ISet<T> b);
+
+        int Count { get; }
     }
 
     //Множество с доступом по индексу
@@ -31,6 +33,8 @@ namespace SimpleLang.Analysis
         {
             Elems = Enumerable.Repeat(false, size).ToArray();
         }
+
+        public int Count { get { return Elems.Length; } }
 
         private BitSet(bool[] elems)
         {
@@ -86,6 +90,11 @@ namespace SimpleLang.Analysis
         public override int GetHashCode()
         {
             return Elems.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return System.String.Join(" ",Elems.Select(e=>e.ToString()));
         }
 
         public static BitSet Intersect(BitSet a, BitSet b)
@@ -159,8 +168,8 @@ namespace SimpleLang.Analysis
         //Передаточные функции для блоков
         protected Dictionary<BaseBlock, TransferFunction<DataType>> Func;
 
-        protected abstract Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit, 
-            DataType otherInit, CollectionFunction collect);
+        protected abstract Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit,
+            DataType otherInit, DataType defaultInit, CollectionFunction collect);
 
         public abstract Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply();
     }
@@ -168,8 +177,8 @@ namespace SimpleLang.Analysis
     public abstract class TopDownAlgorythm<InfoType, DataType> : Algorithm<InfoType, DataType>
         where InfoType : class
     {
-        protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit, 
-            DataType otherInit, CollectionFunction collect)
+        protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit,
+            DataType otherInit, DataType defaultInit, CollectionFunction collect)
         {
             In[Cont.End] = endInit;
             foreach (BaseBlock block in Cont.Blocks)
@@ -182,7 +191,8 @@ namespace SimpleLang.Analysis
                 foreach (BaseBlock block in Cont.Blocks)
                     if (block != Cont.End)
                     {
-                        Out[block] = Cont.Outputs(block).Select(bl => In[bl]).Aggregate((a, b) => collect(a, b));
+                        Out[block] = Cont.Outputs(block).Select(bl => In[bl]).
+                            Aggregate(defaultInit,(a, b) => collect(a, b));
                         if (SomethingChanged)
                             In[block] = Func[block].Transfer(Out[block]);
                         else
@@ -202,7 +212,7 @@ namespace SimpleLang.Analysis
         where InfoType : class
     {
         protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit, 
-            DataType otherInit, CollectionFunction collect)
+            DataType otherInit, DataType defaultInit, CollectionFunction collect)
         {
             Out[Cont.Start] = endInit;
             foreach(BaseBlock block in Cont.Blocks)
@@ -215,7 +225,8 @@ namespace SimpleLang.Analysis
                 foreach(BaseBlock block in Cont.Blocks)
                     if(block!=Cont.Start)
                     {
-                        In[block] = Cont.Inputs(block).Select(bl=>Out[bl]).Aggregate((a,b)=>collect(a,b));
+                        In[block] = Cont.Inputs(block).Select(bl=>Out[bl]).
+                            Aggregate(defaultInit,(a,b)=>collect(a,b));
                         if (SomethingChanged)
                             Out[block] = Func[block].Transfer(In[block]);
                         else

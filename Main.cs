@@ -58,35 +58,31 @@ namespace SimpleCompiler
                     //Генерируем трёхадресный код
                     GenCodeVisitor gcv = new GenCodeVisitor();
                     parser.root.Visit(gcv);
-
-                    Fold.fold(ref gcv.Code); // Вызов сворачивания констант и алг тождеств
-
-                    //Причёсываем метки
-                    //var Iterator = gcv.Code.First;
-                    //while (Iterator != null)
-                    //{
-                    //    if (Iterator.Value.First == null && Iterator.Next != null)
-                    //    {
-                    //        Iterator.Next.Value.Label = Iterator.Value.Label;
-                    //        Iterator = Iterator.Next;
-                    //        gcv.Code.Remove(Iterator.Previous);
-                    //    }
-                    //    else
-                    //        Iterator = Iterator.Next;
-                    //}
-
+                    // Вызов сворачивания констант и алг тождеств
+                    Fold.fold(ref gcv.Code);
+                    //Устранение Nop-ов и коррекция меток
                     Correct3AddressCode.RemoveEmptyLabel(ref gcv.Code);
-
+                    //Выводим то, что получилось
                     Console.WriteLine();
                     Console.WriteLine("Трёхадресный код:");
                     foreach (var ln in gcv.Code)
                         Console.WriteLine(ln);
-
+                    //Строим граф базовых блоков
                     ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
                     Console.WriteLine("Граф построен!");
-
+                    //Демонстрируем проверку живучести переменной
                     List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
                     Console.WriteLine(DeadOrAlive.IsAlive(l[0],"a",1).ToString());
+                    //Проверяем алгоритм поиска достигающих определений
+                    Console.WriteLine();
+                    ReachingDefsAlgorithm RDA = new ReachingDefsAlgorithm(CFG);
+                    var Result = RDA.Apply();
+                    Console.WriteLine("'In's:");
+                    foreach (var elem in Result.Item1)
+                        Console.WriteLine(elem.ToString().Replace("True","1").Replace("False","0"));
+                    Console.WriteLine("'Out's:");
+                    foreach(var elem in Result.Item1)
+                        Console.WriteLine(elem.ToString().Replace("True", "1").Replace("False", "0"));
                 }
             }
             catch (FileNotFoundException)

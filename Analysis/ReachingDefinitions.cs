@@ -17,25 +17,35 @@ namespace SimpleLang.Analysis
             //Вспомогательные структуры - словарь для номеров d, относящихся к соотв. блоку
             Dictionary<BaseBlock, HashSet<int>> BlockDef = new Dictionary<BaseBlock, HashSet<int>>();
             //Соответствие "номер d" - "имя определяемой переменной"
-            List<string> DefVar = new List<string>();
+            Dictionary<string,HashSet<int>> VarDef = new Dictionary<string,HashSet<int>>();
             foreach(BaseBlock bl in Graph.GetBlocks())
             {
                 BlockDef[bl] = new HashSet<int>();
                 foreach (CodeLine cl in bl.Code)
-                    if (cl.Operation == ":=")
+                    if (cl.Operation != "i" && cl.Operation != "g" && cl.Operation != "nop")
                     {
+                        if(!VarDef.ContainsKey(cl.First))
+                            VarDef[cl.First] = new HashSet<int>();
+                        VarDef[cl.First].Add(DefsCount);
                         BlockDef[bl].Add(DefsCount++);
-                        DefVar.Add(cl.First);
                     }
             }
-            //Для каждого базового блока легко можем сформировать элементы Gen
+            //Для каждого базового блока легко можем сформировать элементы Gen и Kill
             foreach (BaseBlock bl in Graph.GetBlocks())
             {
                 this[bl] = new Tuple<BitSet, BitSet>(new BitSet(DefsCount), new BitSet(DefsCount));
                 foreach (int i in BlockDef[bl])
+                {
                     this[bl].Item2.Set(i, true);
+                    foreach(string name in VarDef.Keys)
+                        if(VarDef[name].Contains(i))
+                        {
+                            foreach(int j in VarDef[name])
+                                this[bl].Item1.Set(j,true);
+                            this[bl].Item1.Set(i,false);
+                        }        
+                }
             }
-            //to be continued....
         }
 
         public BitSet Kills(BaseBlock bl)
@@ -72,6 +82,7 @@ namespace SimpleLang.Analysis
         {
             In = new Dictionary<BaseBlock, BitSet>();
             Out = new Dictionary<BaseBlock, BitSet>();
+            Func = new Dictionary<BaseBlock, TransferFunction<BitSet>>();
             Cont = new KillGenContext(cfg);
 
             DataSize = ((KillGenContext)Cont).DefsCount;
@@ -85,7 +96,7 @@ namespace SimpleLang.Analysis
 
         public override Tuple<Dictionary<BaseBlock, BitSet>, Dictionary<BaseBlock, BitSet>> Apply()
         {
-            return base.Apply(new BitSet(DataSize),new BitSet(DataSize),BitSet.Union);
+            return base.Apply(new BitSet(DataSize),new BitSet(DataSize),new BitSet(DataSize),BitSet.Union);
         }
     }
 }
