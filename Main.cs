@@ -17,7 +17,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"..\..\b2.txt";
+            string FileName = @"..\..\_TestTexts\ReachingDefsTest.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);

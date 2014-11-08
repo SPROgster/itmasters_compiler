@@ -21,6 +21,12 @@ namespace SimpleLang.MiddleEnd
                 NewBlock.Add((CodeLine)cl.Clone());
             return NewBlock;
         }
+
+        public override string ToString()
+        {
+            return Code.Count>0 ? 
+                Code.Select(e=>e.ToString()).Aggregate((a,b)=>a+Environment.NewLine+b) : "";
+        }
     }
 
     public class ControlFlowGraph
