@@ -64,4 +64,52 @@ namespace SimpleLang.Analysis
             return alive;
         }
     }
+
+    public class AliveVarsContext : Context<Tuple<BitSet, BitSet>>
+    {
+        public int Count { get; private set; }
+
+        public AliveVarsContext(ControlFlowGraph cfg)
+            : base(cfg)
+        { }
+    }
+
+    //Уж очень похоже на ReachingDefinitions... Не обобщить ли?
+    public class AliveVarsAlgorithm : TopDownAlgorithm<Tuple<BitSet, BitSet>, BitSet>
+    {
+        private int DataSize;
+
+        public AliveVarsAlgorithm(ControlFlowGraph cfg): base(cfg)
+        {
+            Cont = new AliveVarsContext(cfg);
+            DataSize = ((AliveVarsContext)Cont).Count;
+            foreach (BaseBlock bl in cfg.GetBlocks())
+            {
+                In[bl] = new BitSet(DataSize);
+                Out[bl] = new BitSet(DataSize);
+                Func[bl] = new AliveVarsTransferFunction(Cont[bl]);
+            }
+        }
+
+        public override Tuple<Dictionary<BaseBlock, BitSet>, Dictionary<BaseBlock, BitSet>> Apply()
+        {
+            return base.Apply(new BitSet(DataSize), new BitSet(DataSize), new BitSet(DataSize), BitSet.Union);
+        }
+    }
+
+    //Уж очень она похожа на функцию для ReachingDefinitions...
+    public class AliveVarsTransferFunction : TransferFunction<BitSet>
+    {
+        private Tuple<BitSet,BitSet> Info;
+
+        public AliveVarsTransferFunction(Tuple<BitSet,BitSet> info)
+        {
+            Info = info;
+        }
+
+        public BitSet Transfer(BitSet input)
+        {
+            return (BitSet)Info.Item2.Union(input.Subtract(Info.Item1));
+        }
+    }
 }

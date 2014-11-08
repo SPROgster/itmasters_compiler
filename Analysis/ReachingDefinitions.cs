@@ -5,19 +5,7 @@ using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Analysis
 {
-    public class KillGenInfo
-    {
-        public BitSet Kill { get; private set; }
-        public BitSet Gen { get; private set; }
-
-        public KillGenInfo(int size)
-        {
-            Kill = new BitSet(size);
-            Gen = new BitSet(size);
-        }
-    }
-
-    public class KillGenContext : Context<KillGenInfo>
+    public class KillGenContext : Context<Tuple<BitSet,BitSet>>
     {
         public int DefsCount { get; private set; }
 
@@ -45,16 +33,16 @@ namespace SimpleLang.Analysis
             //Для каждого базового блока легко можем сформировать элементы Gen и Kill
             foreach (BaseBlock bl in Graph.GetBlocks())
             {
-                this[bl] = new KillGenInfo(DefsCount);
+                this[bl] = new Tuple<BitSet, BitSet>(new BitSet(DefsCount), new BitSet(DefsCount));
                 foreach (int i in BlockDef[bl])
                 {
-                    this[bl].Gen.Set(i, true);
+                    this[bl].Item2.Set(i, true);
                     foreach(string name in VarDef.Keys)
                         if(VarDef[name].Contains(i))
                         {
                             foreach(int j in VarDef[name])
-                                this[bl].Kill.Set(j,true);
-                            this[bl].Kill.Set(i,false);
+                                this[bl].Item1.Set(j,true);
+                            this[bl].Item1.Set(i,false);
                         }        
                 }
             }
@@ -62,41 +50,37 @@ namespace SimpleLang.Analysis
 
         public BitSet Kills(BaseBlock bl)
         {
-            return this[bl].Kill;
+            return this[bl].Item1;
         }
 
         public BitSet Gens(BaseBlock bl)
         {
-            return this[bl].Gen;
+            return this[bl].Item2;
         }
     }
 
     public class ReachingDefsTransferFunction : TransferFunction<BitSet>
     {
-        private KillGenInfo Info;
+        private Tuple<BitSet,BitSet> Info;
 
-        public ReachingDefsTransferFunction(KillGenInfo info)
+        public ReachingDefsTransferFunction(Tuple<BitSet,BitSet> info)
         {
             Info = info;
         }
 
         public BitSet Transfer(BitSet input)
         {
-            return (BitSet)Info.Gen.Union(input.Subtract(Info.Kill));
+            return (BitSet)Info.Item2.Union(input.Subtract(Info.Item1));
         }
     }
 
-    public class ReachingDefsAlgorithm : DownTopAlgorythm<KillGenInfo, BitSet>
+    public class ReachingDefsAlgorithm : DownTopAlgorithm<Tuple<BitSet,BitSet>, BitSet>
     {
         private int DataSize;
 
-        public ReachingDefsAlgorithm(ControlFlowGraph cfg)
+        public ReachingDefsAlgorithm(ControlFlowGraph cfg): base(cfg)
         {
-            In = new Dictionary<BaseBlock, BitSet>();
-            Out = new Dictionary<BaseBlock, BitSet>();
-            Func = new Dictionary<BaseBlock, TransferFunction<BitSet>>();
             Cont = new KillGenContext(cfg);
-
             DataSize = ((KillGenContext)Cont).DefsCount;
             foreach (BaseBlock bl in cfg.GetBlocks())
             {

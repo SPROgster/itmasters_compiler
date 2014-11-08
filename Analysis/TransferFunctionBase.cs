@@ -172,9 +172,16 @@ namespace SimpleLang.Analysis
             DataType otherInit, DataType defaultInit, CollectionFunction collect);
 
         public abstract Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply();
+
+        protected Algorithm(ControlFlowGraph cfg)
+        {
+            In = new Dictionary<BaseBlock, DataType>();
+            Out = new Dictionary<BaseBlock, DataType>();
+            Func = new Dictionary<BaseBlock, TransferFunction<DataType>>();
+        }
     }
 
-    public abstract class TopDownAlgorythm<InfoType, DataType> : Algorithm<InfoType, DataType>
+    public abstract class TopDownAlgorithm<InfoType, DataType> : Algorithm<InfoType, DataType>
         where InfoType : class
     {
         protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit,
@@ -206,9 +213,12 @@ namespace SimpleLang.Analysis
             }
             return new Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>>(In, Out);
         }
+
+        protected TopDownAlgorithm(ControlFlowGraph cfg): base(cfg)
+        {}
     }
 
-    public abstract class DownTopAlgorythm<InfoType, DataType> : Algorithm<InfoType, DataType>
+    public abstract class DownTopAlgorithm<InfoType, DataType> : Algorithm<InfoType, DataType>
         where InfoType : class
     {
         protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit, 
@@ -240,5 +250,8 @@ namespace SimpleLang.Analysis
             }
             return new Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>>(In, Out);
         }
+
+        protected DownTopAlgorithm(ControlFlowGraph cfg): base(cfg)
+        {}
     }
 }
