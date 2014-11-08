@@ -1,11 +1,10 @@
 begin
-	i:=m-1;
+	i:=m;
 	j:=n;
 	while(i>j)
 	begin
-		a:=u1;
-		i:=i+1;
 		j:=j+1;
+		a:=i;
 		if (i>j)
 			a:=u2;
 		i:=u3

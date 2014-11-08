@@ -77,13 +77,13 @@ namespace SimpleCompiler
                     Console.WriteLine();
                     ReachingDefsAlgorithm RDA = new ReachingDefsAlgorithm(CFG);
                     var Result = RDA.Apply();
-                    Console.WriteLine("'In's:");
                     foreach (var block in Result.Item1.Keys)
-                    {
-                        Console.WriteLine(block);
-                        Console.WriteLine("In: " + Result.Item1[block].ToString().Replace("True", "1").Replace("False", "0"));
-                        Console.WriteLine("Out: " + Result.Item2[block].ToString().Replace("True", "1").Replace("False", "0"));
-                    }
+                        if(block!=CFG.GetStart() && block!=CFG.GetEnd())
+                        {
+                            Console.WriteLine(block);
+                            Console.WriteLine("In:\t" + Result.Item1[block].ToString().Replace("True", "1").Replace("False", "0"));
+                            Console.WriteLine("Out:\t" + Result.Item2[block].ToString().Replace("True", "1").Replace("False", "0"));
+                        }
                 }
             }
             catch (FileNotFoundException)

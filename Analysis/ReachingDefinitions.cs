@@ -70,7 +70,7 @@ namespace SimpleLang.Analysis
 
         public BitSet Transfer(BitSet input)
         {
-            return (BitSet)Info.Item1.Union(input.Subtract(Info.Item2));
+            return (BitSet)Info.Item2.Union(input.Subtract(Info.Item1));
         }
     }
 
