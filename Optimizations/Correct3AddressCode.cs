@@ -14,14 +14,14 @@ namespace SimpleLang.Optimizations
         /// <summary>
         /// Удаляет пустые метки из кода
         /// </summary>
-        public static void RemoveEmptyLabel(ref LinkedList<CodeLine> code)
+        public static void RemoveEmptyLabel(LinkedList<CodeLine> code)
         {
             var Iterator = code.First;
             while (Iterator != null)
             {
                 if (Iterator.Value.First == null && Iterator.Next != null)
                 {
-                    Correct3AddressCode.RenameLabeles(ref code, Iterator.Next.Value.Label, Iterator.Value.Label);                    
+                    Correct3AddressCode.RenameLabels(code, Iterator.Next.Value.Label, Iterator.Value.Label);                    
                     Iterator.Next.Value.Label = Iterator.Value.Label;
                     Iterator = Iterator.Next;
                     code.Remove(Iterator.Previous);
@@ -34,7 +34,7 @@ namespace SimpleLang.Optimizations
         /// <summary>
         /// Заменяет метки со старым именем на новое имя
         /// </summary>
-        private static void RenameLabeles(ref LinkedList<CodeLine> inputCode, string oldName, string newName)
+        private static void RenameLabels(LinkedList<CodeLine> inputCode, string oldName, string newName)
         {
             for (var elem = inputCode.First; elem != null; elem = elem.Next)
             {
@@ -46,6 +46,11 @@ namespace SimpleLang.Optimizations
                 if (elem.Value.Operation == "g")                
                     if (elem.Value.First != null && elem.Value.First == oldName)
                         elem.Value.First = newName;
+
+                // замена в if
+                if (elem.Value.Operation == "i")
+                    if (elem.Value.Second != null && elem.Value.Second == oldName)
+                        elem.Value.Second = newName;
                 
             }
         }

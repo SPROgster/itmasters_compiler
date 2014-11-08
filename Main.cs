@@ -61,7 +61,7 @@ namespace SimpleCompiler
                     // Вызов сворачивания констант и алг тождеств
                     Fold.fold(ref gcv.Code);
                     //Устранение Nop-ов и коррекция меток
-                    Correct3AddressCode.RemoveEmptyLabel(ref gcv.Code);
+                    Correct3AddressCode.RemoveEmptyLabel(gcv.Code);
                     //Выводим то, что получилось
                     Console.WriteLine();
                     Console.WriteLine("Трёхадресный код:");
