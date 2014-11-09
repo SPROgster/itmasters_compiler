@@ -21,25 +21,22 @@ namespace SimpleLang.MiddleEnd
                 NewBlock.Add((CodeLine)cl.Clone());
             return NewBlock;
         }
-        public void optimization_CSE_inBBl() {
-            int t_id = 0;
-            for (LinkedListNode<CodeLine> node = Code.Last; node != null; node = node.Previous)
-            {
+
+        public void cseOptimization()
+        {            
+            for (LinkedListNode<CodeLine> node = Code.Last; node != null; node = node.Previous)            
                 for (LinkedListNode<CodeLine> node1 = node.Next; node1 != null; node1 = node1.Next)
                 {
-                    if (node1.Value.First.Equals(node.Value.Second) || node1.Value.First.Equals(node.Value.Third))break;
-                    if (node1.Value.Second == node.Value.Second && node1.Value.Third == node.Value.Third && node1.Value.Operation == node.Value.Operation)
-                    {
-                        string lab = "_tCSE" + t_id;
-                        Code.AddBefore(node, new CodeLine(null, lab, node.Value.Second, node.Value.Third, node.Value.Operation));
-                        node.Value = new CodeLine(null, node.Value.First, lab, null, null);
-                        node1.Value = new CodeLine(null, node1.Value.First, lab, null, null);
-                        t_id++;
+                    if (node1.Value.First.Equals(node.Value.Second) || node1.Value.First.Equals(node.Value.Third))
                         break;
+                    if (node1.Value.Second == node.Value.Second && node1.Value.Third == node.Value.Third && node1.Value.Operation == node.Value.Operation)
+                    {                                                
+                        node1.Next.Value.Second = node.Value.First;
+                        Code.Remove(node1);                                             
                     }
-                }
-            }
+                }            
         }
+
         public override string ToString()
         {
             return Code.Count>0 ? 

@@ -17,7 +17,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"..\..\_TestTexts\CSE_optTest.txt";
+            string FileName = @"..\..\_TestTexts\test0.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -37,7 +37,7 @@ namespace SimpleCompiler
                     var pp = new PrettyPrintVisitor();
                     parser.root.Visit(pp);
                     Console.WriteLine(pp.Text);
-
+                    Console.WriteLine("---------------------------------");
                     //Отрабатывают визиторы, проверяющие наличие ошибок
                     var sne = new CheckVariablesVisitor();
                     parser.root.Visit(sne);
@@ -53,28 +53,28 @@ namespace SimpleCompiler
                         // Вызов сворачивания констант и алг тождеств
                         Fold.fold(ref gcv.Code);
                         //Выводим то, что получилось
-                        Console.WriteLine();
+                        //Console.WriteLine();
                         Console.WriteLine("Трёхадресный код:");
                         foreach (var ln in gcv.Code)
                             Console.WriteLine(ln);
+                        Console.WriteLine("---------------------------------");
                         //Строим граф базовых блоков
                         ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
                         Console.WriteLine("Граф построен!");
                         //Демонстрируем проверку живучести переменной
-                        List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
-                        Console.WriteLine("---------------------------------");
+                        List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());                        
                         //Тест Оптимизация общих подвыражений
                         Console.WriteLine("Оптимизация общих подвыражений в Блоке:");
                         foreach (var block in l)
                         {
+                            //Console.WriteLine(block);
+                            block.cseOptimization();
                             Console.WriteLine(block);
-                            block.optimization_CSE_inBBl();
-                            Console.WriteLine(block);
-                            Console.WriteLine("---------------------------------");
-                            Console.WriteLine("---------------------------------");
+                            //Console.WriteLine("---------------------------------");                            
                         }
+                        Console.WriteLine("---------------------------------");
                         //Console.WriteLine(l);
-                        Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1).ToString());
+                        Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1));
                         //Проверяем алгоритм поиска достигающих определений
                         Console.WriteLine();
                         ReachingDefsAlgorithm RDA = new ReachingDefsAlgorithm(CFG);
