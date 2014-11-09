@@ -1,0 +1,7 @@
+begin
+  var a, b, c, d : integer;
+  a := b + c;
+  b := a - d;
+  c := b + c;
+  d := a - d
+end
