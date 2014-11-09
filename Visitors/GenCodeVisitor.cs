@@ -2,38 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProgramTree;
 
-using SimpleParser;
+using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
-
-    public class CodeLine
-    {
-        public string Label, First, Second, Third, Operation;
-
-        public CodeLine(string lab, string fst, string snd, string thrd, string op)
-        {
-            Label = lab;
-            First = fst;
-            Second = snd;
-            Third = thrd;
-            Operation = op;
-        }
-
-        public override string ToString()
-        {
-            switch (Operation)
-            {
-                case "i": return "if " + First + " goto " + Second;
-                case "g": return "goto " + First;
-                default: return
-                    Label + (Label != null ? ": " : " ")
-                    + (First != null ? First + " := " + Second + " " + Operation + " " + Third : "");
-            }
-        }
-    }
 
     class GenCodeVisitor : AutoVisitor
     {
@@ -120,7 +93,7 @@ namespace SimpleLang.Visitors
                 null, null, "g"));
             //Дальше идёт код, на который переходим после окончания работы цикла
             Code.AddLast(new CodeLine(AfterCycleLabel, null,
-                null, null, null));
+                null, null, "nop"));
         }
 
         public override void VisitWhileNode(WhileNode node)
@@ -130,21 +103,23 @@ namespace SimpleLang.Visitors
             string HeaderLabel = NextLabel();
             string AfterWhileLabel = NextLabel();
 
+            Code.AddLast(new CodeLine(HeaderLabel, null,
+               null, null, "nop"));
             node.Expr.Visit(this);
 
             Code.AddLast(new CodeLine(null, CondVariable,
                 NamesValuesStack.Pop(), null, null));
-            Code.AddLast(new CodeLine(HeaderLabel, CondVariable,
+            Code.AddLast(new CodeLine(null, CondVariable,
                 BodyLabel, null, "i"));
             Code.AddLast(new CodeLine(null, AfterWhileLabel,
                null, null, "g"));
             Code.AddLast(new CodeLine(BodyLabel, null,
-               null, null, null));
+               null, null, "nop"));
             node.Stat.Visit(this);
             Code.AddLast(new CodeLine(null, HeaderLabel,
                null, null, "g"));
             Code.AddLast(new CodeLine(AfterWhileLabel, null,
-               null, null, null));
+               null, null, "nop"));
         }
 
         public override void VisitIfNode(IfNode node)
@@ -163,10 +138,59 @@ namespace SimpleLang.Visitors
             Code.AddLast(new CodeLine(null, AfterIfLabel,
                null, null, "g"));
             Code.AddLast(new CodeLine(IfLabel, null,
-               null, null, null));
+               null, null, "nop"));
             node.StatIf.Visit(this);
             Code.AddLast(new CodeLine(AfterIfLabel, null,
-               null, null, null));
+               null, null, "nop"));
+        }
+
+        public void RemoveEmptyLabels()
+        {
+            RemoveEmptyLabels(Code);
+        }
+
+        /// <summary>
+        /// Удаляет пустые метки из кода
+        /// </summary>
+        public static void RemoveEmptyLabels(LinkedList<CodeLine> code)
+        {
+            var Iterator = code.First;
+            while (Iterator != null)
+            {
+                if (Iterator.Value.First == null && Iterator.Next != null)
+                {
+                    RenameLabels(code, Iterator.Next.Value.Label, Iterator.Value.Label);
+                    Iterator.Next.Value.Label = Iterator.Value.Label;
+                    Iterator = Iterator.Next;
+                    code.Remove(Iterator.Previous);
+                }
+                else
+                    Iterator = Iterator.Next;
+            }
+        }
+
+        /// <summary>
+        /// Заменяет метки со старым именем на новое имя
+        /// </summary>
+        private static void RenameLabels(LinkedList<CodeLine> inputCode, string oldName, string newName)
+        {
+            for (var elem = inputCode.First; elem != null; elem = elem.Next)
+            {
+                // замена метки
+                if (elem.Value.Label != null && elem.Value.Label == oldName)
+                    elem.Value.Label = newName;
+
+                // замена в goto
+                if (elem.Value.Operation == "g")
+                    if (elem.Value.First != null && elem.Value.First == oldName)
+                        elem.Value.First = newName;
+
+                // замена в if
+                if (elem.Value.Operation == "i")
+                    if (elem.Value.Second != null && elem.Value.Second == oldName)
+                        elem.Value.Second = newName;
+
+            }
         }
     }
 }

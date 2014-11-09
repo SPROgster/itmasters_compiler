@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProgramTree;
+
+using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
@@ -46,12 +47,25 @@ namespace SimpleLang.Visitors
             Text += " := ";
             a.Expr.Visit(this);
         }
+
+        private void PrintLineOrBlockBody(StatementNode node)
+        {
+            if (!(node is BlockNode))
+            {
+                IndentPlus();
+                node.Visit(this);
+                IndentMinus();
+            }
+            else
+                node.Visit(this);
+        }
+
         public override void VisitCycleNode(CycleNode c) 
         {
             Text += IndentStr() + "cycle ";
             c.Expr.Visit(this);
             Text += Environment.NewLine;
-            c.Stat.Visit(this);
+            PrintLineOrBlockBody(c.Stat);
         }
         public override void VisitBlockNode(BlockNode bl) 
         {
@@ -83,22 +97,26 @@ namespace SimpleLang.Visitors
             Text += IndentStr() + "var " + w.Idents[0].Name;
             for (int i = 1; i < w.Idents.Count; i++)
                 Text += ',' + w.Idents[i].Name;
+            Text += ": " + w.TypeIdent.Name;
         }
         public override void VisitWhileNode(WhileNode w)
         {
             Text+= IndentStr() + "while";
             w.Expr.Visit(this);
             Text += Environment.NewLine;
-            w.Stat.Visit(this);
+            PrintLineOrBlockBody(w.Stat);
         }
         public override void VisitIfNode(IfNode w)
         {
             Text += IndentStr() + "if";
             w.Expr.Visit(this);
             Text += Environment.NewLine;
-            w.StatIf.Visit(this);
-            Text += IndentStr() + "else" + Environment.NewLine;
-            w.StatIf.Visit(this);
+            PrintLineOrBlockBody(w.StatIf);
+            if (!(w.StatElse is EmptyNode))
+            {
+                Text += Environment.NewLine + IndentStr() + "else" + Environment.NewLine;
+                PrintLineOrBlockBody(w.StatElse);
+            }
         }
     } 
 }

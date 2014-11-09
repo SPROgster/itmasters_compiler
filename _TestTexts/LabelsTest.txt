@@ -1,0 +1,10 @@
+begin
+  var a,b,c,d,f:int;
+  cycle 2*a
+    b:=a*b;
+  while (a>b)
+  begin
+    a:=a-1;
+    write(a)
+  end
+end
