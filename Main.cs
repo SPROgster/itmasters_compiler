@@ -17,7 +17,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"..\..\_TestTexts\ReachingDefsTest.txt";
+            string FileName = @"..\..\_TestTexts\CSE_optTest.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -62,11 +62,18 @@ namespace SimpleCompiler
                         Console.WriteLine("Граф построен!");
                         //Демонстрируем проверку живучести переменной
                         List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
-                        Console.WriteLine(l[1]);
                         Console.WriteLine("---------------------------------");
                         //Тест Оптимизация общих подвыражений
-                        l[1].optimization_CSE_inBBl();
-                        Console.WriteLine(l[1]);
+                        Console.WriteLine("Оптимизация общих подвыражений в Блоке:");
+                        foreach (var block in l)
+                        {
+                            Console.WriteLine(block);
+                            block.optimization_CSE_inBBl();
+                            Console.WriteLine(block);
+                            Console.WriteLine("---------------------------------");
+                            Console.WriteLine("---------------------------------");
+                        }
+                        //Console.WriteLine(l);
                         Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1).ToString());
                         //Проверяем алгоритм поиска достигающих определений
                         Console.WriteLine();

@@ -28,11 +28,12 @@ namespace SimpleLang.MiddleEnd
                 for (LinkedListNode<CodeLine> node1 = node.Next; node1 != null; node1 = node1.Next)
                 {
                     if (node1.Value.First.Equals(node.Value.Second) || node1.Value.First.Equals(node.Value.Third))break;
-                    if (node1.Value.Second.Equals(node.Value.Second) && node1.Value.Third.Equals(node.Value.Third) && node1.Value.Operation.Equals(node.Value.Operation))
+                    if (node1.Value.Second == node.Value.Second && node1.Value.Third == node.Value.Third && node1.Value.Operation == node.Value.Operation)
                     {
-                        Code.AddBefore(node, new CodeLine(null, "_t", node.Value.Second, node.Value.Third, node.Value.Operation));
-                        node.Value = new CodeLine(null, node.Value.First, "_t", null, null);
-                        node1.Value = new CodeLine(null, node1.Value.First, "_t", null, null);
+                        string lab = "_tCSE" + t_id;
+                        Code.AddBefore(node, new CodeLine(null, lab, node.Value.Second, node.Value.Third, node.Value.Operation));
+                        node.Value = new CodeLine(null, node.Value.First, lab, null, null);
+                        node1.Value = new CodeLine(null, node1.Value.First, lab, null, null);
                         t_id++;
                         break;
                     }
