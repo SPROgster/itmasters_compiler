@@ -5,7 +5,6 @@ using SimpleParser;
 
 namespace SimpleLang.MiddleEnd
 {
-    public enum AssignType { Assign, AssignPlus, AssignMinus, AssignMult, AssignDivide };
     public enum BinOpType { Plus, Minus, Div, Mult, Less, Greater, Equal, LEqual, GEqual, NEqual };
 
     public abstract class Node // базовый класс для всех узлов    
@@ -110,12 +109,10 @@ namespace SimpleLang.MiddleEnd
     {
         public IdNode Id { get; set; }
         public ExprNode Expr { get; set; }
-        public AssignType AssOp { get; set; }
-        public AssignNode(IdNode id, ExprNode expr, AssignType assop = AssignType.Assign)
+        public AssignNode(IdNode id, ExprNode expr)
         {
             Id = id;
             Expr = expr;
-            AssOp = assop;
         }
 
         public override void Visit(Visitor v)

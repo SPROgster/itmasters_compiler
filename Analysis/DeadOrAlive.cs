@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using SimpleLang.MiddleEnd;
@@ -65,51 +66,170 @@ namespace SimpleLang.Analysis
         }
     }
 
-    public class AliveVarsContext : Context<Tuple<BitSet, BitSet>>
+    public class StringSet : ChaoticSet<string>, ICloneable
     {
-        public int Count { get; private set; }
+        private HashSet<string> Elems;
 
-        public AliveVarsContext(ControlFlowGraph cfg)
-            : base(cfg)
-        { }
+        public StringSet()
+        {
+            Elems = new HashSet<string>();
+        }
+
+        private StringSet(string[] elems)
+        {
+            Elems = new HashSet<string>(elems);
+        }
+
+        public void Add(string elem)
+        {
+            Elems.Add(elem);
+        }
+
+        public void Remove(string elem)
+        {
+            Elems.Remove(elem);
+        }
+
+        public bool Contains(string elem)
+        {
+            return Elems.Contains(elem);
+        }
+
+        public ISet<string> Intersect(ISet<string> b)
+        {
+            return new StringSet(Elems.Intersect(((StringSet)b).Elems).ToArray());
+        }
+
+        public ISet<string> Union(ISet<string> b)
+        {
+            return new StringSet(Elems.Union(((StringSet)b).Elems).ToArray());
+        }
+
+        public ISet<string> Subtract(ISet<string> b)
+        {
+            return new StringSet(Elems.Except(((StringSet)b).Elems).ToArray());
+        }
+
+        public int Count
+        {
+            get { return Elems.Count; }
+        }
+
+        public object Clone()
+        {
+            return new StringSet(Elems.ToArray());
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is StringSet)
+            {
+                StringSet Second = (StringSet)obj;
+                if (Second.Elems.Count != Elems.Count)
+                    return false;
+                foreach(string s in Elems)
+                    if(!Second.Elems.Contains(s))
+                        return false;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Elems.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return System.String.Join(" ", Elems.Select(e => e.ToString()));
+        }
+
+        public static StringSet Intersect(StringSet a, StringSet b)
+        {
+            return (StringSet)a.Intersect(b);
+        }
+
+        public static StringSet Union(StringSet a, StringSet b)
+        {
+            return (StringSet)a.Union(b);
+        }
+
+        public static StringSet Subtract(StringSet a, StringSet b)
+        {
+            return (StringSet)a.Subtract(b);
+        }
     }
 
-    //Уж очень похоже на ReachingDefinitions... Не обобщить ли?
-    public class AliveVarsAlgorithm : TopDownAlgorithm<Tuple<BitSet, BitSet>, BitSet>
+    public class DefUseContext : Context<Tuple<StringSet, StringSet>>
     {
-        private int DataSize;
-
-        public AliveVarsAlgorithm(ControlFlowGraph cfg): base(cfg)
+        private bool GoodOperand(BaseBlock block, string s)
         {
-            Cont = new AliveVarsContext(cfg);
-            DataSize = ((AliveVarsContext)Cont).Count;
+            return s != null && (Char.IsLetter(s[0]) || s[0]=='_') && !this[block].Item1.Contains(s);
+        }
+
+        public DefUseContext(ControlFlowGraph cfg)
+            : base(cfg)
+        {
+            foreach (BaseBlock block in cfg.GetBlocks())
+            {
+                this[block] = new Tuple<StringSet, StringSet>(new StringSet(), new StringSet());
+                foreach (CodeLine line in block.Code)
+                {
+                    //Дурацкая проверка операции
+                    //Надо учитывать использование в условии перехода?
+                    //У нас в грамматике странно обстоят дела с типом bool...
+                    if (line.First != null && line.Operation != "g" && line.Operation != "i")
+                    {
+                        if (GoodOperand(block,line.Second))
+                            this[block].Item2.Add(line.Second);
+                        if (GoodOperand(block,line.Third))
+                            this[block].Item2.Add(line.Third);
+                        this[block].Item1.Add(line.First);
+                    }
+                }
+            }
+        }
+
+        public StringSet Def(BaseBlock bl)
+        {
+            return this[bl].Item1;
+        }
+
+        public StringSet Use(BaseBlock bl)
+        {
+            return this[bl].Item2;
+        }
+    }
+
+    public class AliveVarsAlgorithm : TopDownAlgorithm<Tuple<StringSet, StringSet>, DefUseContext, StringSet>
+    {
+        public AliveVarsAlgorithm(ControlFlowGraph cfg):base(cfg)
+        {
             foreach (BaseBlock bl in cfg.GetBlocks())
             {
-                In[bl] = new BitSet(DataSize);
-                Out[bl] = new BitSet(DataSize);
+                In[bl] = new StringSet();
+                Out[bl] = new StringSet();
                 Func[bl] = new AliveVarsTransferFunction(Cont[bl]);
             }
         }
 
-        public override Tuple<Dictionary<BaseBlock, BitSet>, Dictionary<BaseBlock, BitSet>> Apply()
+        public override Tuple<Dictionary<BaseBlock, StringSet>, Dictionary<BaseBlock, StringSet>> Apply()
         {
-            return base.Apply(new BitSet(DataSize), new BitSet(DataSize), new BitSet(DataSize), BitSet.Union);
+            return base.Apply(new StringSet(), new StringSet(), new StringSet(), StringSet.Union);
         }
     }
 
-    //Уж очень она похожа на функцию для ReachingDefinitions...
-    public class AliveVarsTransferFunction : TransferFunction<BitSet>
+    public class AliveVarsTransferFunction : InfoProvidedTransferFunction<Tuple<StringSet, StringSet>, StringSet>
     {
-        private Tuple<BitSet,BitSet> Info;
+        public AliveVarsTransferFunction(Tuple<StringSet, StringSet> info)
+            : base(info)
+        { }
 
-        public AliveVarsTransferFunction(Tuple<BitSet,BitSet> info)
+        public override StringSet Transfer(StringSet input)
         {
-            Info = info;
-        }
-
-        public BitSet Transfer(BitSet input)
-        {
-            return (BitSet)Info.Item2.Union(input.Subtract(Info.Item1));
+            return (StringSet)Info.Item2.Union(input.Subtract(Info.Item1));
         }
     }
 }

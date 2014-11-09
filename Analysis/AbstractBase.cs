@@ -18,105 +18,71 @@ namespace SimpleLang.Analysis
     }
 
     //Множество с доступом по индексу
-    public interface IndexedSet<T> : ISet<T>
+    public interface IndexedSet<IndexType, ValueType> : ISet<ValueType>
     {
-        T Get(int index);
-        void Set(int index, T value);
+        ValueType Get(IndexType index);
+        void Set(IndexType index, ValueType value);
     }
 
-    //Множество, в котором элементы представлены флажками true/false
-    public class BitSet : IndexedSet<bool>, ICloneable
+    //Множество с доступом по индексу
+    public interface ChaoticSet<ValueType> : ISet<ValueType>
     {
-        private bool[] Elems;
-
-        public BitSet(int size)
-        {
-            Elems = Enumerable.Repeat(false, size).ToArray();
-        }
-
-        public int Count { get { return Elems.Length; } }
-
-        private BitSet(bool[] elems)
-        {
-            Elems = (bool[])elems.Clone();
-        }
-
-        public bool Get(int index)
-        {
-            return Elems[index];
-        }
-
-        public void Set(int index, bool value)
-        {
-            Elems[index] = value;
-        }
-
-        public ISet<bool> Intersect(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f && s).ToArray());
-        }
-
-        public ISet<bool> Union(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f || s).ToArray());
-        }
-
-        public ISet<bool> Subtract(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f,s) => s ? false : f).ToArray());
-        }
-    
-        public object Clone()
-        {
-            return new BitSet(Elems);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is BitSet)
-            {
-                BitSet Second = (BitSet)obj;
-                if (Second.Elems.Length != Elems.Length)
-                    return false;
-                for (int i = 0; i < Elems.Length; ++i)
-                    if (Elems[i] != Second.Elems[i])
-                        return false;
-                return true;
-            }
-            else
-                return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return Elems.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return System.String.Join(" ",Elems.Select(e=>e.ToString()));
-        }
-
-        public static BitSet Intersect(BitSet a, BitSet b)
-        {
-            return (BitSet) a.Intersect(b);
-        }
-
-        public static BitSet Union(BitSet a, BitSet b)
-        {
-            return (BitSet) a.Union(b);
-        }
-
-        public static BitSet Subtract(BitSet a, BitSet b)
-        {
-            return (BitSet) a.Subtract(b);
-        }
+        void Add(ValueType elem);
+        void Remove(ValueType elem);
     }
+
+    //public abstract class Set<StorageType,T> : ISet<T>
+    //{
+    //    protected StorageType Elems;
+
+    //    public abstract override bool Equals(object obj);
+
+    //    public override int GetHashCode()
+    //    {
+    //        return Elems.GetHashCode();
+    //    }
+
+    //    public abstract override string ToString();
+
+    //    public static Set<StorageType, T> Intersect(Set<StorageType, T> a, Set<StorageType, T> b)
+    //    {
+    //        return (Set<StorageType, T>)a.Intersect(b);
+    //    }
+
+    //    public static Set<StorageType, T> Union(Set<StorageType, T> a, Set<StorageType, T> b)
+    //    {
+    //        return (Set<StorageType, T>)a.Union(b);
+    //    }
+
+    //    public static Set<StorageType, T> Subtract(Set<StorageType, T> a, Set<StorageType, T> b)
+    //    {
+    //        return (Set<StorageType, T>)a.Subtract(b);
+    //    }
+
+    //    public abstract ISet<T> Intersect(ISet<T> b);
+
+    //    public abstract ISet<T> Union(ISet<T> b);
+
+    //    public abstract ISet<T> Subtract(ISet<T> b);
+
+    //}
 
     //Интерфейс передаточной функции
     public interface TransferFunction<T>
     {
         T Transfer(T input);
+    }
+
+    public abstract class InfoProvidedTransferFunction<InfoType, DataType> : TransferFunction<DataType>
+    {
+        protected InfoType Info;
+
+        public InfoProvidedTransferFunction(InfoType info)
+        {
+            Info = info;
+        }
+
+        public abstract DataType Transfer(DataType input);
     }
 
     //Контекст, навешиваемый на граф базовых блоков
@@ -156,17 +122,19 @@ namespace SimpleLang.Analysis
         public LinkedList<BaseBlock> Blocks { get { return Graph.GetBlocks(); } }
     }
 
-    public abstract class Algorithm<InfoType, DataType>
+    public abstract class Algorithm<InfoType, ContextType, DataType>
         where InfoType : class
+        where ContextType: Context<InfoType>
     {
         protected delegate DataType CollectionFunction(DataType a, DataType b);
 
         //Контекст, специфичный для алгоритма и связанный с базовыми блоками
-        protected Context<InfoType> Cont;
+        protected ContextType Cont {get; private set;}
         //Множества, которые хотим построить
-        protected Dictionary<BaseBlock, DataType> In, Out;
+        protected Dictionary<BaseBlock, DataType> In {get; private set;}
+        protected Dictionary<BaseBlock, DataType>  Out { get; private set; }
         //Передаточные функции для блоков
-        protected Dictionary<BaseBlock, TransferFunction<DataType>> Func;
+        protected Dictionary<BaseBlock, TransferFunction<DataType>> Func { get; private set; }
 
         protected abstract Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit,
             DataType otherInit, DataType defaultInit, CollectionFunction collect);
@@ -177,12 +145,16 @@ namespace SimpleLang.Analysis
         {
             In = new Dictionary<BaseBlock, DataType>();
             Out = new Dictionary<BaseBlock, DataType>();
+            Cont = (ContextType)typeof(ContextType).
+                GetConstructor(new Type[1] { typeof(ControlFlowGraph) }).
+                Invoke(new object[1]{cfg});
             Func = new Dictionary<BaseBlock, TransferFunction<DataType>>();
         }
     }
 
-    public abstract class TopDownAlgorithm<InfoType, DataType> : Algorithm<InfoType, DataType>
+    public abstract class TopDownAlgorithm<InfoType, ContextType, DataType> : Algorithm<InfoType, ContextType, DataType>
         where InfoType : class
+        where ContextType : Context<InfoType>
     {
         protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit,
             DataType otherInit, DataType defaultInit, CollectionFunction collect)
@@ -218,8 +190,9 @@ namespace SimpleLang.Analysis
         {}
     }
 
-    public abstract class DownTopAlgorithm<InfoType, DataType> : Algorithm<InfoType, DataType>
+    public abstract class DownTopAlgorithm<InfoType, ContextType, DataType> : Algorithm<InfoType, ContextType, DataType>
         where InfoType : class
+        where ContextType : Context<InfoType>
     {
         protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit, 
             DataType otherInit, DataType defaultInit, CollectionFunction collect)

@@ -44,7 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analysis\ReachingDefinitions.cs" />
-    <Compile Include="Optimizations\Correct3AddressCode.cs" />
     <Compile Include="Analysis\DeadOrAlive.cs" />
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
@@ -54,7 +53,7 @@
     <Compile Include="Parsers\ShiftReduceParserCode.cs" />
     <Compile Include="Parsers\SimpleLex.cs" />
     <Compile Include="Parsers\SimpleYacc.cs" />
-    <Compile Include="Analysis\TransferFunctionBase.cs" />
+    <Compile Include="Analysis\AbstractBase.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Optimizations\Fold.cs" />

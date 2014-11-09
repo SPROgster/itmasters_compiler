@@ -1,19 +1,109 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Analysis
 {
+    //Множество, в котором элементы представлены флажками true/false
+    public class BitSet : IndexedSet<int, bool>, ICloneable
+    {
+        private bool[] Elems;
+
+        public BitSet(int size)
+        {
+            Elems = Enumerable.Repeat(false, size).ToArray();
+        }
+
+        public int Count { get { return Elems.Length; } }
+
+        private BitSet(bool[] elems)
+        {
+            Elems = (bool[])elems.Clone();
+        }
+
+        public bool Get(int index)
+        {
+            return Elems[index];
+        }
+
+        public void Set(int index, bool value)
+        {
+            Elems[index] = value;
+        }
+
+        public ISet<bool> Intersect(ISet<bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f && s).ToArray());
+        }
+
+        public ISet<bool> Union(ISet<bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f || s).ToArray());
+        }
+
+        public ISet<bool> Subtract(ISet<bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => s ? false : f).ToArray());
+        }
+
+        public object Clone()
+        {
+            return new BitSet(Elems);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is BitSet)
+            {
+                BitSet Second = (BitSet)obj;
+                if (Second.Elems.Length != Elems.Length)
+                    return false;
+                for (int i = 0; i < Elems.Length; ++i)
+                    if (Elems[i] != Second.Elems[i])
+                        return false;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Elems.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return System.String.Join(" ", Elems.Select(e => e.ToString()));
+        }
+
+        public static BitSet Intersect(BitSet a, BitSet b)
+        {
+            return (BitSet)a.Intersect(b);
+        }
+
+        public static BitSet Union(BitSet a, BitSet b)
+        {
+            return (BitSet)a.Union(b);
+        }
+
+        public static BitSet Subtract(BitSet a, BitSet b)
+        {
+            return (BitSet)a.Subtract(b);
+        }
+    }
+
     public class KillGenContext : Context<Tuple<BitSet,BitSet>>
     {
-        public int DefsCount { get; private set; }
+        public int Count { get; protected set; }
 
         public KillGenContext(ControlFlowGraph cfg)
             : base(cfg)
         {
             //Хотим узнать общее количество определений
-            DefsCount = 0;
+            Count = 0;
             //Вспомогательные структуры - словарь для номеров d, относящихся к соотв. блоку
             Dictionary<BaseBlock, HashSet<int>> BlockDef = new Dictionary<BaseBlock, HashSet<int>>();
             //Соответствие "номер d" - "имя определяемой переменной"
@@ -26,14 +116,14 @@ namespace SimpleLang.Analysis
                     {
                         if(!VarDef.ContainsKey(cl.First))
                             VarDef[cl.First] = new HashSet<int>();
-                        VarDef[cl.First].Add(DefsCount);
-                        BlockDef[bl].Add(DefsCount++);
+                        VarDef[cl.First].Add(Count);
+                        BlockDef[bl].Add(Count++);
                     }
             }
             //Для каждого базового блока легко можем сформировать элементы Gen и Kill
             foreach (BaseBlock bl in Graph.GetBlocks())
             {
-                this[bl] = new Tuple<BitSet, BitSet>(new BitSet(DefsCount), new BitSet(DefsCount));
+                this[bl] = new Tuple<BitSet, BitSet>(new BitSet(Count), new BitSet(Count));
                 foreach (int i in BlockDef[bl])
                 {
                     this[bl].Item2.Set(i, true);
@@ -48,40 +138,37 @@ namespace SimpleLang.Analysis
             }
         }
 
-        public BitSet Kills(BaseBlock bl)
+        public BitSet Kill(BaseBlock bl)
         {
             return this[bl].Item1;
         }
 
-        public BitSet Gens(BaseBlock bl)
+        public BitSet Gen(BaseBlock bl)
         {
             return this[bl].Item2;
         }
     }
 
-    public class ReachingDefsTransferFunction : TransferFunction<BitSet>
+    public class ReachingDefsTransferFunction : InfoProvidedTransferFunction<Tuple<BitSet,BitSet>,BitSet>
     {
-        private Tuple<BitSet,BitSet> Info;
+        public ReachingDefsTransferFunction(Tuple<BitSet, BitSet> info)
+            : base(info)
+        { }
 
-        public ReachingDefsTransferFunction(Tuple<BitSet,BitSet> info)
-        {
-            Info = info;
-        }
-
-        public BitSet Transfer(BitSet input)
+        public override BitSet Transfer(BitSet input)
         {
             return (BitSet)Info.Item2.Union(input.Subtract(Info.Item1));
         }
     }
 
-    public class ReachingDefsAlgorithm : DownTopAlgorithm<Tuple<BitSet,BitSet>, BitSet>
+    public class ReachingDefsAlgorithm : DownTopAlgorithm<Tuple<BitSet, BitSet>, KillGenContext, BitSet>
     {
-        private int DataSize;
+        protected int DataSize;
 
-        public ReachingDefsAlgorithm(ControlFlowGraph cfg): base(cfg)
+        public ReachingDefsAlgorithm(ControlFlowGraph cfg)
+            : base(cfg)
         {
-            Cont = new KillGenContext(cfg);
-            DataSize = ((KillGenContext)Cont).DefsCount;
+            DataSize = Cont.Count;
             foreach (BaseBlock bl in cfg.GetBlocks())
             {
                 In[bl] = new BitSet(DataSize);
@@ -92,7 +179,7 @@ namespace SimpleLang.Analysis
 
         public override Tuple<Dictionary<BaseBlock, BitSet>, Dictionary<BaseBlock, BitSet>> Apply()
         {
-            return base.Apply(new BitSet(DataSize),new BitSet(DataSize),new BitSet(DataSize),BitSet.Union);
+            return base.Apply(new BitSet(DataSize), new BitSet(DataSize), new BitSet(DataSize), BitSet.Union);
         }
     }
 }
