@@ -62,6 +62,11 @@ namespace SimpleCompiler
                         Console.WriteLine("Граф построен!");
                         //Демонстрируем проверку живучести переменной
                         List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
+                        Console.WriteLine(l[1]);
+                        Console.WriteLine("---------------------------------");
+                        //Тест Оптимизация общих подвыражений
+                        l[1].optimization_CSE_inBBl();
+                        Console.WriteLine(l[1]);
                         Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1).ToString());
                         //Проверяем алгоритм поиска достигающих определений
                         Console.WriteLine();

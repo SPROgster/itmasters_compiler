@@ -21,7 +21,24 @@ namespace SimpleLang.MiddleEnd
                 NewBlock.Add((CodeLine)cl.Clone());
             return NewBlock;
         }
-
+        public void optimization_CSE_inBBl() {
+            int t_id = 0;
+            for (LinkedListNode<CodeLine> node = Code.Last; node != null; node = node.Previous)
+            {
+                for (LinkedListNode<CodeLine> node1 = node.Next; node1 != null; node1 = node1.Next)
+                {
+                    if (node1.Value.First.Equals(node.Value.Second) || node1.Value.First.Equals(node.Value.Third))break;
+                    if (node1.Value.Second.Equals(node.Value.Second) && node1.Value.Third.Equals(node.Value.Third) && node1.Value.Operation.Equals(node.Value.Operation))
+                    {
+                        Code.AddBefore(node, new CodeLine(null, "_t", node.Value.Second, node.Value.Third, node.Value.Operation));
+                        node.Value = new CodeLine(null, node.Value.First, "_t", null, null);
+                        node1.Value = new CodeLine(null, node1.Value.First, "_t", null, null);
+                        t_id++;
+                        break;
+                    }
+                }
+            }
+        }
         public override string ToString()
         {
             return Code.Count>0 ? 
