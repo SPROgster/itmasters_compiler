@@ -47,6 +47,7 @@
     <Compile Include="Analysis\DeadOrAlive.cs" />
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="MiddleEnd\SymbolTable.cs" />
     <Compile Include="Parsers\ParserHelper.cs" />
     <Compile Include="MiddleEnd\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

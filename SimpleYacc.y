@@ -69,8 +69,7 @@ idlist
 	;
 	
 assign 	
-	: ID ident ASSIGN num_expr { $$ = new AssignNode($2 as IdNode, $4); }
-	| ident ASSIGN num_expr { $$ = new AssignNode($1 as IdNode, $3); }
+	: ident ASSIGN expr { $$ = new AssignNode($1 as IdNode, $3); }
 	;
 
 vardef
