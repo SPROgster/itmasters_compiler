@@ -87,6 +87,12 @@ namespace SimpleCompiler
                                 Console.WriteLine("In:\t" + AVAResult.Item1[block]);
                                 Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
                             }
+                        Console.WriteLine("-------------------------");
+                        //Оптимизация общих подвыражений в блоках
+                        foreach(BaseBlock block in CFG.GetBlocks()){
+                            CSE.CSE_inBBl(ref block.Code);
+                            Console.WriteLine(block);
+                        }
                     }
                     else
                         Console.WriteLine("Исправьте Ваш кривой код!");
