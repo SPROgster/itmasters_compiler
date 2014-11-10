@@ -1,6 +1,5 @@
 begin
   var a,b,c,d,f:int;
-
   cycle 2*a
     b:=a*b;
   while (a>b)

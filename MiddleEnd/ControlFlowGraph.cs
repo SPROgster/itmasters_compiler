@@ -3,17 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MiddleEnd
-{
-    //public class BaseBlock
-    //{
-    //    public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
-    //    public LinkedList<BaseBlock> Input = new LinkedList<BaseBlock>();
-    //    public LinkedList<BaseBlock> Output = new LinkedList<BaseBlock>();
-    //}
+namespace SimpleLang.MiddleEnd
+{   
+    public class BaseBlock: ICloneable
+    {
+        public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
+        
+        public void Add(CodeLine val)
+        {
+            Code.AddLast(val);
+        }
 
-    
-    using BaseBlock = LinkedList<CodeLine>;
+        public object Clone()
+        {
+            var NewBlock = new BaseBlock();
+            foreach(var cl in Code)
+                NewBlock.Add((CodeLine)cl.Clone());
+            return NewBlock;
+        }
+
+        public override string ToString()
+        {
+            return Code.Count>0 ? 
+                Code.Select(e=>e.ToString()).Aggregate((a,b)=>a+Environment.NewLine+b) : "";
+        }
+    }
 
     public class ControlFlowGraph
     {
@@ -74,8 +88,8 @@ namespace MiddleEnd
             while (Current != null)
             {
                 //Добавляем текущую команду в текущий блок
-                CurrentBlock.AddLast(Current.Value);
-                //Если эьл конец блока
+                CurrentBlock.Add(Current.Value);
+                //Если это конец блока
                 if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
@@ -114,6 +128,14 @@ namespace MiddleEnd
                 }
                 Current = Current.Next;
             }
+            //Теперь для всех блоков точно существуют списки входов и выходов
+            foreach (BaseBlock bl in Blocks)
+            {
+                if(!Inputs.ContainsKey(bl))
+                    Inputs[bl] = new LinkedList<BaseBlock>();
+                if (!Outputs.ContainsKey(bl))
+                    Outputs[bl] = new LinkedList<BaseBlock>();
+            }
             //Проходим по блокам, помеченным метками
             foreach (var elem in GotoLabelsSrc)
                 //Если на текущую метку осуществлялись переходы
@@ -121,14 +143,26 @@ namespace MiddleEnd
                     //Достраиваем связи
                     foreach (var dest in GotoLabelsDest[elem.Key])
                     {
-                        if (!Outputs.ContainsKey(dest))
-                            Outputs[dest] = new LinkedList<BaseBlock>();
                         Outputs[dest].AddLast(elem.Value);
-                        if (!Inputs.ContainsKey(elem.Value))
-                            Inputs[elem.Value] = new LinkedList<BaseBlock>();
                         Inputs[elem.Value].AddLast(dest);
                     }
-
+            //Создаём фиктивный блок "вход"
+            BaseBlock EndBlock = new BaseBlock();
+            Inputs[EndBlock] = new LinkedList<BaseBlock>();
+            Outputs[EndBlock] = new LinkedList<BaseBlock>();
+            Outputs[EndBlock].AddLast(Blocks.First());
+            Blocks.AddFirst(EndBlock);
+            //Создаём фиктивный блок "выход"
+            EndBlock = new BaseBlock();
+            Inputs[EndBlock] = new LinkedList<BaseBlock>();
+            Outputs[EndBlock] = new LinkedList<BaseBlock>();
+            foreach(BaseBlock bl in Blocks)
+                if (Outputs[bl].Count == 0)
+                {
+                    Outputs[bl].AddLast(EndBlock);
+                    Inputs[EndBlock].AddLast(bl);
+                }
+            Blocks.AddLast(EndBlock);
         }
 
         //Возвращает список базовых блоков, являющихся предшественниками указанного
@@ -146,10 +180,21 @@ namespace MiddleEnd
         {
             return Blocks;
         }
-        
+
+        //Возвращает блок "вход"
+        public BaseBlock GetStart()
+        {
+            return Blocks.First();
+        }
+
+        //Возвращает блок "выход"
+        public BaseBlock GetEnd()
+        {
+            return Blocks.Last();
+        }
     }
 
-    public class CodeLine
+    public class CodeLine: ICloneable
     {
         public string Label, First, Second, Third, Operation;
 
@@ -173,53 +218,11 @@ namespace MiddleEnd
                     (First != null ? First + " := " + Second + " " + Operation + " " + Third : "nop");
             }
         }
-    }
 
-    public enum SymbolKind { type, var }
-    public enum CType { Int, Double, Bool, None };
-
-    public static class SymbolTable // Таблица символов
-    {
-        static SymbolTable()
+        public object Clone()
         {
-            vars = new List<Tuple<string, CType, SymbolKind>>();
-            foreach (CType value in System.Enum.GetValues(typeof(CType)))
-                if (value != CType.None)
-                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), value, SymbolKind.type));
-        }
-
-        public static List<Tuple<string, CType, SymbolKind>> vars;
-
-        public static void Add(string name, CType t, SymbolKind kind)
-        {
-            //int Index = IndexOfIdent(name);
-            //if (Index >= 0)
-            //    if (vars[Index].Item3 == SymbolKind.var)
-            //        throw new SemanticException("Переменная " + name + " уже определена");
-            //    else
-            //        throw new SemanticException("Тип " + name + " уже определён");
-            //else
-            vars.Add(new Tuple<string, CType, SymbolKind>(name, t, kind));
-        }
-
-        public static int IndexOfIdent(string id)
-        {
-            return vars.FindIndex(e => e.Item1 == id);
-        }
-
-        public static bool Contains(string id)
-        {
-            return IndexOfIdent(id) >= 0;
-        }
-
-        public static CType ParseType(string name)
-        {
-            switch (name)
-            {
-                case "int": return CType.Int;
-                case "bool": return CType.Bool;
-                default: return CType.None;
-            }
+            return new CodeLine(Label, First, Second, Third, Operation);
         }
     }
+
 }

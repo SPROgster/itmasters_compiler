@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProgramTree;
 
-using MiddleEnd;
+using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
@@ -143,6 +142,55 @@ namespace SimpleLang.Visitors
             node.StatIf.Visit(this);
             Code.AddLast(new CodeLine(AfterIfLabel, null,
                null, null, "nop"));
+        }
+
+        public void RemoveEmptyLabels()
+        {
+            RemoveEmptyLabels(Code);
+        }
+
+        /// <summary>
+        /// Удаляет пустые метки из кода
+        /// </summary>
+        public static void RemoveEmptyLabels(LinkedList<CodeLine> code)
+        {
+            var Iterator = code.First;
+            while (Iterator != null)
+            {
+                if (Iterator.Value.First == null && Iterator.Next != null)
+                {
+                    RenameLabels(code, Iterator.Next.Value.Label, Iterator.Value.Label);
+                    Iterator.Next.Value.Label = Iterator.Value.Label;
+                    Iterator = Iterator.Next;
+                    code.Remove(Iterator.Previous);
+                }
+                else
+                    Iterator = Iterator.Next;
+            }
+        }
+
+        /// <summary>
+        /// Заменяет метки со старым именем на новое имя
+        /// </summary>
+        private static void RenameLabels(LinkedList<CodeLine> inputCode, string oldName, string newName)
+        {
+            for (var elem = inputCode.First; elem != null; elem = elem.Next)
+            {
+                // замена метки
+                if (elem.Value.Label != null && elem.Value.Label == oldName)
+                    elem.Value.Label = newName;
+
+                // замена в goto
+                if (elem.Value.Operation == "g")
+                    if (elem.Value.First != null && elem.Value.First == oldName)
+                        elem.Value.First = newName;
+
+                // замена в if
+                if (elem.Value.Operation == "i")
+                    if (elem.Value.Second != null && elem.Value.Second == oldName)
+                        elem.Value.Second = newName;
+
+            }
         }
     }
 }

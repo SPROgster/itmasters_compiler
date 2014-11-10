@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using MiddleEnd;
-
 namespace SimpleParser
 {
     public class LexException : Exception

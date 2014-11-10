@@ -43,16 +43,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Optimizations\DeadOrAlive.cs" />
-    <Compile Include="InternalStructures\MiddleEnd.cs" />
+    <Compile Include="Analysis\ReachingDefinitions.cs" />
+    <Compile Include="Analysis\DeadOrAlive.cs" />
+    <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="MiddleEnd\SymbolTable.cs" />
     <Compile Include="Parsers\ParserHelper.cs" />
-    <Compile Include="InternalStructures\ProgramTree.cs" />
+    <Compile Include="MiddleEnd\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parsers\ShiftReduceParserCode.cs" />
     <Compile Include="Parsers\SimpleLex.cs" />
     <Compile Include="Parsers\SimpleYacc.cs" />
-    <Compile Include="Optimizations\TransferFunctionInterfaces.cs" />
+    <Compile Include="Analysis\AbstractBase.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Optimizations\Fold.cs" />
@@ -61,6 +63,10 @@
     <Compile Include="Visitors\CheckVariablesVisitor.cs" />
     <Compile Include="Visitors\VariableRenameVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="_TestTexts\LabelsTest.txt" />
+    <Content Include="_TestTexts\ReachingDefsTest.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

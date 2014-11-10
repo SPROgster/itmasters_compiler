@@ -1,0 +1,13 @@
+begin
+	var i,j,m,n,u2,u3,a:int;
+	i:=m;
+	j:=n;
+	while(i>j)
+	begin
+		j:=j+1;
+		a:=i;
+		if (i>j)
+			a:=u2;
+		i:=u3
+	end
+end
