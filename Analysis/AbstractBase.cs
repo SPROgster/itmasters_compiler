@@ -152,9 +152,10 @@ namespace SimpleLang.Analysis
         }
     }
 
-    public abstract class TopDownAlgorithm<InfoType, ContextType, DataType> : Algorithm<InfoType, ContextType, DataType>
+    public abstract class DownTopAlgorithm<InfoType, ContextType, DataType> : Algorithm<InfoType, ContextType, DataType>
         where InfoType : class
         where ContextType : Context<InfoType>
+        where DataType : IEquatable<DataType>
     {
         protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit,
             DataType otherInit, DataType defaultInit, CollectionFunction collect)
@@ -186,13 +187,15 @@ namespace SimpleLang.Analysis
             return new Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>>(In, Out);
         }
 
-        protected TopDownAlgorithm(ControlFlowGraph cfg): base(cfg)
+        protected DownTopAlgorithm(ControlFlowGraph cfg)
+            : base(cfg)
         {}
     }
 
-    public abstract class DownTopAlgorithm<InfoType, ContextType, DataType> : Algorithm<InfoType, ContextType, DataType>
+    public abstract class TopDownAlgorithm<InfoType, ContextType, DataType> : Algorithm<InfoType, ContextType, DataType>
         where InfoType : class
         where ContextType : Context<InfoType>
+        where DataType : IEquatable<DataType>
     {
         protected override Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>> Apply(DataType endInit, 
             DataType otherInit, DataType defaultInit, CollectionFunction collect)
@@ -224,7 +227,8 @@ namespace SimpleLang.Analysis
             return new Tuple<Dictionary<BaseBlock, DataType>, Dictionary<BaseBlock, DataType>>(In, Out);
         }
 
-        protected DownTopAlgorithm(ControlFlowGraph cfg): base(cfg)
+        protected TopDownAlgorithm(ControlFlowGraph cfg)
+            : base(cfg)
         {}
     }
 }

@@ -7,7 +7,7 @@ using SimpleLang.MiddleEnd;
 namespace SimpleLang.Analysis
 {
     //Множество, в котором элементы представлены флажками true/false
-    public class BitSet : IndexedSet<int, bool>, ICloneable
+    public class BitSet : IndexedSet<int, bool>, ICloneable, IEquatable<BitSet>
     {
         private bool[] Elems;
 
@@ -53,25 +53,14 @@ namespace SimpleLang.Analysis
             return new BitSet(Elems);
         }
 
-        public override bool Equals(object obj)
+        public bool Equals(BitSet other)
         {
-            if (obj is BitSet)
-            {
-                BitSet Second = (BitSet)obj;
-                if (Second.Elems.Length != Elems.Length)
-                    return false;
-                for (int i = 0; i < Elems.Length; ++i)
-                    if (Elems[i] != Second.Elems[i])
-                        return false;
-                return true;
-            }
-            else
+            if (other.Elems.Length != Elems.Length)
                 return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return Elems.GetHashCode();
+            for (int i = 0; i < Elems.Length; ++i)
+                if (Elems[i] != other.Elems[i])
+                    return false;
+            return true;
         }
 
         public override string ToString()
@@ -161,7 +150,7 @@ namespace SimpleLang.Analysis
         }
     }
 
-    public class ReachingDefsAlgorithm : DownTopAlgorithm<Tuple<BitSet, BitSet>, KillGenContext, BitSet>
+    public class ReachingDefsAlgorithm : TopDownAlgorithm<Tuple<BitSet, BitSet>, KillGenContext, BitSet>
     {
         protected int DataSize;
 
