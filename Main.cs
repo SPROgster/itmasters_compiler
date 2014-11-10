@@ -17,7 +17,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"..\..\_TestTexts\ReachingDefsTest.txt";
+            string FileName = @"..\..\_TestTexts\Fold-Test.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -50,8 +50,6 @@ namespace SimpleCompiler
                         parser.root.Visit(gcv);
                         //Устранение Nop-ов и коррекция меток
                         gcv.RemoveEmptyLabels();
-                        // Вызов сворачивания констант и алг тождеств
-                        Fold.fold(ref gcv.Code);
                         //Выводим то, что получилось
                         Console.WriteLine();
                         Console.WriteLine("Трёхадресный код:");
@@ -60,6 +58,10 @@ namespace SimpleCompiler
                         //Строим граф базовых блоков
                         ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
                         Console.WriteLine("Граф построен!");
+                        // Вызов сворачивания констант и алг тождеств 
+                        // По-блочно
+                        foreach (BaseBlock block in CFG.GetBlocks())
+                            Fold.fold(ref block.Code);
                         //Демонстрируем проверку живучести переменной
                         List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
                         Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1).ToString());
