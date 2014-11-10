@@ -8,6 +8,7 @@ using SimpleParser;
 using SimpleLang.Visitors;
 using MiddleEnd;
 using DefUse;
+using CleanDead;
 
 namespace SimpleCompiler
 {
@@ -85,6 +86,15 @@ namespace SimpleCompiler
                     List<BaseBlock> l=new List<BaseBlock>(CFG.GetBlocks());
                     Console.WriteLine(DeadOrAlive.IsAlive(l[0],"a",1).ToString());
                     Console.WriteLine("Граф построен!");
+
+                    Console.WriteLine("\nУдаляем мёртвый код:");
+                    LinkedList<BaseBlock> blocks = CFG.GetBlocks();
+                    for (var p = blocks.First; p != null; p = p.Next)
+                    {
+                        CleanDead.CleanDead.cleanBlock(p.Value);
+                        for (var r = p.Value.First; r != null; r = r.Next)
+                            Console.WriteLine(r.Value.ToString());
+                    }
                 }
             }
             catch (FileNotFoundException)
