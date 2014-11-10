@@ -29,43 +29,8 @@ namespace SimpleLang.Analysis
     {
         void Add(ValueType elem);
         void Remove(ValueType elem);
+        bool Contains(ValueType elem);
     }
-
-    //public abstract class Set<StorageType,T> : ISet<T>
-    //{
-    //    protected StorageType Elems;
-
-    //    public abstract override bool Equals(object obj);
-
-    //    public override int GetHashCode()
-    //    {
-    //        return Elems.GetHashCode();
-    //    }
-
-    //    public abstract override string ToString();
-
-    //    public static Set<StorageType, T> Intersect(Set<StorageType, T> a, Set<StorageType, T> b)
-    //    {
-    //        return (Set<StorageType, T>)a.Intersect(b);
-    //    }
-
-    //    public static Set<StorageType, T> Union(Set<StorageType, T> a, Set<StorageType, T> b)
-    //    {
-    //        return (Set<StorageType, T>)a.Union(b);
-    //    }
-
-    //    public static Set<StorageType, T> Subtract(Set<StorageType, T> a, Set<StorageType, T> b)
-    //    {
-    //        return (Set<StorageType, T>)a.Subtract(b);
-    //    }
-
-    //    public abstract ISet<T> Intersect(ISet<T> b);
-
-    //    public abstract ISet<T> Union(ISet<T> b);
-
-    //    public abstract ISet<T> Subtract(ISet<T> b);
-
-    //}
 
     //Интерфейс передаточной функции
     public interface TransferFunction<T>
