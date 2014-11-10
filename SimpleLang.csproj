@@ -48,6 +48,7 @@
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MiddleEnd\SymbolTable.cs" />
+    <Compile Include="Optimizations\CSE.cs" />
     <Compile Include="Parsers\ParserHelper.cs" />
     <Compile Include="MiddleEnd\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
