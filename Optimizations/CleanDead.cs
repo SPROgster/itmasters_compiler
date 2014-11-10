@@ -12,13 +12,14 @@ namespace CleanDead
         public static void cleanBlock(BaseBlock block)
         {
             var list = DeadOrAlive.GenerateDefUse(new List<CodeLine>(block));
-            var p = block.First;
 
-            foreach (Tuple<string, string, int> def in list)
+            for (var p = block.First; p != null; p = p.Next)
             {
-                if (!DeadOrAlive.IsAlive(block, def.Item1, def.Item3))
-                    block.Remove(p);
-                p = p.Next;
+                foreach (Tuple<string, string, int> def in list)
+                {
+                    if (!DeadOrAlive.IsAlive(block, def.Item1, def.Item3))
+                        block.Remove(p);
+                }
             }
         }
     }
