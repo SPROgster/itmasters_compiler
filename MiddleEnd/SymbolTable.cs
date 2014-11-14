@@ -6,7 +6,7 @@ using System.Text;
 namespace SimpleLang.MiddleEnd
 {
     public enum SymbolKind { type, var }
-    public enum CType { Int, Double, Bool, None };
+    public enum CType { Int, Float, Double, Bool, None };
 
     public static class SymbolTable // Таблица символов
     {
@@ -21,7 +21,7 @@ namespace SimpleLang.MiddleEnd
 
         public static List<Tuple<string, CType, SymbolKind>> vars;
 
-        public static void Add(string name, CType t, SymbolKind kind)
+        public static void Add(string name, CType type, SymbolKind kind)
         {
             //int Index = IndexOfIdent(name);
             //if (Index >= 0)
@@ -30,7 +30,7 @@ namespace SimpleLang.MiddleEnd
             //    else
             //        throw new SemanticException("Тип " + name + " уже определён");
             //else
-            vars.Add(new Tuple<string, CType, SymbolKind>(name, t, kind));
+            vars.Add(new Tuple<string, CType, SymbolKind>(name, type, kind));
         }
 
         public static int IndexOfIdent(string id)
@@ -49,6 +49,7 @@ namespace SimpleLang.MiddleEnd
             {
                 case "int"      : return CType.Int;
                 case "bool"     : return CType.Bool;
+                case "float"    : return CType.Float;
                 case "double"   : return CType.Double;
                 default         : return CType.None;
             }
