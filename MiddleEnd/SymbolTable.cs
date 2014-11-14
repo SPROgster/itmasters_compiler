@@ -12,6 +12,7 @@ namespace SimpleLang.MiddleEnd
     {
         static SymbolTable()
         {
+            // Initializing Symbol Table with all data types except for None
             vars = new List<Tuple<string, CType, SymbolKind>>();
             foreach (CType value in System.Enum.GetValues(typeof(CType)))
                 if (value != CType.None)
@@ -46,9 +47,10 @@ namespace SimpleLang.MiddleEnd
         {
             switch (name)
             {
-                case "int": return CType.Int;
-                case "bool": return CType.Bool;
-                default: return CType.None;
+                case "int"      : return CType.Int;
+                case "bool"     : return CType.Bool;
+                case "double"   : return CType.Double;
+                default         : return CType.None;
             }
         }
     }

@@ -10,15 +10,23 @@ namespace SimpleLang.Visitors
     class CheckVariablesVisitor:AutoVisitor
     {
         public List<String> Errors = new List<string>();
+        // Flag for adding new vars in VisitIdNode, else - using
         bool InVarDef = false;
         private LinkedList<string> Names = new LinkedList<string>();
 
         public override void VisitVarDefNode (VarDefNode vd)
         {
             InVarDef = true;
+            // Empty new names list 
+            if (Names.Count() > 0)
+                Names.Clear();
+            
+            // Adding new id's as names for vars
             foreach (var id in vd.Idents)
                 id.Visit(this);
             InVarDef = false;
+
+            // Adding new vars in SymbolTable
             foreach (var id in Names)
                 SymbolTable.Add(id, SymbolTable.ParseType(vd.TypeIdent.Name), SymbolKind.var);
         }
