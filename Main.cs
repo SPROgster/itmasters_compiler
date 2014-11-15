@@ -65,8 +65,8 @@ namespace SimpleCompiler
                         Console.WriteLine("c оптимизацией общих подвыражений в каждом блоке:");
                         int i = 0; // # блока
                         foreach (var block in CFG.GetBlocks())
-                        {                            
-                            block.cseOptimization();
+                        {
+                            CSE.cseOptimization(block);
                             Console.WriteLine("--- Блок {0} ---", i);
                             Console.WriteLine(block);
                             ++i;
