@@ -14,6 +14,7 @@ namespace SimpleLang.Visitors
             new LinkedList<CodeLine>();
 
         private Stack<string> NamesValuesStack = new Stack<string>();
+        private Stack<CType> CTypeValuesStack = new Stack<CType>();
         private int TempCounter = 0;
         private int LabelCounter = 0;
         private const string TempName = "_t";
@@ -32,30 +33,76 @@ namespace SimpleLang.Visitors
             return LabelName + LabelCounter++;
         }
 
+        /// <summary>
+        /// Определяет какого типа должен быть результат операции по двум операторам
+        /// </summary>
+        /// <param name="op1">Первый операнд</param>
+        /// <param name="op2">Второй операнд</param>
+        /// <param name="op">Операция</param>
+        /// <returns>CType результата операции</returns>
+        private CType OpResultType(CType op1, CType op2, BinOpType op)
+        {
+            if (op2 == CType.None)
+                return op1;
+
+            if (op == BinOpType.Equal  || op == BinOpType.GEqual || op == BinOpType.Greater ||
+                op == BinOpType.LEqual || op == BinOpType.Less   || op == BinOpType.NEqual)
+                return CType.Bool;
+
+            if ((op1 == CType.Double) || (op2 == CType.Double))
+                return CType.Double;
+
+            if ((op1 == CType.Float) || (op2 == CType.Float))
+                return CType.Float;
+
+            if ((op1 == CType.Int) || (op2 == CType.Int))
+                return CType.Int;
+
+            if ((op1 == CType.Bool) || (op2 == CType.Bool))
+                return CType.Bool;
+
+            return CType.None;
+        }
 
         public override void VisitAssignNode(AssignNode node)
         {
-            if (node.Expr is BinOpNode) {
+            if (node.Expr is BinOpNode) 
+            {
                 (node.Expr as BinOpNode).Right.Visit(this);
                 (node.Expr as BinOpNode).Left.Visit(this);
                 node.Id.Visit(this);
                 Code.AddLast(new CodeLine(null, NamesValuesStack.Pop(), NamesValuesStack.Pop(), NamesValuesStack.Pop(), (node.Expr as BinOpNode).Op.ToString()));
-            }else{
-            node.Expr.Visit(this);
-            node.Id.Visit(this);
-            Code.AddLast(new CodeLine(null, NamesValuesStack.Pop(),
-                NamesValuesStack.Pop(), null, null));
+
+                // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
+                CTypeValuesStack.Pop(); CTypeValuesStack.Pop(); CTypeValuesStack.Pop();
+            }
+            else
+            {
+                node.Expr.Visit(this);
+                node.Id.Visit(this);
+                Code.AddLast(new CodeLine(null, NamesValuesStack.Pop(),
+                             NamesValuesStack.Pop(), null, null));
+
+                // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
+                CTypeValuesStack.Pop(); CTypeValuesStack.Pop();
             }
         }
 
         public override void VisitIdNode(IdNode id)
         {
+            // Определяем тип переменной
+            int idx = SymbolTable.IndexOfIdent(id.Name);
+            if (idx < 0)
+                throw new Exception("Невозможно определить тип переменной " + id.Name + " , возможно она не описана в var");
+
             NamesValuesStack.Push(id.Name);
+            CTypeValuesStack.Push(SymbolTable.vars[idx].Item2);
         }
 
         public override void VisitIntNumNode(IntNumNode num)
         {
             NamesValuesStack.Push(num.Num.ToString());
+            CTypeValuesStack.Push(CType.Int);
         }
 
         public override void VisitBinOpNode(BinOpNode binop)
@@ -63,9 +110,15 @@ namespace SimpleLang.Visitors
             binop.Right.Visit(this);
             binop.Left.Visit(this);
             string CurName = NextTemp();
+
+            // Какой же тут тип надо получить?
+            CType resultType = OpResultType(CTypeValuesStack.Pop(), CTypeValuesStack.Pop(), binop.Op);
+            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CurName, resultType, SymbolKind.var));
+
             Code.AddLast(new CodeLine(null,CurName,
                 NamesValuesStack.Pop(),NamesValuesStack.Pop(),binop.Op.ToString()));
             NamesValuesStack.Push(CurName);
+            CTypeValuesStack.Push(resultType);
         }
 
         public override void VisitCycleNode(CycleNode c)
@@ -76,6 +129,8 @@ namespace SimpleLang.Visitors
             string HeaderLabel = NextLabel();
             //Счётчик цикла
             string CounterVar= NextTemp();
+
+            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CounterVar, CType.Bool, SymbolKind.var));
 
             //Находим начальное значение счётчика
             c.Expr.Visit(this);
@@ -101,6 +156,9 @@ namespace SimpleLang.Visitors
             //Дальше идёт код, на который переходим после окончания работы цикла
             Code.AddLast(new CodeLine(AfterCycleLabel, null,
                 null, null, "nop"));
+
+            // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
+            CTypeValuesStack.Pop();
         }
 
         public override void VisitWhileNode(WhileNode node)
@@ -109,6 +167,8 @@ namespace SimpleLang.Visitors
             string BodyLabel = NextLabel();
             string HeaderLabel = NextLabel();
             string AfterWhileLabel = NextLabel();
+
+            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
 
             Code.AddLast(new CodeLine(HeaderLabel, null,
                null, null, "nop"));
@@ -127,6 +187,9 @@ namespace SimpleLang.Visitors
                null, null, "g"));
             Code.AddLast(new CodeLine(AfterWhileLabel, null,
                null, null, "nop"));
+
+            // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
+            CTypeValuesStack.Pop();
         }
 
         public override void VisitIfNode(IfNode node)
@@ -134,6 +197,8 @@ namespace SimpleLang.Visitors
             string CondVariable = NextTemp();
             string IfLabel = NextLabel();
             string AfterIfLabel = NextLabel();
+
+            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
 
             node.Expr.Visit(this);
 
@@ -149,6 +214,9 @@ namespace SimpleLang.Visitors
             node.StatIf.Visit(this);
             Code.AddLast(new CodeLine(AfterIfLabel, null,
                null, null, "nop"));
+
+            // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
+            CTypeValuesStack.Pop();
         }
 
         public void RemoveEmptyLabels()
