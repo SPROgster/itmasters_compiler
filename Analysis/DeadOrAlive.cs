@@ -7,6 +7,8 @@ using SimpleLang.MiddleEnd;
 namespace SimpleLang.Analysis
 {
 
+    using StringSet = SetAdapter<string>;
+
     internal class DeadOrAlive
     {
         public static List<Tuple<string, string, int>> GenerateDefUse(List<CodeLine> l)
@@ -63,56 +65,6 @@ namespace SimpleLang.Analysis
                 }
             }
             return alive;
-        }
-    }
-
-    public class StringSet : HashSet<string>, IEquatable<StringSet>, ICloneable
-    {
-        private StringSet(string[] elems)
-            : base(elems)
-        { }
-
-        public StringSet(StringSet elems)
-            : base(elems)
-        { }
-
-        public StringSet()
-            : base()
-        { }
-
-        public object Clone()
-        {
-            return new StringSet(this);
-        }
-
-        public bool Equals(StringSet other)
-        {
-            if (other.Count != Count)
-                return false;
-            foreach (string s in this)
-                if (!other.Contains(s))
-                    return false;
-            return true;
-        }
-
-        public override string ToString()
-        {
-            return System.String.Join(" ", this.Select(e => e.ToString()));
-        }
-
-        public static StringSet Intersect(StringSet a, StringSet b)
-        {
-            return new StringSet(a.Intersect(b).ToArray());
-        }
-
-        public static StringSet Union(StringSet a, StringSet b)
-        {
-            return new StringSet(a.Union(b).ToArray());
-        }
-
-        public static StringSet Subtract(StringSet a, StringSet b)
-        {
-            return new StringSet(a.Except(b).ToArray());
         }
     }
 

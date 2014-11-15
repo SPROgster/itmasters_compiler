@@ -32,6 +32,57 @@ namespace SimpleLang.Analysis
         bool Contains(ValueType elem);
     }
 
+    //Адаптация HashSet к использованию в алгоритмах
+    public class SetAdapter<T> : HashSet<T>, IEquatable<SetAdapter<T>>, ICloneable
+    {
+        private SetAdapter(T[] elems)
+            : base(elems)
+        { }
+
+        public SetAdapter(SetAdapter<T> elems)
+            : base(elems)
+        { }
+
+        public SetAdapter()
+            : base()
+        { }
+
+        public object Clone()
+        {
+            return new SetAdapter<T>(this);
+        }
+
+        public bool Equals(SetAdapter<T> other)
+        {
+            if (other.Count != Count)
+                return false;
+            foreach (T e in this)
+                if (!other.Contains(e))
+                    return false;
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return System.String.Join(" ", this.Select(e => e.ToString()));
+        }
+
+        public static SetAdapter<T> Intersect(SetAdapter<T> a, SetAdapter<T> b)
+        {
+            return new SetAdapter<T>(a.Intersect(b).ToArray());
+        }
+
+        public static SetAdapter<T> Union(SetAdapter<T> a, SetAdapter<T> b)
+        {
+            return new SetAdapter<T>(a.Union(b).ToArray());
+        }
+
+        public static SetAdapter<T> Subtract(SetAdapter<T> a, SetAdapter<T> b)
+        {
+            return new SetAdapter<T>(a.Except(b).ToArray());
+        }
+    }
+
     //Интерфейс передаточной функции
     public interface TransferFunction<T>
     {

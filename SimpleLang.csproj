@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analysis\AvailableExpressions.cs" />
     <Compile Include="Analysis\ReachingDefinitions.cs" />
     <Compile Include="Analysis\DeadOrAlive.cs" />
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
