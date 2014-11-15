@@ -59,11 +59,11 @@ namespace SimpleLang.MiddleEnd
                     Labeled[Current.Value.Label] = Current.Value;
                 switch (Current.Value.Operation)
                 {
-                    case "g": 
+                    case BinOpType.Goto: 
                         UsedLabels.Add(Current.Value.First);
                         NextIsLeader = true;
                         break;
-                    case "i": 
+                    case BinOpType.If: 
                         UsedLabels.Add(Current.Value.Second);
                         NextIsLeader = true;
                         break;
@@ -93,7 +93,7 @@ namespace SimpleLang.MiddleEnd
                 if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
-                    if (Current.Value.Operation == "g")
+                    if (Current.Value.Operation == BinOpType.Goto)
                     {
                         if (!GotoLabelsDest.ContainsKey(Current.Value.First))
                             GotoLabelsDest[Current.Value.First] = new LinkedList<BaseBlock>();
@@ -106,7 +106,7 @@ namespace SimpleLang.MiddleEnd
                     }
                     else
                     {
-                        if (Current.Value.Operation == "i")
+                        if (Current.Value.Operation == BinOpType.If)
                         {
                             if(!GotoLabelsDest.ContainsKey(Current.Value.Second))
                                 GotoLabelsDest[Current.Value.Second] = new LinkedList<BaseBlock>();
@@ -196,9 +196,10 @@ namespace SimpleLang.MiddleEnd
 
     public class CodeLine: ICloneable
     {
-        public string Label, First, Second, Third, Operation;
+        public string Label, First, Second, Third;
+        public BinOpType Operation;
 
-        public CodeLine(string lab, string fst, string snd, string thrd, string op)
+        public CodeLine(string lab, string fst, string snd, string thrd, BinOpType op)
         {
             Label = lab;
             First = fst;
@@ -212,9 +213,14 @@ namespace SimpleLang.MiddleEnd
             string ToReturn = Label + (Label != null ? ": " : " ");
             switch (Operation)
             {
-                case "i": return ToReturn +  "if " + First + " goto " + Second;
-                case "g": return ToReturn +  "goto " + First;
-                default: return ToReturn + 
+                case BinOpType.If: 
+                    return ToReturn +  "if " + First + " goto " + Second;
+
+                case BinOpType.Goto: 
+                    return ToReturn +  "goto " + First;
+
+                default: 
+                    return ToReturn + 
                     (First != null ? First + " := " + Second + " " + Operation + " " + Third : "nop");
             }
         }

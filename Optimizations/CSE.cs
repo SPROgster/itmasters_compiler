@@ -22,8 +22,8 @@ namespace SimpleLang.Optimizations
                     {
                         string lab = "_tcse" + t_id;
                         Code.AddBefore(node, new CodeLine(null, lab, node.Value.Second, node.Value.Third, node.Value.Operation));
-                        node.Value = new CodeLine(null, node.Value.First, lab, null, null);
-                        node1.Value = new CodeLine(null, node1.Value.First, lab, null, null);
+                        node.Value = new CodeLine(null, node.Value.First, lab, null, BinOpType.None);
+                        node1.Value = new CodeLine(null, node1.Value.First, lab, null, BinOpType.None);
                         t_id++;
                         break;
                     }

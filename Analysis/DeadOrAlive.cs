@@ -84,8 +84,8 @@ namespace SimpleLang.Analysis
                 foreach (CodeLine line in block.Code)
                 {
                     //У нас в грамматике странно обстоят дела с типом bool...
-                    if (line.First != null && line.Operation != "g")
-                        if(line.Operation != "i")
+                    if (line.First != null && line.Operation != BinOpType.Goto)
+                        if (line.Operation != BinOpType.If)
                         {
                             if (GoodOperand(block,line.Second))
                                 this[block].Item2.Add(line.Second);

@@ -36,7 +36,7 @@ namespace SimpleLang.Optimizations
             for (var elem = gcv.First; elem != null; elem = elem.Next)
             {
                 CodeLine cl = elem.Value;
-                if (cl.Third == null && cl.Operation == null)
+                if (cl.Third == null && cl.Operation == BinOpType.None)
                 {
                     int second;
                     bool second_int = int.TryParse(cl.Second, out second);
@@ -76,16 +76,16 @@ namespace SimpleLang.Optimizations
                 bool third_int = int.TryParse(cl.Third, out third);
                 if (second_int && third_int)
                 {
-                    if (cl.Operation == "Plus")
+                    if (cl.Operation == BinOpType.Plus)
                         cl.Second = (third + second).ToString();
-                    else if (cl.Operation == "Mult")
+                    else if (cl.Operation == BinOpType.Mult)
                         cl.Second = (third * second).ToString();
-                    else if (cl.Operation == "Minus")
+                    else if (cl.Operation == BinOpType.Minus)
                         cl.Second = (second - third).ToString();
                     else
                         continue;
                     cl.Third = null;
-                    cl.Operation = null;
+                    cl.Operation = BinOpType.None;
                     has_const = true;
                 }
             }
@@ -98,17 +98,17 @@ namespace SimpleLang.Optimizations
         {
             if (cl.Second == "0")
             {
-                if (cl.Operation == "Minus")
+                if (cl.Operation == BinOpType.Minus)
                     return;
                 else
                     cl.Second = cl.Third;
                 cl.Third = null;
-                cl.Operation = null;
+                cl.Operation = BinOpType.None;
             }
             if (cl.Third != null && cl.Third == "0")
             {
                 cl.Third = null;
-                cl.Operation = null;
+                cl.Operation = BinOpType.None;
             }
         }
 
@@ -120,18 +120,18 @@ namespace SimpleLang.Optimizations
             {
                 cl.Second = cl.Third;
                 cl.Third = null;
-                cl.Operation = null;
+                cl.Operation = BinOpType.None;
             }
             if (cl.Third != null && cl.Third == "1")
             {
                 cl.Third = null;
-                cl.Operation = null;
+                cl.Operation = BinOpType.None;
             }
             if (cl.Second == "0" || (cl.Third != null && cl.Third == "0"))
             {
                 cl.Second = "0";
                 cl.Third = null;
-                cl.Operation = null;
+                cl.Operation = BinOpType.None;
             }
         }
         
@@ -148,13 +148,13 @@ namespace SimpleLang.Optimizations
                 {
                     switch (cl.Operation)
                     {
-                        case "Plus":
+                        case BinOpType.Plus:
                             checkPlusOrMinus(cl);
                             break;
-                        case "Minus":
+                        case BinOpType.Minus:
                             checkPlusOrMinus(cl);
                             break;
-                        case "Mult":
+                        case BinOpType.Mult:
                             checkMult(cl);
                             break;
                         default:

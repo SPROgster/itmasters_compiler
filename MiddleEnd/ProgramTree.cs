@@ -5,7 +5,12 @@ using SimpleParser;
 
 namespace SimpleLang.MiddleEnd
 {
-    public enum BinOpType { Plus, Minus, Div, Mult, Less, Greater, Equal, LEqual, GEqual, NEqual };
+    public enum BinOpType { None = 0, 
+                            Plus, Minus, Div, Mult, 
+                            Less, Greater, Equal, LEqual, GEqual, NEqual,
+                            Goto, If,
+                            Nop
+                          };
 
     public abstract class Node // базовый класс для всех узлов    
     {

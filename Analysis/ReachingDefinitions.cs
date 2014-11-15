@@ -101,7 +101,7 @@ namespace SimpleLang.Analysis
             {
                 BlockDef[bl] = new HashSet<int>();
                 foreach (CodeLine cl in bl.Code)
-                    if (cl.Operation != "i" && cl.Operation != "g" && cl.Operation != "nop")
+                    if (cl.Operation != BinOpType.If && cl.Operation != BinOpType.Goto && cl.Operation != BinOpType.Nop)
                     {
                         if(!VarDef.ContainsKey(cl.First))
                             VarDef[cl.First] = new HashSet<int>();
