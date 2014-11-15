@@ -17,7 +17,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"..\..\_TestTexts\CSE_optTest0.txt";
+            string FileName = @"..\..\_TestTexts\optCseTest.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -53,25 +53,23 @@ namespace SimpleCompiler
                         // Устранение лишних временных переменных
                         gcv.RemoveTmpVariables();
                         // Вызов сворачивания констант и алг тождеств
-                        Fold.fold(ref gcv.Code);
-                        //Выводим то, что получилось
-                        //Console.WriteLine();
+                        //Fold.fold(ref gcv.Code);
+                        //
                         Console.WriteLine("Трёхадресный код:");
                         foreach (var ln in gcv.Code)
                             Console.WriteLine(ln);
                         Console.WriteLine("---------------------------------");
                         //Строим граф базовых блоков
                         ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
-                        Console.WriteLine("Граф построен!");
-                        //Демонстрируем проверку живучести переменной
-                        List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());                        
-                        //Тест Оптимизация общих подвыражений
-                        Console.WriteLine("Оптимизация общих подвыражений в Блоке:");
-                        foreach (var block in l)
-                        {
-                            //Console.WriteLine(block);
+                        Console.WriteLine("Граф ББ построен!");                        
+                        Console.WriteLine("c оптимизацией общих подвыражений в каждом блоке:");
+                        int i = 0; // # блока
+                        foreach (var block in CFG.GetBlocks())
+                        {                            
                             block.cseOptimization();
+                            Console.WriteLine("--- Блок {0} ---", i);
                             Console.WriteLine(block);
+                            ++i;
                             //Console.WriteLine("---------------------------------");                            
                         }
                         Console.WriteLine("---------------------------------");
