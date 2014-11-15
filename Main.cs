@@ -17,7 +17,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"..\..\_TestTexts\test0.txt";
+            string FileName = @"..\..\_TestTexts\CSE_optTest0.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -48,8 +48,10 @@ namespace SimpleCompiler
                         //Генерируем трёхадресный код
                         GenCodeVisitor gcv = new GenCodeVisitor();
                         parser.root.Visit(gcv);
-                        //Устранение Nop-ов и коррекция меток
+                        // Устранение Nop-ов и коррекция меток
                         gcv.RemoveEmptyLabels();
+                        // Устранение лишних временных переменных
+                        gcv.RemoveTmpVariables();
                         // Вызов сворачивания констант и алг тождеств
                         Fold.fold(ref gcv.Code);
                         //Выводим то, что получилось

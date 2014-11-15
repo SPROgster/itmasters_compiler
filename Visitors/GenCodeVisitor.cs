@@ -143,6 +143,18 @@ namespace SimpleLang.Visitors
             Code.AddLast(new CodeLine(AfterIfLabel, null,
                null, null, "nop"));
         }
+        /// <summary>
+        /// Удаление лишних временных переменных
+        /// </summary>
+        public void RemoveTmpVariables()
+        {
+            for (var iter = Code.First.Next; iter != null; iter = iter.Next)
+                if (iter.Value.Third == null && iter.Value.Second == iter.Previous.Value.First)
+                {
+                    iter.Value = new CodeLine(iter.Previous.Value.Label, iter.Value.First, iter.Previous.Value.Second, iter.Previous.Value.Third, iter.Previous.Value.Operation);
+                    Code.Remove(iter.Previous);
+                }
+        }
 
         public void RemoveEmptyLabels()
         {
