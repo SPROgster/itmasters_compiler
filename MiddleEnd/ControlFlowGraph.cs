@@ -221,7 +221,7 @@ namespace SimpleLang.MiddleEnd
 
                 default: 
                     return ToReturn + 
-                    (First != null ? First + " := " + Second + " " + Operation + " " + Third : "nop");
+                        (First != null ? First + " := " + Second + " " + ((Operation == BinOpType.None) ? "" : Operation.ToString()) + " " + Third : "nop");
             }
         }
 
