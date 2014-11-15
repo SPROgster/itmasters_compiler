@@ -35,10 +35,17 @@ namespace SimpleLang.Visitors
 
         public override void VisitAssignNode(AssignNode node)
         {
+            if (node.Expr is BinOpNode) {
+                (node.Expr as BinOpNode).Right.Visit(this);
+                (node.Expr as BinOpNode).Left.Visit(this);
+                node.Id.Visit(this);
+                Code.AddLast(new CodeLine(null, NamesValuesStack.Pop(), NamesValuesStack.Pop(), NamesValuesStack.Pop(), (node.Expr as BinOpNode).Op.ToString()));
+            }else{
             node.Expr.Visit(this);
             node.Id.Visit(this);
             Code.AddLast(new CodeLine(null, NamesValuesStack.Pop(),
                 NamesValuesStack.Pop(), null, null));
+            }
         }
 
         public override void VisitIdNode(IdNode id)
@@ -203,6 +210,10 @@ namespace SimpleLang.Visitors
                         elem.Value.Second = newName;
 
             }
+        }
+
+        public static void RemoveTmpLabels(LinkedList<CodeLine> code) {
+
         }
     }
 }

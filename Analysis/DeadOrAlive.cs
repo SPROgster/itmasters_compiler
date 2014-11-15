@@ -66,99 +66,53 @@ namespace SimpleLang.Analysis
         }
     }
 
-    public class StringSet : ChaoticSet<string>, ICloneable
+    public class StringSet : HashSet<string>, IEquatable<StringSet>, ICloneable
     {
-        private HashSet<string> Elems;
+        private StringSet(string[] elems)
+            : base(elems)
+        { }
+
+        public StringSet(StringSet elems)
+            : base(elems)
+        { }
 
         public StringSet()
-        {
-            Elems = new HashSet<string>();
-        }
-
-        private StringSet(string[] elems)
-        {
-            Elems = new HashSet<string>(elems);
-        }
-
-        public void Add(string elem)
-        {
-            Elems.Add(elem);
-        }
-
-        public void Remove(string elem)
-        {
-            Elems.Remove(elem);
-        }
-
-        public bool Contains(string elem)
-        {
-            return Elems.Contains(elem);
-        }
-
-        public ISet<string> Intersect(ISet<string> b)
-        {
-            return new StringSet(Elems.Intersect(((StringSet)b).Elems).ToArray());
-        }
-
-        public ISet<string> Union(ISet<string> b)
-        {
-            return new StringSet(Elems.Union(((StringSet)b).Elems).ToArray());
-        }
-
-        public ISet<string> Subtract(ISet<string> b)
-        {
-            return new StringSet(Elems.Except(((StringSet)b).Elems).ToArray());
-        }
-
-        public int Count
-        {
-            get { return Elems.Count; }
-        }
+            : base()
+        { }
 
         public object Clone()
         {
-            return new StringSet(Elems.ToArray());
+            return new StringSet(this);
         }
 
-        public override bool Equals(object obj)
+        public bool Equals(StringSet other)
         {
-            if (obj is StringSet)
-            {
-                StringSet Second = (StringSet)obj;
-                if (Second.Elems.Count != Elems.Count)
-                    return false;
-                foreach(string s in Elems)
-                    if(!Second.Elems.Contains(s))
-                        return false;
-                return true;
-            }
-            else
+            if (other.Count != Count)
                 return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return Elems.GetHashCode();
+            foreach (string s in this)
+                if (!other.Contains(s))
+                    return false;
+            return true;
         }
 
         public override string ToString()
         {
-            return System.String.Join(" ", Elems.Select(e => e.ToString()));
+            return System.String.Join(" ", this.Select(e => e.ToString()));
         }
 
         public static StringSet Intersect(StringSet a, StringSet b)
         {
-            return (StringSet)a.Intersect(b);
+            return new StringSet(a.Intersect(b).ToArray());
         }
 
         public static StringSet Union(StringSet a, StringSet b)
         {
-            return (StringSet)a.Union(b);
+            return new StringSet(a.Union(b).ToArray());
         }
 
         public static StringSet Subtract(StringSet a, StringSet b)
         {
-            return (StringSet)a.Subtract(b);
+            return new StringSet(a.Except(b).ToArray());
         }
     }
 
@@ -177,17 +131,19 @@ namespace SimpleLang.Analysis
                 this[block] = new Tuple<StringSet, StringSet>(new StringSet(), new StringSet());
                 foreach (CodeLine line in block.Code)
                 {
-                    //Дурацкая проверка операции
-                    //Надо учитывать использование в условии перехода?
                     //У нас в грамматике странно обстоят дела с типом bool...
-                    if (line.First != null && line.Operation != "g" && line.Operation != "i")
-                    {
-                        if (GoodOperand(block,line.Second))
-                            this[block].Item2.Add(line.Second);
-                        if (GoodOperand(block,line.Third))
-                            this[block].Item2.Add(line.Third);
-                        this[block].Item1.Add(line.First);
-                    }
+                    if (line.First != null && line.Operation != "g")
+                        if(line.Operation != "i")
+                        {
+                            if (GoodOperand(block,line.Second))
+                                this[block].Item2.Add(line.Second);
+                            if (GoodOperand(block,line.Third))
+                                this[block].Item2.Add(line.Third);
+                            this[block].Item1.Add(line.First);
+                        }
+                        else
+                            if(GoodOperand(block,line.First))
+                                this[block].Item2.Add(line.First);
                 }
             }
         }
@@ -203,7 +159,7 @@ namespace SimpleLang.Analysis
         }
     }
 
-    public class AliveVarsAlgorithm : TopDownAlgorithm<Tuple<StringSet, StringSet>, DefUseContext, StringSet>
+    public class AliveVarsAlgorithm : DownTopAlgorithm<Tuple<StringSet, StringSet>, DefUseContext, StringSet>
     {
         public AliveVarsAlgorithm(ControlFlowGraph cfg):base(cfg)
         {
@@ -229,7 +185,7 @@ namespace SimpleLang.Analysis
 
         public override StringSet Transfer(StringSet input)
         {
-            return (StringSet)Info.Item2.Union(input.Subtract(Info.Item1));
+            return StringSet.Union(Info.Item2,StringSet.Subtract(input,Info.Item1));
         }
     }
 }
