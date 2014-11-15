@@ -32,7 +32,7 @@ namespace SimpleLang.MiddleEnd
                     if (node1.Value.Second == node0.Value.Second && node1.Value.Third == node0.Value.Third && node1.Value.Operation == node0.Value.Operation)
                     {
                         bool isOpt = true;
-                        for (var tempNode = node0.Next; tempNode != node1; tempNode = tempNode.Next)
+                        for (var tempNode = node0; tempNode != node1; tempNode = tempNode.Next)
                             if (tempNode.Value.First.Equals(node0.Value.Second) || tempNode.Value.First.Equals(node0.Value.Third))
                             {
                                 isOpt = false;
