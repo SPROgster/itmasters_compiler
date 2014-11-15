@@ -23,17 +23,29 @@ namespace SimpleLang.MiddleEnd
         }
 
         public void cseOptimization()
-        {            
-            for (LinkedListNode<CodeLine> node = Code.Last; node != null; node = node.Previous)            
-                for (LinkedListNode<CodeLine> node1 = node.Next; node1 != null; node1 = node1.Next)
-                {
-                    if (node1.Value.First.Equals(node.Value.Second) || node1.Value.First.Equals(node.Value.Third))
-                        break;
-                    if (node1.Value.Second == node.Value.Second && node1.Value.Third == node.Value.Third && node1.Value.Operation == node.Value.Operation)
-                    {                                                
-                        node1.Next.Value.Second = node.Value.First;
-                        Code.Remove(node1);                                             
-                    }
+        {
+            const string tempName = "_tCSE";
+            int tempCounter = 0;
+            for (LinkedListNode<CodeLine> node0 = Code.Last; node0 != null; node0 = node0.Previous)            
+                for (LinkedListNode<CodeLine> node1 = node0.Next; node1 != null; node1 = node1.Next)
+                {                    
+                    if (node1.Value.Second == node0.Value.Second && node1.Value.Third == node0.Value.Third && node1.Value.Operation == node0.Value.Operation)
+                    {
+                        bool isOpt = true;
+                        for (var tempNode = node0.Next; tempNode != node1; tempNode = tempNode.Next)
+                            if (tempNode.Value.First.Equals(node0.Value.Second) || tempNode.Value.First.Equals(node0.Value.Third))
+                            {
+                                isOpt = false;
+                                break;
+                            }
+                        if (isOpt)
+                        {
+                            string tName = tempName + ++tempCounter;
+                            Code.AddAfter(node0, new CodeLine(node0.Value.Label, node0.Value.First, tName, null, null));
+                            node0.Value.First = tName;
+                            node1.Value = new CodeLine(node1.Value.Label, node1.Value.First, tName, null, null);
+                        }                                            
+                    }                    
                 }            
         }
 
