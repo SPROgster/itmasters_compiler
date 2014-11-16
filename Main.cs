@@ -10,14 +10,16 @@ using SimpleLang.Visitors;
 using SimpleLang.MiddleEnd;
 using SimpleLang.Optimizations;
 using SimpleLang.Analysis;
+using SimpleLang.CodeGenerator;
 
 namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
+        public static string FileName = @"..\..\_TestTexts\SaneTest.txt";
+
         public static void Main()
         {
-            string FileName = @"..\..\_TestTexts\ReachingDefsTest.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -93,6 +95,9 @@ namespace SimpleCompiler
                             CSE.CSE_inBBl(ref block.Code);
                             Console.WriteLine(block);
                         }
+
+                        ILAsm gen = new ILAsm();
+                        gen.compileExe(CFG);
                     }
                     else
                         Console.WriteLine("Исправьте Ваш кривой код!");

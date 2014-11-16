@@ -50,6 +50,9 @@
     <Compile Include="Main.cs" />
     <Compile Include="MiddleEnd\SymbolTable.cs" />
     <Compile Include="Optimizations\CSE.cs" />
+    <Compile Include="CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="CodeGenerator\ILAsm.cs" />
+    <Compile Include="CodeGenerator\ILAsmInstructions.cs" />
     <Compile Include="Parsers\ParserHelper.cs" />
     <Compile Include="MiddleEnd\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,11 +70,15 @@
     <Compile Include="Visitors\Visitor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CodeGenerator\ilasm.exe" />
     <Content Include="_TestTexts\LabelsTest.txt" />
     <Content Include="_TestTexts\ReachingDefsTest.txt" />
     <Content Include="_TestTexts\UnknownTest.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y $(ProjectDir)CodeGenerator\ilasm.exe $(ProjectDir)$(OutDir)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

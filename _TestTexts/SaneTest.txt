@@ -1,0 +1,10 @@
+begin
+	var s, i, j : int;
+	i := 1;
+	while (j < 10)
+	begin
+		s := s + i;
+		i := i + i;
+		j := j + 1
+	end
+end
