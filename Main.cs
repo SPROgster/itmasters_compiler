@@ -17,9 +17,12 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static string FileName = @"..\..\_TestTexts\SaneTest.txt";
+        public static string BinOutputDirectory = @"..\Compiled\";
 
         public static void Main()
         {
+            if (!Directory.Exists(BinOutputDirectory))
+                Directory.CreateDirectory(BinOutputDirectory);
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -97,7 +100,7 @@ namespace SimpleCompiler
                         }
 
                         ILAsm gen = new ILAsm();
-                        gen.compileExe(CFG);
+                        gen.compileExe(CFG,BinOutputDirectory);
                     }
                     else
                         Console.WriteLine("Исправьте Ваш кривой код!");

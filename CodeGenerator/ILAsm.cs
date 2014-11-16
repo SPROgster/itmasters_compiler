@@ -183,10 +183,12 @@ namespace SimpleLang.CodeGenerator
             return ((ILAsm)this).code(CFG);
         }
 
-        public void compileExe(ControlFlowGraph CFG)
+        public void compileExe(ControlFlowGraph CFG, string outputDir)
         {
-            string outFileNameIL = Path.ChangeExtension(SimpleCompiler.SimpleCompilerMain.FileName, "il");
-            string outFileNameEXE = Path.ChangeExtension(SimpleCompiler.SimpleCompilerMain.FileName, "exe");
+            string outFileNameIL = outputDir +
+                Path.GetFileNameWithoutExtension(SimpleCompiler.SimpleCompilerMain.FileName)+".il";
+            string outFileNameEXE = outputDir +
+                Path.GetFileNameWithoutExtension(SimpleCompiler.SimpleCompilerMain.FileName)+".exe";
             File.WriteAllText(outFileNameIL, code(CFG));    
             Process.Start("ilasm.exe", outFileNameIL + " /exe");
         }

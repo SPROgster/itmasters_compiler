@@ -73,6 +73,7 @@
     <Content Include="CodeGenerator\ilasm.exe" />
     <Content Include="_TestTexts\LabelsTest.txt" />
     <Content Include="_TestTexts\ReachingDefsTest.txt" />
+    <Content Include="_TestTexts\SaneTest.txt" />
     <Content Include="_TestTexts\UnknownTest.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
