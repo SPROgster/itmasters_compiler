@@ -187,8 +187,7 @@ namespace SimpleLang.CodeGenerator
         {
             string outFileNameIL = Path.ChangeExtension(SimpleCompiler.SimpleCompilerMain.FileName, "il");
             string outFileNameEXE = Path.ChangeExtension(SimpleCompiler.SimpleCompilerMain.FileName, "exe");
-            File.WriteAllText(outFileNameIL, code(CFG));
-
+            File.WriteAllText(outFileNameIL, code(CFG));    
             Process.Start("ilasm.exe", outFileNameIL + " /exe");
         }
     }

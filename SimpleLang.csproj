@@ -77,7 +77,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y $(ProjectDir)CodeGenerator\ilasm.exe $(ProjectDir)$(OutDir)</PostBuildEvent>
+    <PostBuildEvent>xcopy /y $(ProjectDir)CodeGenerator\ilasm.exe $(ProjectDir)$(OutDir)
+xcopy /y $(ProjectDir)CodeGenerator\fusion.dll $(ProjectDir)$(OutDir)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
