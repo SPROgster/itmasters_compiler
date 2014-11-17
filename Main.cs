@@ -93,6 +93,18 @@ namespace SimpleCompiler
                                 Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
                             }
                         Console.WriteLine("-------------------------");
+                        // Оптимизация живучести переменных
+                        // Убиваем неживие переменные.
+                        AliveVarsOptimization.optimize(AVAResult, CFG);
+                        Console.WriteLine("AVA OPTIMIZATION");
+                        foreach (var block in AVAResult.Item1.Keys)
+                            if (block != CFG.GetStart() && block != CFG.GetEnd())
+                            {
+                                Console.WriteLine(block);
+                                Console.WriteLine("In:\t" + AVAResult.Item1[block]);
+                                Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
+                            }
+                        Console.WriteLine("-------------------------");
                         //Оптимизация общих подвыражений в блоках
                         foreach(BaseBlock block in CFG.GetBlocks()){
                             CSE.CSE_inBBl(ref block.Code);
