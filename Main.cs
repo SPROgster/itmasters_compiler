@@ -73,30 +73,7 @@ namespace SimpleCompiler
                             //Console.WriteLine("---------------------------------");                            
                         }
                         Console.WriteLine("---------------------------------");
-                        //Console.WriteLine(l);
-                        //Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1));
-                        ////Проверяем алгоритм поиска достигающих определений
-                        //Console.WriteLine();
-                        //ReachingDefsAlgorithm RDA = new ReachingDefsAlgorithm(CFG);
-                        //var RDAResult = RDA.Apply();
-                        //foreach (var block in RDAResult.Item1.Keys)
-                        //    if (block != CFG.GetStart() && block != CFG.GetEnd())
-                        //    {
-                        //        Console.WriteLine(block);
-                        //        Console.WriteLine("In:\t" + RDAResult.Item1[block].ToString().Replace("True", "1").Replace("False", "0"));
-                        //        Console.WriteLine("Out:\t" + RDAResult.Item2[block].ToString().Replace("True", "1").Replace("False", "0"));
-                        //    }
-                        ////Проверяем алгоритм поиска живых переменных
-                        //Console.WriteLine();
-                        //AliveVarsAlgorithm AVA = new AliveVarsAlgorithm(CFG);
-                        //var AVAResult = AVA.Apply();
-                        //foreach (var block in AVAResult.Item1.Keys)
-                        //    if (block != CFG.GetStart() && block != CFG.GetEnd())
-                        //    {
-                        //        Console.WriteLine(block);
-                        //        Console.WriteLine("In:\t" + AVAResult.Item1[block]);
-                        //        Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
-                        //    }
+                       
                     }
                     else
                         Console.WriteLine("Исправьте Ваш кривой код!");
