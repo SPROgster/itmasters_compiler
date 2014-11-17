@@ -70,7 +70,6 @@
     <Compile Include="Visitors\Visitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CodeGenerator\ilasm.exe" />
     <Content Include="_TestTexts\LabelsTest.txt" />
     <Content Include="_TestTexts\ReachingDefsTest.txt" />
     <Content Include="_TestTexts\SaneTest.txt" />

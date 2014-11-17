@@ -42,6 +42,39 @@ namespace SimpleLang.MiddleEnd
         }
     }
 
+    public class FloatNumNode : ExprNode
+    {
+        public float Num { get; set; }
+        public FloatNumNode(float num) { Num = num; }
+
+        public override void Visit(Visitor v)
+        {
+            v.VisitFloatNumNode(this);
+        }
+    }
+
+    public class BoolNode : ExprNode
+    {
+        public bool Val { get; set; }
+        public BoolNode(bool val) { Val = val; }
+
+        public override void Visit(Visitor v)
+        {
+            v.VisitBoolNode(this);
+        }
+    }
+
+    public class StringNode : ExprNode
+    {
+        public string Val { get; set; }
+        public StringNode(string val) { Val = val; }
+
+        public override void Visit(Visitor v)
+        {
+            v.VisitStringNode(this);
+        }
+    }
+
     public class BinOpNode : ExprNode
     {
         public ExprNode Left { get; set; }

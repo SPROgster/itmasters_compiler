@@ -8,8 +8,8 @@
 %partial
 
 %union { 
-			public double dVal; 
-			public int iVal; 
+			public float fVal; 
+			public int iVal;
 			public string sVal; 
 			public Node nVal;
 			public ExprNode eVal;
@@ -23,8 +23,10 @@
 
 %token BEGIN END CYCLE WHILE IF ELSE ASSIGN SEMICOLON WRITE COLON COMMA VAR
 %token PLUS MINUS MULT DIV LBR RBR LESS GREATER EQUAL NEQUAL LEQUAL GEQUAL LESS GREATER
+%token TRUE FALSE
+%token <sVal> STRING
 %token <iVal> INUM 
-%token <dVal> RNUM 
+%token <fVal> FNUM 
 %token <sVal> ID
 
 %type <eVal> num_expr comp_expr ident T F expr
@@ -113,6 +115,8 @@ comp_expr
 	| num_expr LEQUAL num_expr { $$ = new BinOpNode($1, $3, BinOpType.LEqual); }
 	| num_expr GEQUAL num_expr { $$ = new BinOpNode($1, $3, BinOpType.GEqual); }
 	| LBR comp_expr RBR { $$ = $2; }
+	| TRUE { $$ = new BoolNode(true); }
+	| FALSE { $$ = new BoolNode(false); }
 	;
 	
 num_expr 
@@ -130,6 +134,8 @@ T
 F    
 	: ident  { $$ = $1 as IdNode; }
 	| INUM { $$ = new IntNumNode($1); }
+	| FNUM { $$ = new FloatNumNode($1); }
+	| STRING { $$ = new StringNode($1); } 
     | LBR num_expr RBR { $$ = $2; }
     ;
 	 

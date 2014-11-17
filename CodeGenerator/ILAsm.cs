@@ -67,7 +67,7 @@ namespace SimpleLang.CodeGenerator
                 localDirectiveList = "";
 
                 var Types = from ids in MiddleEnd.SymbolTable.vars
-                            where ids.Item3 != SymbolKind.type
+                            where ids.Item3 == SymbolKind.var
                             select ids;
 
                 foreach (var id in Types)

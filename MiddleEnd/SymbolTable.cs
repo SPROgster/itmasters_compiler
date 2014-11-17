@@ -5,18 +5,23 @@ using System.Text;
 
 namespace SimpleLang.MiddleEnd
 {
-    public enum SymbolKind { type, var }
-    public enum CType { Int, Float, Double, Bool, None };
+    public enum SymbolKind { type, var, keyword}
+    public enum CType { Int, Float, Double, Bool, String, None };
 
     public static class SymbolTable // Таблица символов
     {
+        public static string[] KeyWords = {"begin", "end", "cycle", "while", "if", "else",
+                                              "write", "var", "true", "false" };
+
         static SymbolTable()
         {
             // Initializing Symbol Table with all data types except for None
             vars = new List<Tuple<string, CType, SymbolKind>>();
             foreach (CType value in System.Enum.GetValues(typeof(CType)))
                 if (value != CType.None)
-                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), value, SymbolKind.type));
+                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), CType.None, SymbolKind.type));
+            foreach (string s in KeyWords)
+                vars.Add(new Tuple<string, CType, SymbolKind>(s,CType.None,SymbolKind.keyword));
         }
 
         public static List<Tuple<string, CType, SymbolKind>> vars;

@@ -49,8 +49,8 @@ namespace SimpleLang.Visitors
                 op == BinOpType.LEqual || op == BinOpType.Less   || op == BinOpType.NEqual)
                 return CType.Bool;
 
-            if ((op1 == CType.Double) || (op2 == CType.Double))
-                return CType.Double;
+            if ((op1 == CType.String) || (op2 == CType.String))
+                return CType.String;
 
             if ((op1 == CType.Float) || (op2 == CType.Float))
                 return CType.Float;
@@ -103,6 +103,24 @@ namespace SimpleLang.Visitors
         {
             NamesValuesStack.Push(num.Num.ToString());
             CTypeValuesStack.Push(CType.Int);
+        }
+
+        public override void VisitFloatNumNode(FloatNumNode num)
+        {
+            NamesValuesStack.Push(num.Num.ToString());
+            CTypeValuesStack.Push(CType.Float);
+        }
+
+        public override void VisitBoolNode(BoolNode val)
+        {
+            NamesValuesStack.Push(val.Val.ToString());
+            CTypeValuesStack.Push(CType.Bool);
+        }
+
+        public override void VisitStringNode(StringNode val)
+        {
+            NamesValuesStack.Push(val.Val);
+            CTypeValuesStack.Push(CType.String);
         }
 
         public override void VisitBinOpNode(BinOpNode binop)
