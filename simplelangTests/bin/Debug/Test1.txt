@@ -1,0 +1,6 @@
+begin
+	var i : int;
+	var k : float;
+	i := 1;
+	k := 2
+end

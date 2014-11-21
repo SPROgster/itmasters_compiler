@@ -8,7 +8,7 @@ using SimpleLang.MiddleEnd;
 namespace SimpleLang.Visitors
 {
 
-    class GenCodeVisitor : AutoVisitor
+    public class GenCodeVisitor : AutoVisitor
     {
         public LinkedList<CodeLine> Code = 
             new LinkedList<CodeLine>();
