@@ -16,7 +16,7 @@ namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
-        public static string FileName = @"..\..\_TestTexts\SaneTest.txt";
+        public static string FileName = @"..\..\_TestTexts\optCseTest.txt";
         public static string BinOutputDirectory = @"..\Compiled\";
 
         public static void Main()
@@ -105,14 +105,17 @@ namespace SimpleCompiler
                                 Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
                             }
                         Console.WriteLine("-------------------------");
+                        int i = 0; // # блока
                         //Оптимизация общих подвыражений в блоках
                         foreach(BaseBlock block in CFG.GetBlocks()){
-                            CSE.CSE_inBBl(ref block.Code);
+                            CSE.cseOptimization(block);                            
+                            Console.WriteLine("--- Блок {0} ---", i);
                             Console.WriteLine(block);
+                            ++i;
                         }
 
                         ILAsm gen = new ILAsm();
-                        gen.compileExe(CFG,BinOutputDirectory);
+                        gen.compileExe(CFG, BinOutputDirectory);
                     }
                     else
                         Console.WriteLine("Исправьте Ваш кривой код!");

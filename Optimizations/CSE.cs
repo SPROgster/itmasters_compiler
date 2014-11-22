@@ -2,33 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Optimizations
 {
     class CSE
     {
-        public static int t_id = 0;
-        public static void CSE_inBBl(ref LinkedList<CodeLine> Code)
+        public static void cseOptimization(BaseBlock block)
         {
-            for (LinkedListNode<CodeLine> node = Code.Last; node != null; node = node.Previous)
-            {
-                for (LinkedListNode<CodeLine> node1 = node.Next; node1 != null; node1 = node1.Next)
+            for (LinkedListNode<CodeLine> node0 = block.Code.Last; node0 != null; node0 = node0.Previous)
+                for (LinkedListNode<CodeLine> node1 = node0.Next; node1 != null; node1 = node1.Next)
                 {
-                    if (node1.Value.First.Equals(node.Value.Second) || node1.Value.First.Equals(node.Value.Third)) 
-                        break;
-                    if (node1.Value.Second == node.Value.Second && node1.Value.Third == node.Value.Third && node1.Value.Operation == node.Value.Operation)
+                    if (node1.Value.Second == node0.Value.Second && node1.Value.Third == node0.Value.Third && node1.Value.Operation == node0.Value.Operation)
                     {
-                        string lab = "_tcse" + t_id;
-                        Code.AddBefore(node, new CodeLine(null, lab, node.Value.Second, node.Value.Third, node.Value.Operation));
-                        node.Value = new CodeLine(null, node.Value.First, lab, null, BinOpType.None);
-                        node1.Value = new CodeLine(null, node1.Value.First, lab, null, BinOpType.None);
-                        t_id++;
-                        break;
+                        bool isOpt = true;
+                        for (var tempNode = node0; tempNode != node1; tempNode = tempNode.Next)
+                            if (tempNode.Value.First.Equals(node0.Value.Second) || tempNode.Value.First.Equals(node0.Value.Third))
+                            {
+                                isOpt = false;
+                                break;
+                            }
+                        if (isOpt)
+                        {
+                            string tName = tempName + ++tempCounter;
+                            block.Code.AddAfter(node0, new CodeLine(node0.Value.Label, node0.Value.First, tName, null, BinOpType.None));
+                            node0.Value.First = tName;
+                            node1.Value = new CodeLine(node1.Value.Label, node1.Value.First, tName, null, BinOpType.None);
+                        }
                     }
                 }
-            }
         }
+
+        const string tempName = "_tCSE";
+        static int tempCounter = 0;        
     }
 }
