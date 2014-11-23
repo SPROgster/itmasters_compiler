@@ -70,6 +70,7 @@ namespace SimpleCompiler
                         //Демонстрируем проверку живучести переменной
                         List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
                         Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1).ToString());
+
                         //Проверяем алгоритм поиска достигающих определений
                         Console.WriteLine();
                         ReachingDefsAlgorithm RDA = new ReachingDefsAlgorithm(CFG);
@@ -92,6 +93,18 @@ namespace SimpleCompiler
                                 Console.WriteLine("In:\t" + AVAResult.Item1[block]);
                                 Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
                             }
+                        //Проверяем алгоритм поиска доступных выражений
+                        Console.WriteLine();
+                        AvailableExprsAlgorithm AEA = new AvailableExprsAlgorithm(CFG);
+                        var AEAResult = AEA.Apply();
+                        foreach (var block in AEAResult.Item1.Keys)
+                            if (block != CFG.GetStart() && block != CFG.GetEnd())
+                            {
+                                Console.WriteLine(block);
+                                Console.WriteLine("In:\t" + AEAResult.Item1[block]);
+                                Console.WriteLine("Out:\t" + AEAResult.Item2[block]);
+                            }
+
                         Console.WriteLine("-------------------------");
                         // Оптимизация живучести переменных
                         // Убиваем неживие переменные.
