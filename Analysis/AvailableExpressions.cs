@@ -32,8 +32,11 @@ namespace SimpleLang.Analysis
             {
                 Expression Other = (Expression)obj;
                 return Other.Operation == this.Operation &&
-                    (Other.Op1 == this.Op1 && Other.Op2 == this.Op2 ||
-                    Other.Op1 == this.Op2 && Other.Op2 == this.Op1);
+                    //Коммутативный случай
+                    ((this.Operation == BinOpType.Equal || this.Operation == BinOpType.Mult || this.Operation == BinOpType.Plus) && 
+                    (Other.Op1 == this.Op1 && Other.Op2 == this.Op2 || Other.Op1 == this.Op2 && Other.Op2 == this.Op1) ||
+                    //Некоммутативный случай
+                    Other.Op1 == this.Op1 && Other.Op2 == this.Op2);
             }
             else
                 return false;
