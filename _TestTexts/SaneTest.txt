@@ -6,5 +6,9 @@ begin
 		s := s + i;
 		i := i + i;
 		j := j + 1
-	end
+	end;
+	var t: bool;
+	t := true;
+	if t
+		s := s + 1
 end
