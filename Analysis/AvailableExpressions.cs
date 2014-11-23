@@ -25,6 +25,16 @@ namespace SimpleLang.Analysis
             Op1 = Op2 = null;
             Operation = BinOpType.None;
         }
+        /// <summary>
+        /// Определение типа выражения
+        /// </summary>
+        /// <returns>CType выражения</returns>
+        public CType Type()
+        {
+            CType arg1Type = SymbolTable.vars[SymbolTable.IndexOfIdent(Op1)].Item2;
+            CType arg2Type = SymbolTable.vars[SymbolTable.IndexOfIdent(Op2)].Item2;
+            return SymbolTable.OpResultType(arg1Type, arg2Type, Operation);
+        }
 
         public override bool Equals(object obj)
         {
