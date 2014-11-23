@@ -57,13 +57,13 @@ namespace SimpleLang.MiddleEnd
                 }
                 if (Current.Value.Label != null)
                     Labeled[Current.Value.Label] = Current.Value;
-                switch (Current.Value.Operation)
+                switch (Current.Value.Operator)
                 {
-                    case BinOpType.Goto: 
+                    case OperatorType.Goto: 
                         UsedLabels.Add(Current.Value.First);
                         NextIsLeader = true;
                         break;
-                    case BinOpType.If: 
+                    case OperatorType.If: 
                         UsedLabels.Add(Current.Value.Second);
                         NextIsLeader = true;
                         break;
@@ -93,7 +93,7 @@ namespace SimpleLang.MiddleEnd
                 if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
-                    if (Current.Value.Operation == BinOpType.Goto)
+                    if (Current.Value.Operator == OperatorType.Goto)
                     {
                         if (!GotoLabelsDest.ContainsKey(Current.Value.First))
                             GotoLabelsDest[Current.Value.First] = new LinkedList<BaseBlock>();
@@ -106,7 +106,7 @@ namespace SimpleLang.MiddleEnd
                     }
                     else
                     {
-                        if (Current.Value.Operation == BinOpType.If)
+                        if (Current.Value.Operator == OperatorType.If)
                         {
                             if(!GotoLabelsDest.ContainsKey(Current.Value.Second))
                                 GotoLabelsDest[Current.Value.Second] = new LinkedList<BaseBlock>();
@@ -194,10 +194,14 @@ namespace SimpleLang.MiddleEnd
         }
     }
 
+    //Виды операторов, которые могут встретиться в нашем трёхадресном коде
+    public enum OperatorType { Nop, Goto, If, Assign }
+
     public class CodeLine: ICloneable
     {
         public string Label, First, Second, Third;
-        public BinOpType Operation;
+        public BinOpType BinOp;
+        public OperatorType Operator;
 
         public CodeLine(string lab, string fst, string snd, string thrd, BinOpType op)
         {
@@ -205,29 +209,45 @@ namespace SimpleLang.MiddleEnd
             First = fst;
             Second = snd;
             Third = thrd;
-            Operation = op;
+            Operator = OperatorType.Assign;
+            BinOp = op;
+        }
+
+        public CodeLine(string lab, string fst, string snd, string thrd, 
+            OperatorType op, BinOpType bop = BinOpType.None)
+        {
+            Label = lab;
+            First = fst;
+            Second = snd;
+            Third = thrd;
+            Operator = op;
+            BinOp = bop;
         }
 
         public override string ToString()
         {
             string ToReturn = Label + (Label != null ? ": " : " ");
-            switch (Operation)
+            switch (Operator)
             {
-                case BinOpType.If: 
+                case OperatorType.If: 
                     return ToReturn +  "if " + First + " goto " + Second;
 
-                case BinOpType.Goto: 
+                case OperatorType.Goto: 
                     return ToReturn +  "goto " + First;
 
+                case OperatorType.Nop:
+                    return ToReturn + "nop";
+
+                //Присваивание
                 default: 
                     return ToReturn + 
-                        (First != null ? First + " := " + Second + " " + ((Operation == BinOpType.None) ? "" : Operation.ToString()) + " " + Third : "nop");
+                        First + " := " + Second + " " + ((BinOp == BinOpType.None) ? "" : BinOp.ToString()) + " " + Third;
             }
         }
 
         public object Clone()
         {
-            return new CodeLine(Label, First, Second, Third, Operation);
+            return new CodeLine(Label, First, Second, Third, BinOp);
         }
     }
 

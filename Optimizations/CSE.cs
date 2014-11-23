@@ -13,7 +13,7 @@ namespace SimpleLang.Optimizations
             for (LinkedListNode<CodeLine> node0 = block.Code.Last; node0 != null; node0 = node0.Previous)
                 for (LinkedListNode<CodeLine> node1 = node0.Next; node1 != null; node1 = node1.Next)
                 {
-                    if (node1.Value.Second == node0.Value.Second && node1.Value.Third == node0.Value.Third && node1.Value.Operation == node0.Value.Operation)
+                    if (node1.Value.Second == node0.Value.Second && node1.Value.Third == node0.Value.Third && node1.Value.BinOp == node0.Value.BinOp)
                     {
                         bool isOpt = true;
                         for (var tempNode = node0; tempNode != node1; tempNode = tempNode.Next)
