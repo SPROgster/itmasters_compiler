@@ -61,13 +61,17 @@ namespace SimpleLang.Analysis
             {
                 this[block] = new Tuple<TripleSet, TripleSet>(new TripleSet(), new TripleSet());
                 var Current = block.Code.Last;
+                HashSet<string> LeftVars = new HashSet<string>();
                 for(int i=0;i<block.Code.Count;++i)
                 {
-                    //Если у нас тут правда какая-то адекватная операция
                     if (Current.Value.Operator==OperatorType.Assign)
                     {
-                        this[block].Item1.Add(new Expression(Current.Value.Second, 
-                            Current.Value.Third, Current.Value.BinOp));
+                        LeftVars.Add(Current.Value.First);
+                        if(Current.Value.BinOp != BinOpType.None)
+                            if (!LeftVars.Contains(Current.Value.Second) && !LeftVars.Contains(Current.Value.Third))
+                                this[block].Item1.Add(new Expression(Current.Value.Second, Current.Value.Third, Current.Value.BinOp));
+                            else
+                                this[block].Item2.Add(new Expression(Current.Value.Second, Current.Value.Third, Current.Value.BinOp));
                     }
                     Current = Current.Previous;
                 }
