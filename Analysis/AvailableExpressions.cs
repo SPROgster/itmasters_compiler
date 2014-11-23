@@ -10,9 +10,10 @@ namespace SimpleLang.Analysis
 
     public class Expression
     {
-        public string Op1, Op2, Operation;
+        public string Op1, Op2;
+        public BinOpType Operation;
 
-        public Expression(string op1, string op2, string oper)
+        public Expression(string op1, string op2, BinOpType oper)
         {
             Op1 = op1;
             Op2 = op2;
@@ -21,7 +22,8 @@ namespace SimpleLang.Analysis
 
         public Expression()
         {
-            Op1 = Op2 = Operation = null;
+            Op1 = Op2 = null;
+            Operation = BinOpType.None;
         }
 
         public override bool Equals(object obj)
@@ -55,8 +57,21 @@ namespace SimpleLang.Analysis
         public ExprDefUseContext(ControlFlowGraph cfg)
             : base(cfg)
         {
-            AllExprs = new TripleSet();
-            //И вот тут надо собрать нужную информацию и всё заработает, по идее...
+            foreach (BaseBlock block in cfg.GetBlocks())
+            {
+                this[block] = new Tuple<TripleSet, TripleSet>(new TripleSet(), new TripleSet());
+                var Current = block.Code.Last;
+                for(int i=0;i<block.Code.Count;++i)
+                {
+                    //Если у нас тут правда какая-то адекватная операция
+                    if (Current.Value.Operator==OperatorType.Assign)
+                    {
+                        this[block].Item1.Add(new Expression(Current.Value.Second, 
+                            Current.Value.Third, Current.Value.BinOp));
+                    }
+                    Current = Current.Previous;
+                }
+            }
         }
 
         public TripleSet EDef(BaseBlock bl)

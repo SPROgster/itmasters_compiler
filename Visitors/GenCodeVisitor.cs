@@ -144,7 +144,7 @@ namespace SimpleLang.Visitors
             Code.AddLast(new CodeLine(HeaderLabel, CompTemp,
                 CounterVar, "0", BinOpType.LEqual));
             Code.AddLast(new CodeLine(null, CompTemp,
-                AfterCycleLabel, null, BinOpType.If));
+                AfterCycleLabel, null, OperatorType.If));
             //Зафигачили в трёхадресный код тело цикла
             c.Stat.Visit(this);
             //Уменьшили значение счётчика на 1
@@ -152,10 +152,10 @@ namespace SimpleLang.Visitors
                 CounterVar, "1", BinOpType.Minus));
             //Перешли к началу
             Code.AddLast(new CodeLine(null, HeaderLabel,
-                null, null, BinOpType.Goto));
+                null, null, OperatorType.Goto));
             //Дальше идёт код, на который переходим после окончания работы цикла
             Code.AddLast(new CodeLine(AfterCycleLabel, null,
-                null, null, BinOpType.Nop));
+                null, null, OperatorType.Nop));
 
             // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
             CTypeValuesStack.Pop();
@@ -171,22 +171,22 @@ namespace SimpleLang.Visitors
             SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
 
             Code.AddLast(new CodeLine(HeaderLabel, null,
-               null, null, BinOpType.Nop));
+               null, null, OperatorType.Nop));
             node.Expr.Visit(this);
 
             Code.AddLast(new CodeLine(null, CondVariable,
                 NamesValuesStack.Pop(), null, BinOpType.None));
             Code.AddLast(new CodeLine(null, CondVariable,
-                BodyLabel, null, BinOpType.If));
+                BodyLabel, null, OperatorType.If));
             Code.AddLast(new CodeLine(null, AfterWhileLabel,
-               null, null, BinOpType.Goto));
+               null, null, OperatorType.Goto));
             Code.AddLast(new CodeLine(BodyLabel, null,
-               null, null, BinOpType.Nop));
+               null, null, OperatorType.Nop));
             node.Stat.Visit(this);
             Code.AddLast(new CodeLine(null, HeaderLabel,
-               null, null, BinOpType.Goto));
+               null, null, OperatorType.Goto));
             Code.AddLast(new CodeLine(AfterWhileLabel, null,
-               null, null, BinOpType.Nop));
+               null, null, OperatorType.Nop));
 
             // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
             CTypeValuesStack.Pop();
@@ -205,15 +205,15 @@ namespace SimpleLang.Visitors
             Code.AddLast(new CodeLine(null, CondVariable,
                 NamesValuesStack.Pop(), null, BinOpType.None));
             Code.AddLast(new CodeLine(null, CondVariable,
-                IfLabel, null, BinOpType.If));
+                IfLabel, null, OperatorType.If));
             node.StatElse.Visit(this);
             Code.AddLast(new CodeLine(null, AfterIfLabel,
-               null, null, BinOpType.Goto));
+               null, null, OperatorType.Goto));
             Code.AddLast(new CodeLine(IfLabel, null,
-               null, null, BinOpType.Nop));
+               null, null, OperatorType.Nop));
             node.StatIf.Visit(this);
             Code.AddLast(new CodeLine(AfterIfLabel, null,
-               null, null, BinOpType.Nop));
+               null, null, OperatorType.Nop));
 
             // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
             CTypeValuesStack.Pop();
@@ -256,20 +256,16 @@ namespace SimpleLang.Visitors
                     elem.Value.Label = newName;
 
                 // замена в goto
-                if (elem.Value.Operation == BinOpType.Goto)
+                if (elem.Value.Operator == OperatorType.Goto)
                     if (elem.Value.First != null && elem.Value.First == oldName)
                         elem.Value.First = newName;
 
                 // замена в if
-                if (elem.Value.Operation == BinOpType.If)
+                if (elem.Value.Operator == OperatorType.If)
                     if (elem.Value.Second != null && elem.Value.Second == oldName)
                         elem.Value.Second = newName;
 
             }
-        }
-
-        public static void RemoveTmpLabels(LinkedList<CodeLine> code) {
-
         }
     }
 }

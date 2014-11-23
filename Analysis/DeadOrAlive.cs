@@ -83,17 +83,16 @@ namespace SimpleLang.Analysis
                 this[block] = new Tuple<StringSet, StringSet>(new StringSet(), new StringSet());
                 foreach (CodeLine line in block.Code)
                 {
-                    //У нас в грамматике странно обстоят дела с типом bool...
-                    if (line.First != null && line.Operation != BinOpType.Goto)
-                        if (line.Operation != BinOpType.If)
-                        {
-                            if (GoodOperand(block,line.Second))
-                                this[block].Item2.Add(line.Second);
-                            if (GoodOperand(block,line.Third))
-                                this[block].Item2.Add(line.Third);
-                            this[block].Item1.Add(line.First);
-                        }
-                        else
+                    if (line.Operator == OperatorType.Assign)
+                    {
+                        if (GoodOperand(block, line.Second))
+                            this[block].Item2.Add(line.Second);
+                        if (GoodOperand(block, line.Third))
+                            this[block].Item2.Add(line.Third);
+                        this[block].Item1.Add(line.First);
+                    }
+                    else
+                        if (line.Operator == OperatorType.If)
                             if(GoodOperand(block,line.First))
                                 this[block].Item2.Add(line.First);
                 }
