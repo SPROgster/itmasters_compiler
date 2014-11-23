@@ -14,55 +14,14 @@ namespace SimpleLang.Visitors
             new LinkedList<CodeLine>();
 
         private Stack<string> NamesValuesStack = new Stack<string>();
-        private Stack<CType> CTypeValuesStack = new Stack<CType>();
-        private int TempCounter = 0;
-        private int LabelCounter = 0;
-        private const string TempName = "_t";
-        private const string LabelName = "_l";
-
-
-        private string NextTemp()
-        {
-            while (SymbolTable.Contains(TempName + TempCounter))
-                TempCounter++;
-            return TempName + TempCounter++;
-        }
+        private Stack<CType> CTypeValuesStack = new Stack<CType>();                
+        private int LabelCounter = 0;        
+        private const string LabelName = "_l";        
 
         private string NextLabel()
         {
             return LabelName + LabelCounter++;
-        }
-
-        /// <summary>
-        /// Определяет какого типа должен быть результат операции по двум операторам
-        /// </summary>
-        /// <param name="op1">Первый операнд</param>
-        /// <param name="op2">Второй операнд</param>
-        /// <param name="op">Операция</param>
-        /// <returns>CType результата операции</returns>
-        private CType OpResultType(CType op1, CType op2, BinOpType op)
-        {
-            if (op2 == CType.None)
-                return op1;
-
-            if (op == BinOpType.Equal  || op == BinOpType.GEqual || op == BinOpType.Greater ||
-                op == BinOpType.LEqual || op == BinOpType.Less   || op == BinOpType.NEqual)
-                return CType.Bool;
-
-            if ((op1 == CType.Double) || (op2 == CType.Double))
-                return CType.Double;
-
-            if ((op1 == CType.Float) || (op2 == CType.Float))
-                return CType.Float;
-
-            if ((op1 == CType.Int) || (op2 == CType.Int))
-                return CType.Int;
-
-            if ((op1 == CType.Bool) || (op2 == CType.Bool))
-                return CType.Bool;
-
-            return CType.None;
-        }
+        }       
 
         public override void VisitAssignNode(AssignNode node)
         {
@@ -109,10 +68,10 @@ namespace SimpleLang.Visitors
         {
             binop.Right.Visit(this);
             binop.Left.Visit(this);
-            string CurName = NextTemp();
+            string CurName = SymbolTable.NextTemp();
 
             // Какой же тут тип надо получить?
-            CType resultType = OpResultType(CTypeValuesStack.Pop(), CTypeValuesStack.Pop(), binop.Op);
+            CType resultType = SymbolTable.OpResultType(CTypeValuesStack.Pop(), CTypeValuesStack.Pop(), binop.Op);
             SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CurName, resultType, SymbolKind.var));
 
             Code.AddLast(new CodeLine(null, CurName,
@@ -128,7 +87,7 @@ namespace SimpleLang.Visitors
             //Метка для проверки значения счётчика цикла
             string HeaderLabel = NextLabel();
             //Счётчик цикла
-            string CounterVar= NextTemp();
+            string CounterVar= SymbolTable.NextTemp();
 
             SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CounterVar, CType.Bool, SymbolKind.var));
 
@@ -139,7 +98,7 @@ namespace SimpleLang.Visitors
             Code.AddLast(new CodeLine(null, CounterVar,
                 NamesValuesStack.Pop(), null, BinOpType.None));
             //Временная переменная для хранения результата сравнения
-            string CompTemp = NextTemp();
+            string CompTemp = SymbolTable.NextTemp();
             //Надо ли выполнять тело?
             Code.AddLast(new CodeLine(HeaderLabel, CompTemp,
                 CounterVar, "0", BinOpType.LEqual));
@@ -163,7 +122,7 @@ namespace SimpleLang.Visitors
 
         public override void VisitWhileNode(WhileNode node)
         {
-            string CondVariable = NextTemp();
+            string CondVariable = SymbolTable.NextTemp();
             string BodyLabel = NextLabel();
             string HeaderLabel = NextLabel();
             string AfterWhileLabel = NextLabel();
@@ -194,7 +153,7 @@ namespace SimpleLang.Visitors
 
         public override void VisitIfNode(IfNode node)
         {
-            string CondVariable = NextTemp();
+            string CondVariable = SymbolTable.NextTemp();
             string IfLabel = NextLabel();
             string AfterIfLabel = NextLabel();
 
