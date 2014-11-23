@@ -16,7 +16,7 @@ namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
-        public static string FileName = @"..\..\_TestTexts\ReachingDefsTest.txt";
+        public static string FileName = @"..\..\_TestTexts\optCseTest.txt";
         public static string BinOutputDirectory = @"..\Compiled\";
 
         public static void Main()
@@ -95,7 +95,7 @@ namespace SimpleCompiler
                         Console.WriteLine("-------------------------");
                         // Оптимизация живучести переменных
                         // Убиваем неживие переменные.
-                        AliveVarsOptimization.optimize(AVAResult, CFG);
+//                        AliveVarsOptimization.optimize(AVAResult, CFG);
                         Console.WriteLine("AVA OPTIMIZATION");
                         foreach (var block in AVAResult.Item1.Keys)
                             if (block != CFG.GetStart() && block != CFG.GetEnd())
@@ -104,11 +104,12 @@ namespace SimpleCompiler
                                 Console.WriteLine("In:\t" + AVAResult.Item1[block]);
                                 Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
                             }
-                        Console.WriteLine("-------------------------");
-                        int i = 0; // # блока
+                        Console.WriteLine("-------------------------");                        
                         //Оптимизация общих подвыражений в блоках
+                        int i = 0; // # блока
+                        CSE cse = new CSE();
                         foreach(BaseBlock block in CFG.GetBlocks()){
-                            CSE.cseOptimization(block);                            
+                            cse.Optimize(block);                            
                             Console.WriteLine("--- Блок {0} ---", i);
                             Console.WriteLine(block);
                             ++i;
