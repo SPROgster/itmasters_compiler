@@ -48,6 +48,7 @@ namespace SimpleCompiler
                     parser.root.Visit(sne);
                     foreach (var err in sne.Errors)
                         Console.WriteLine(err);
+
                     if (sne.Errors.Count == 0)
                     {
                         //Генерируем трёхадресный код
