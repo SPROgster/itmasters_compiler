@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProgramTree;
+
+using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
     // базовая логика обхода без действий
     // Если нужны действия или другая логика обхода, то соответствующие методы надо переопределять
     // При переопределении методов для задания действий необходимо не забывать обходить подузлы
-    class AutoVisitor: Visitor
+    public class AutoVisitor: Visitor
     {
         public override void VisitBinOpNode(BinOpNode binop) 
         {

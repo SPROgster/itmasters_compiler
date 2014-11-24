@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using MiddleEnd;
+using SimpleLang.MiddleEnd;
 
-namespace SimpleLang.Visitors
+namespace SimpleLang.Optimizations
 {
     class Fold
     {
@@ -36,7 +36,7 @@ namespace SimpleLang.Visitors
             for (var elem = gcv.First; elem != null; elem = elem.Next)
             {
                 CodeLine cl = elem.Value;
-                if (cl.Third == null && cl.Operation == null)
+                if (cl.Third == null && cl.BinOp == BinOpType.None)
                 {
                     int second;
                     bool second_int = int.TryParse(cl.Second, out second);
@@ -76,16 +76,16 @@ namespace SimpleLang.Visitors
                 bool third_int = int.TryParse(cl.Third, out third);
                 if (second_int && third_int)
                 {
-                    if (cl.Operation == "Plus")
+                    if (cl.BinOp == BinOpType.Plus)
                         cl.Second = (third + second).ToString();
-                    else if (cl.Operation == "Mult")
+                    else if (cl.BinOp == BinOpType.Mult)
                         cl.Second = (third * second).ToString();
-                    else if (cl.Operation == "Minus")
+                    else if (cl.BinOp == BinOpType.Minus)
                         cl.Second = (second - third).ToString();
                     else
                         continue;
                     cl.Third = null;
-                    cl.Operation = null;
+                    cl.BinOp = BinOpType.None;
                     has_const = true;
                 }
             }
@@ -98,17 +98,17 @@ namespace SimpleLang.Visitors
         {
             if (cl.Second == "0")
             {
-                if (cl.Operation == "Minus")
+                if (cl.BinOp == BinOpType.Minus)
                     return;
                 else
                     cl.Second = cl.Third;
                 cl.Third = null;
-                cl.Operation = null;
+                cl.BinOp = BinOpType.None;
             }
             if (cl.Third != null && cl.Third == "0")
             {
                 cl.Third = null;
-                cl.Operation = null;
+                cl.BinOp = BinOpType.None;
             }
         }
 
@@ -120,18 +120,18 @@ namespace SimpleLang.Visitors
             {
                 cl.Second = cl.Third;
                 cl.Third = null;
-                cl.Operation = null;
+                cl.BinOp = BinOpType.None;
             }
             if (cl.Third != null && cl.Third == "1")
             {
                 cl.Third = null;
-                cl.Operation = null;
+                cl.BinOp = BinOpType.None;
             }
             if (cl.Second == "0" || (cl.Third != null && cl.Third == "0"))
             {
                 cl.Second = "0";
                 cl.Third = null;
-                cl.Operation = null;
+                cl.BinOp = BinOpType.None;
             }
         }
         
@@ -146,15 +146,15 @@ namespace SimpleLang.Visitors
                 bool third_int = int.TryParse(cl.Third, out third);
                 if (second_int || third_int)
                 {
-                    switch (cl.Operation)
+                    switch (cl.BinOp)
                     {
-                        case "Plus":
+                        case BinOpType.Plus:
                             checkPlusOrMinus(cl);
                             break;
-                        case "Minus":
+                        case BinOpType.Minus:
                             checkPlusOrMinus(cl);
                             break;
-                        case "Mult":
+                        case BinOpType.Mult:
                             checkMult(cl);
                             break;
                         default:
