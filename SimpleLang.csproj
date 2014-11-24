@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analysis\AvailableExpressions.cs" />
+    <Compile Include="Analysis\DominatorTree.cs" />
     <Compile Include="Analysis\ReachingDefinitions.cs" />
     <Compile Include="Analysis\DeadOrAlive.cs" />
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
