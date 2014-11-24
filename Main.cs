@@ -6,17 +6,11 @@ using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
-<<<<<<< HEAD
-using MiddleEnd;
-using DefUse;
-using CleanDead;
-=======
 
 using SimpleLang.MiddleEnd;
 using SimpleLang.Optimizations;
 using SimpleLang.Analysis;
 using SimpleLang.CodeGenerator;
->>>>>>> master
 
 namespace SimpleCompiler
 {
@@ -54,49 +48,7 @@ namespace SimpleCompiler
                     parser.root.Visit(sne);
                     foreach (var err in sne.Errors)
                         Console.WriteLine(err);
-<<<<<<< HEAD
 
-                    //Генерируем трёхадресный код
-                    GenCodeVisitor gcv = new GenCodeVisitor();
-                    parser.root.Visit(gcv);
-
-                    Fold.fold(ref gcv.Code); // Вызов сворачивания констант и алг тождеств
-
-                    //Причёсываем метки
-                    //var Iterator = gcv.Code.First;
-                    //while (Iterator != null)
-                    //{
-                    //    if (Iterator.Value.First == null && Iterator.Next != null)
-                    //    {
-                    //        Iterator.Next.Value.Label = Iterator.Value.Label;
-                    //        Iterator = Iterator.Next;
-                    //        gcv.Code.Remove(Iterator.Previous);
-                    //    }
-                    //    else
-                    //        Iterator = Iterator.Next;
-                    //}
-
-                    Correct3AddressCode.RemoveEmptyLabel(ref gcv.Code);
-
-                    Console.WriteLine();
-                    Console.WriteLine("Трёхадресный код:");
-                    foreach (var ln in gcv.Code)
-                        Console.WriteLine(ln);
-
-                    ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
-                    List<BaseBlock> l=new List<BaseBlock>(CFG.GetBlocks());
-                    Console.WriteLine(DeadOrAlive.IsAlive(l[0],"a",1).ToString());
-                    Console.WriteLine("Граф построен!");
-
-                    Console.WriteLine("\nУдаляем мёртвый код:");
-                    LinkedList<BaseBlock> blocks = CFG.GetBlocks();
-                    for (var p = blocks.First; p != null; p = p.Next)
-                    {
-                        CleanDead.CleanDead.cleanBlock(p.Value);
-                        for (var r = p.Value.First; r != null; r = r.Next)
-                            Console.WriteLine(r.Value.ToString());
-                    }
-=======
                     if (sne.Errors.Count == 0)
                     {
                         //Генерируем трёхадресный код
@@ -182,7 +134,6 @@ namespace SimpleCompiler
                     }
                     else
                         Console.WriteLine("Исправьте Ваш кривой код!");
->>>>>>> master
                 }
             }
             catch (FileNotFoundException)
