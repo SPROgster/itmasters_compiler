@@ -29,7 +29,7 @@ namespace simplelangTests
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
             CleanDead cl = new CleanDead();
             cl.Optimize(CFG.GetBlocks().First.Next.Value);
-
+            Assert.AreEqual(5, CFG.GetBlocks().First.Next.Value.Code.Count);
         }
     }
 }
