@@ -8,8 +8,44 @@ namespace SimpleLang.Analysis
 {
     using BlockSet = SetAdapter<BaseBlock>;
 
-    public class DominatorTree
+    public class DominatorsTree
     {
+        public TreeNode<BaseBlock> Root;
+
+        public DominatorsTree(ControlFlowGraph cfg)
+        {
+            var Dominators = (new DominatorsAlgorithm(cfg)).Apply().Item2;
+            var DirectDominators = new Dictionary<BaseBlock, TreeNode<BaseBlock>>();
+            //Находим непосредственных доминаторов после того, как уже нашли всех
+            foreach (BaseBlock block in Dominators.Keys)
+                DirectDominators[block] = new TreeNode<BaseBlock>(block);
+            foreach (BaseBlock block in Dominators.Keys)
+                foreach (BaseBlock dblock in
+                    Dominators.Where(e => e.Key != block && Dominators[block].Contains(e.Key)).Select(e => e.Value).
+                    Aggregate(new BlockSet(), (a, b) => BlockSet.Union(BlockSet.Subtract(a, b), BlockSet.Subtract(b, a))))
+                    DirectDominators[dblock].AddItem(DirectDominators[block]);
+            Root = DirectDominators[cfg.GetStart()];
+        }
+
+        /******************************************************************************/
+
+        public class TreeNode<T>
+        {
+            public T Value;
+            public LinkedList<TreeNode<T>> Items;
+
+            public TreeNode(T val)
+            {
+                Value = val;
+                Items = new LinkedList<TreeNode<T>>();
+            }
+
+            public void AddItem(TreeNode<T> i)
+            {
+                Items.AddLast(i);
+            }
+        }
+
         private class EmptyContext: Context<BaseBlock>
         {
             public EmptyContext(ControlFlowGraph cfg)
@@ -19,7 +55,7 @@ namespace SimpleLang.Analysis
 
         private class DominatorsAlgorithm : TopDownAlgorithm<BaseBlock, EmptyContext, BlockSet>
         {
-            public class DominatorsTransferFunction: InfoProvidedTransferFunction<BaseBlock, BlockSet>
+            public class DominatorsTransferFunction : InfoProvidedTransferFunction<BaseBlock, BlockSet>
             {
                 public DominatorsTransferFunction(BaseBlock info)
                     : base(info)
@@ -51,11 +87,6 @@ namespace SimpleLang.Analysis
                     AllBlocks.Add(bl);
                 return base.Apply(new BlockSet(Cont.Start), AllBlocks, AllBlocks, BlockSet.Intersect);
             }
-        }
-
-        public DominatorTree(ControlFlowGraph cfg)
-        {
-
         }
     }
 }
