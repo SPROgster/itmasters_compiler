@@ -1,13 +1,9 @@
-﻿using System;
+﻿using SimpleLang.MiddleEnd;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Optimizations
 {
-    class Fold
+    public class Fold
     {
         // Основная функция свертки
         public static void fold(ref LinkedList<CodeLine> gcv)
@@ -134,9 +130,9 @@ namespace SimpleLang.Optimizations
                 cl.BinOp = BinOpType.None;
             }
         }
-        
+
         // Функция, которая сворачивает алгебраические тождества
-        private  static void FoldSameness(ref LinkedList<CodeLine> gcv)
+        private static void FoldSameness(ref LinkedList<CodeLine> gcv)
         {
             foreach (CodeLine cl in gcv)
             {
@@ -151,21 +147,20 @@ namespace SimpleLang.Optimizations
                         case BinOpType.Plus:
                             checkPlusOrMinus(cl);
                             break;
+
                         case BinOpType.Minus:
                             checkPlusOrMinus(cl);
                             break;
+
                         case BinOpType.Mult:
                             checkMult(cl);
                             break;
+
                         default:
                             break;
                     }
                 }
             }
         }
-
-
-
-
     }
 }

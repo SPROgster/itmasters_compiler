@@ -1,0 +1,9 @@
+begin
+  var a, b, c, d : int;
+  a := 5 + (b + c) * (b + c);
+  b := a - d;
+  c := b + c;
+  d := a - d;
+  d := d + 1;
+  a := d + 1
+end
