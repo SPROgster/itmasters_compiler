@@ -1,20 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SimpleLang.Visitors;
+using SimpleScanner;
+using SimpleParser;
+using System.IO;
 using SimpleLang.MiddleEnd;
 using SimpleLang.Optimizations;
-using SimpleLang.Visitors;
-using SimpleParser;
-using SimpleScanner;
-using System.IO;
 
 namespace simplelangTests
 {
     [TestClass]
-    public class Smeshariki
+    public class AAA
     {
         [TestMethod]
-        public void TestCSE()
+        public void CleanDeadTest()
         {
-            string FileName = @"..\..\Test4.txt";
+            string FileName = @"..\..\Test2.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
@@ -26,11 +27,9 @@ namespace simplelangTests
             parser.root.Visit(gcv);
             gcv.RemoveEmptyLabels();
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
-            CSE cse = new CSE();
-            string f = CFG.GetBlocks().First.Next.Value.Code.First.Value.First;
-            Assert.IsTrue(f.StartsWith("_t"));
-            Assert.IsTrue(CFG.GetBlocks().First.Next.Value.Code.First.Value.Second.Equals("b"));
-            Assert.IsTrue(CFG.GetBlocks().First.Next.Value.Code.First.Value.Third.Equals("c"));
+            CleanDead cl = new CleanDead();
+            cl.Optimize(CFG.GetBlocks().First.Next.Value);
+
         }
     }
 }

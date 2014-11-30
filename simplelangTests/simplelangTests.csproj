@@ -59,6 +59,8 @@
     <Compile Include="Smeshariki.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Titanic.cs" />
+    <Compile Include="Beda.cs" />
+    <Compile Include="AAA.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleLang.csproj">
