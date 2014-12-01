@@ -13,7 +13,7 @@ namespace simplelangTests
     public class AAA
     {
         [TestMethod]
-        public void CleanDeadTest()
+        public void CleanDead_1_5()
         {
             string FileName = @"..\..\Test2.txt";
             string Text = File.ReadAllText(FileName);

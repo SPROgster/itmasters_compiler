@@ -12,7 +12,7 @@ namespace simplelangTests
     public class Smeshariki
     {
         [TestMethod]
-        public void TestCSE()
+        public void CSE_1_3()
         {
             string FileName = @"..\..\Test4.txt";
             string Text = File.ReadAllText(FileName);

@@ -13,7 +13,7 @@ namespace simplelangTests
     public class Beda
     {
         [TestMethod]
-        public void DeadOrAliveTest()
+        public void DeadOrAlive_1_1()
         {
             string FileName = @"..\..\Test2.txt";
             string Text = File.ReadAllText(FileName);

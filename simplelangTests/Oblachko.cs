@@ -14,7 +14,7 @@ namespace simplelangTests
     public class Oblachko
     {
         [TestMethod]
-        public void TestFold()
+        public void Fold_1_2()
         {
             string FileName = @"..\..\Test5.txt";
             string Text = File.ReadAllText(FileName);
