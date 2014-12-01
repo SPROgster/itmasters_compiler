@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C95C0195-E90C-4353-9E44-6938D028290D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SimpleLangMono</RootNamespace>
+    <AssemblyName>SimpleLangMono</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="Analysis\AnalysisBase.cs" />
+    <Compile Include="Analysis\AvailableExpressions.cs" />
+    <Compile Include="Analysis\DeadOrAlive.cs" />
+    <Compile Include="Analysis\DominatorTree.cs" />
+    <Compile Include="Analysis\ReachingDefinitions.cs" />
+    <Compile Include="CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="CodeGenerator\ILAsm.cs" />
+    <Compile Include="CodeGenerator\ILAsmInstructions.cs" />
+    <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
+    <Compile Include="MiddleEnd\ProgramTree.cs" />
+    <Compile Include="MiddleEnd\SymbolTable.cs" />
+    <Compile Include="Optimizations\AliveVarsOptimization.cs" />
+    <Compile Include="Optimizations\CSE.cs" />
+    <Compile Include="Optimizations\CleanDead.cs" />
+    <Compile Include="Optimizations\Fold.cs" />
+    <Compile Include="Optimizations\OptimizationsBase.cs" />
+    <Compile Include="Parsers\ParserHelper.cs" />
+    <Compile Include="Parsers\ShiftReduceParserCode.cs" />
+    <Compile Include="Parsers\SimpleLex.cs" />
+    <Compile Include="Parsers\SimpleYacc.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Visitors\AssignCountVisitor.cs" />
+    <Compile Include="Visitors\AutoVisitor.cs" />
+    <Compile Include="Visitors\CheckVariablesVisitor.cs" />
+    <Compile Include="Visitors\GenCodeVisitor.cs" />
+    <Compile Include="Visitors\PrettyPrintVisitor.cs" />
+    <Compile Include="Visitors\VariableRenameVisitor.cs" />
+    <Compile Include="Visitors\Visitor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Analysis\" />
+    <Folder Include="CodeGenerator\" />
+    <Folder Include="MiddleEnd\" />
+    <Folder Include="Optimizations\" />
+    <Folder Include="Optimizations\Parsers\" />
+    <Folder Include="Parsers\" />
+    <Folder Include="Properties\" />
+    <Folder Include="Visitors\" />
+    <Folder Include="_TestTexts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="_TestTexts\LabelsTest.txt" />
+    <None Include="_TestTexts\ReachingDefsTest.txt" />
+    <None Include="_TestTexts\SaneTest.txt" />
+    <None Include="_TestTexts\UnknownTest.txt" />
+    <None Include="_TestTexts\optCseTest.txt" />
+  </ItemGroup>
+</Project>
