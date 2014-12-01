@@ -151,6 +151,7 @@ namespace SimpleLang.MiddleEnd
             Inputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock].AddLast(Blocks.First());
+            Inputs[Blocks.First()].AddLast(EndBlock);
             Blocks.AddFirst(EndBlock);
             //Создаём фиктивный блок "выход"
             EndBlock = new BaseBlock();

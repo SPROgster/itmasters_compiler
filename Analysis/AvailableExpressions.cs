@@ -6,7 +6,7 @@ using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Analysis
 {
-    using TripleSet = SetAdapter<Expression>;
+    using ExprSet = SetAdapter<Expression>;
 
     public class Expression
     {
@@ -42,8 +42,11 @@ namespace SimpleLang.Analysis
             {
                 Expression Other = (Expression)obj;
                 return Other.Operation == this.Operation &&
-                    (Other.Op1 == this.Op1 && Other.Op2 == this.Op2 ||
-                    Other.Op1 == this.Op2 && Other.Op2 == this.Op1);
+                    //Коммутативный случай
+                    ((this.Operation == BinOpType.Equal || this.Operation == BinOpType.Mult || this.Operation == BinOpType.Plus) && 
+                    (Other.Op1 == this.Op1 && Other.Op2 == this.Op2 || Other.Op1 == this.Op2 && Other.Op2 == this.Op1) ||
+                    //Некоммутативный случай
+                    Other.Op1 == this.Op1 && Other.Op2 == this.Op2);
             }
             else
                 return false;
@@ -60,73 +63,83 @@ namespace SimpleLang.Analysis
         }
     }
 
-    public class ExprDefUseContext : Context<Tuple<TripleSet, TripleSet>>
+    public class ExprGenKillContext : Context<Tuple<ExprSet, ExprSet>>
     {
-        public TripleSet AllExprs { get; protected set; }
+        public ExprSet AllExprs { get; protected set; }
 
-        public ExprDefUseContext(ControlFlowGraph cfg)
+        public ExprGenKillContext(ControlFlowGraph cfg)
             : base(cfg)
         {
+            AllExprs = new ExprSet();
+            Dictionary<BaseBlock, HashSet<string>> BlockDefs = new Dictionary<BaseBlock, HashSet<string>>();
             foreach (BaseBlock block in cfg.GetBlocks())
             {
-                this[block] = new Tuple<TripleSet, TripleSet>(new TripleSet(), new TripleSet());
+                BlockDefs[block] = new HashSet<string>();
+                this[block] = new Tuple<ExprSet, ExprSet>(new ExprSet(), new ExprSet());
                 var Current = block.Code.Last;
-                HashSet<string> LeftVars = new HashSet<string>();
                 for(int i=0;i<block.Code.Count;++i)
                 {
                     if (Current.Value.Operator==OperatorType.Assign)
                     {
-                        LeftVars.Add(Current.Value.First);
-                        if(Current.Value.BinOp != BinOpType.None)
-                            if (!LeftVars.Contains(Current.Value.Second) && !LeftVars.Contains(Current.Value.Third))
-                                this[block].Item1.Add(new Expression(Current.Value.Second, Current.Value.Third, Current.Value.BinOp));
-                            else
-                                this[block].Item2.Add(new Expression(Current.Value.Second, Current.Value.Third, Current.Value.BinOp));
+                        BlockDefs[block].Add(Current.Value.First);
+                        if (Current.Value.BinOp != BinOpType.None)
+                        {
+                            var Element = new Expression(Current.Value.Second, Current.Value.Third, Current.Value.BinOp);
+                            AllExprs.Add(Element);
+                            if (!BlockDefs[block].Contains(Current.Value.Second) && !BlockDefs[block].Contains(Current.Value.Third))
+                                this[block].Item1.Add(Element); //Добавляем элемент во множество gen
+                        }
                     }
                     Current = Current.Previous;
                 }
             }
+            //Формируем множество kill
+            foreach (Expression e in AllExprs)
+                foreach (BaseBlock block in cfg.GetBlocks())
+                    if (!this[block].Item1.Contains(e) &&
+                        (BlockDefs[block].Contains(e.Op1) || BlockDefs[block].Contains(e.Op2)))
+                        this[block].Item2.Add(e);
         }
 
-        public TripleSet EDef(BaseBlock bl)
+        public ExprSet EGen(BaseBlock bl)
         {
             return this[bl].Item1;
         }
 
-        public TripleSet EUse(BaseBlock bl)
+        public ExprSet EKill(BaseBlock bl)
         {
             return this[bl].Item2;
         }
     }
 
-    public class AvailableExprsTransferFunction : InfoProvidedTransferFunction<Tuple<TripleSet, TripleSet>, TripleSet>
+    public class AvailableExprsTransferFunction : InfoProvidedTransferFunction<Tuple<ExprSet, ExprSet>, ExprSet>
     {
-        public AvailableExprsTransferFunction(Tuple<TripleSet, TripleSet> info)
+        public AvailableExprsTransferFunction(Tuple<ExprSet, ExprSet> info)
             : base(info)
         { }
 
-        public override TripleSet Transfer(TripleSet input)
+        public override ExprSet Transfer(ExprSet input)
         {
-            return TripleSet.Union(Info.Item2, TripleSet.Subtract(input, Info.Item1));
+            return ExprSet.Union(Info.Item1, ExprSet.Subtract(input, Info.Item2));
         }
     }
 
-    public class AvailableExprsAlgorithm : TopDownAlgorithm<Tuple<TripleSet, TripleSet>, ExprDefUseContext, TripleSet>
+    public class AvailableExprsAlgorithm : TopDownAlgorithm<Tuple<ExprSet, ExprSet>, ExprGenKillContext, ExprSet>
     {
         public AvailableExprsAlgorithm(ControlFlowGraph cfg)
             : base(cfg)
         {
             foreach (BaseBlock bl in cfg.GetBlocks())
             {
-                In[bl] = new TripleSet();
-                Out[bl] = new TripleSet();
+                In[bl] = new ExprSet();
+                Out[bl] = new ExprSet();
                 Func[bl] = new AvailableExprsTransferFunction(Cont[bl]);
             }
         }
 
-        public override Tuple<Dictionary<BaseBlock, TripleSet>, Dictionary<BaseBlock, TripleSet>> Apply()
+        public override Tuple<Dictionary<BaseBlock, ExprSet>, Dictionary<BaseBlock, ExprSet>> Apply()
         {
-            return base.Apply(new TripleSet(), Cont.AllExprs, Cont.AllExprs, TripleSet.Intersect);
+            return base.Apply(new ExprSet(), Cont.AllExprs, Cont.AllExprs, ExprSet.Intersect);
         }
     }
 }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+
 using SimpleScanner;
 using SimpleParser;
-using SimpleLang.Visitors;
 
+using SimpleLang.Visitors;
 using SimpleLang.MiddleEnd;
 using SimpleLang.Optimizations;
 using SimpleLang.Analysis;
@@ -48,8 +50,11 @@ namespace SimpleCompiler
                     parser.root.Visit(sne);
                     foreach (var err in sne.Errors)
                         Console.WriteLine(err);
+
                     if (sne.Errors.Count == 0)
                     {
+                        /**************** ПОСТРОЕНИЕ ТРЁХАДР. КОДА И CFG ******************************/
+
                         //Генерируем трёхадресный код
                         GenCodeVisitor gcv = new GenCodeVisitor();
                         parser.root.Visit(gcv);
@@ -63,6 +68,34 @@ namespace SimpleCompiler
                         //Строим граф базовых блоков
                         ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
                         Console.WriteLine("Граф построен!");
+                        
+                        /**************** ПРИМЕНЕНИЕ ОПТИМИЗАЦИЙ **************************************/
+
+                        //Готовимся применять оптимизации
+                        LocalOptimization[] Locals = AppDomain.CurrentDomain.GetAssemblies().
+                            SelectMany(t => t.GetTypes()).
+                            Where(t => t.IsClass &&
+                            t.Namespace == @"SimpleLang.Optimizations" &&
+                            t.GetInterfaces().Contains(typeof(LocalOptimization))).
+                            Select(e => (LocalOptimization)e.GetConstructor(new Type[0]).Invoke(new object[0])).
+                            ToArray();
+                        GlobalOptimization[] Globals = AppDomain.CurrentDomain.GetAssemblies().
+                            SelectMany(t => t.GetTypes()).
+                            Where(t => t.IsClass &&
+                            t.Namespace == @"SimpleLang.Optimizations" &&
+                            t.GetInterfaces().Contains(typeof(GlobalOptimization))).
+                            Select(e => (GlobalOptimization)e.GetConstructor(new Type[0]).Invoke(new object[0])).
+                            ToArray();
+                        Console.WriteLine("Доступные внутриблочные оптимизации:");
+                        for (int i = 0; i < Locals.Length; ++i)
+                            Console.WriteLine(i + " - " + Locals[i].GetType());
+                        Console.WriteLine("Доступные межблочные оптимизации:");
+                        for (int i = 0; i < Globals.Length; ++i)
+                            Console.WriteLine(i + " - " + Globals[i].GetType());
+                        //to be continued...
+
+                        /***************** ЖУТЬ, ОТ КОТОРОЙ НАДО ИЗБАВИТЬСЯ *****************************/
+
                         // Вызов сворачивания констант и алг тождеств 
                         // По-блочно
                         foreach (BaseBlock block in CFG.GetBlocks())
@@ -70,6 +103,7 @@ namespace SimpleCompiler
                         //Демонстрируем проверку живучести переменной
                         List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
                         Console.WriteLine(DeadOrAlive.IsAlive(l[0], "a", 1).ToString());
+
                         //Проверяем алгоритм поиска достигающих определений
                         Console.WriteLine();
                         ReachingDefsAlgorithm RDA = new ReachingDefsAlgorithm(CFG);
@@ -92,6 +126,18 @@ namespace SimpleCompiler
                                 Console.WriteLine("In:\t" + AVAResult.Item1[block]);
                                 Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
                             }
+                        //Проверяем алгоритм поиска доступных выражений
+                        Console.WriteLine();
+                        AvailableExprsAlgorithm AEA = new AvailableExprsAlgorithm(CFG);
+                        var AEAResult = AEA.Apply();
+                        foreach (var block in AEAResult.Item1.Keys)
+                            if (block != CFG.GetStart() && block != CFG.GetEnd())
+                            {
+                                Console.WriteLine(block);
+                                Console.WriteLine("In:\t" + AEAResult.Item1[block]);
+                                Console.WriteLine("Out:\t" + AEAResult.Item2[block]);
+                            }
+
                         Console.WriteLine("-------------------------");
                         // Оптимизация живучести переменных
                         // Убиваем неживие переменные.
@@ -106,14 +152,18 @@ namespace SimpleCompiler
                             }
                         Console.WriteLine("-------------------------");                        
                         //Оптимизация общих подвыражений в блоках
-                        int i = 0; // # блока
+                        int j = 0; // # блока
                         CSE cse = new CSE();
-                        foreach(BaseBlock block in CFG.GetBlocks()){
+                        foreach(BaseBlock block in CFG.GetBlocks())
+                        {
                             cse.Optimize(block);                            
-                            Console.WriteLine("--- Блок {0} ---", i);
+                            Console.WriteLine("--- Блок {0} ---", j);
                             Console.WriteLine(block);
-                            ++i;
+                            ++j;
                         }
+                        DominatorsTree Tree = new DominatorsTree(CFG);
+
+                        /**************** ГЕНЕРАЦИЯ ИСПОЛНЯЕМОГО ФАЙЛА *********************************/
 
                         ILAsm gen = new ILAsm();
                         gen.compileExe(CFG, BinOutputDirectory);

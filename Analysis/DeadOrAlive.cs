@@ -9,7 +9,7 @@ namespace SimpleLang.Analysis
 
     using StringSet = SetAdapter<string>;
 
-    internal class DeadOrAlive
+    public class DeadOrAlive
     {
         public static List<Tuple<string, string, int>> GenerateDefUse(List<CodeLine> l)
         {

@@ -8,7 +8,7 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.Optimizations
 {
-    class CSE : LocalOptimization
+    public class CSE : LocalOptimization
     {
         /// <summary>
         /// Оптимизация общих подвыражений в блоке

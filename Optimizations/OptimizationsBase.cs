@@ -18,7 +18,7 @@ namespace SimpleLang.Optimizations
         bool Optimize(BaseBlock block);
     }
 
-    public interface GlobalOptimization<InfoType>
+    public interface GlobalOptimization
     {
         /// <summary>
         /// Выполняет межблочную оптимизацию

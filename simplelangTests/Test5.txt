@@ -1,0 +1,16 @@
+begin
+  var a,b,c,d,f,h,k:int;
+  c:=0;
+  f:=1;
+  a:=4;
+  d:=4+1;
+  h:=c-2;
+  k:=f*a;
+  f:=a*0;
+  c:=a*1;
+  d:=0+c;
+  f:=0*a;
+  h:=1*a;
+  c:=0-c;
+  f:=c-0
+end

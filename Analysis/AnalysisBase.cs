@@ -35,13 +35,16 @@ namespace SimpleLang.Analysis
     //Адаптация HashSet к использованию в алгоритмах
     public class SetAdapter<T> : HashSet<T>, IEquatable<SetAdapter<T>>, ICloneable
     {
-        private SetAdapter(T[] elems)
-            : base(elems)
-        { }
-
         public SetAdapter(SetAdapter<T> elems)
             : base(elems)
         { }
+
+        public SetAdapter(params T[] elems)
+            : base()
+        {
+            for (int i = 0; i < elems.Length; ++i)
+                this.Add(elems[i]);
+        }
 
         public SetAdapter()
             : base()

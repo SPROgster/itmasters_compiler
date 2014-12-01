@@ -59,12 +59,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analysis\AvailableExpressions.cs" />
+    <Compile Include="Analysis\DominatorTree.cs" />
     <Compile Include="Analysis\ReachingDefinitions.cs" />
     <Compile Include="Analysis\DeadOrAlive.cs" />
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MiddleEnd\SymbolTable.cs" />
     <Compile Include="Optimizations\AliveVarsOptimization.cs" />
+    <Compile Include="Optimizations\CleanDead.cs" />
     <Compile Include="Optimizations\CSE.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\ILAsm.cs" />
