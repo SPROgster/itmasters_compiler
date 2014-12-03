@@ -36,22 +36,12 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Main.cs" />
-    <Compile Include="Analysis\AnalysisBase.cs" />
-    <Compile Include="Analysis\AvailableExpressions.cs" />
-    <Compile Include="Analysis\DeadOrAlive.cs" />
-    <Compile Include="Analysis\DominatorTree.cs" />
-    <Compile Include="Analysis\ReachingDefinitions.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\ILAsm.cs" />
     <Compile Include="CodeGenerator\ILAsmInstructions.cs" />
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="MiddleEnd\ProgramTree.cs" />
     <Compile Include="MiddleEnd\SymbolTable.cs" />
-    <Compile Include="Optimizations\AliveVarsOptimization.cs" />
-    <Compile Include="Optimizations\CSE.cs" />
-    <Compile Include="Optimizations\CleanDead.cs" />
-    <Compile Include="Optimizations\Fold.cs" />
-    <Compile Include="Optimizations\OptimizationsBase.cs" />
     <Compile Include="Parsers\ParserHelper.cs" />
     <Compile Include="Parsers\ShiftReduceParserCode.cs" />
     <Compile Include="Parsers\SimpleLex.cs" />
@@ -64,17 +54,22 @@
     <Compile Include="Visitors\PrettyPrintVisitor.cs" />
     <Compile Include="Visitors\VariableRenameVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
+    <Compile Include="Analysis\AbstractBase.cs" />
+    <Compile Include="Analysis\AvailableExpressions.cs" />
+    <Compile Include="Analysis\DeadOrAlive.cs" />
+    <Compile Include="Analysis\ReachingDefinitions.cs" />
+    <Compile Include="Optimizations\CSE.cs" />
+    <Compile Include="Optimizations\Fold.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Analysis\" />
     <Folder Include="CodeGenerator\" />
     <Folder Include="MiddleEnd\" />
-    <Folder Include="Optimizations\" />
-    <Folder Include="Optimizations\Parsers\" />
     <Folder Include="Parsers\" />
     <Folder Include="Properties\" />
     <Folder Include="Visitors\" />
     <Folder Include="_TestTexts\" />
+    <Folder Include="Analysis\" />
+    <Folder Include="Optimizations\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="_TestTexts\LabelsTest.txt" />
