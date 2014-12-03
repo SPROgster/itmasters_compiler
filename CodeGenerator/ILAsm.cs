@@ -190,7 +190,18 @@ namespace SimpleLang.CodeGenerator
             string outFileNameEXE = outputDir +
                 Path.GetFileNameWithoutExtension(SimpleCompiler.SimpleCompilerMain.FileName)+".exe";
             File.WriteAllText(outFileNameIL, code(CFG));    
-            Process.Start("ilasm.exe", outFileNameIL + " /exe");
+            switch (System.Environment.OSVersion.Platform)
+            {
+                case System.PlatformID.Win32Windows:
+                case System.PlatformID.Win32NT:
+                case System.PlatformID.Win32S:
+                    Process.Start("ilasm.exe", outFileNameIL + " /exe");
+                    break;
+
+                case System.PlatformID.Unix:
+                    Process.Start("ilasm", outFileNameIL + " /exe");
+                    break;
+            }
         }
     }
 
