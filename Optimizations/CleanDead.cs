@@ -10,7 +10,7 @@ namespace SimpleLang.Optimizations
         public bool Optimize(BaseBlock block)
         {
             var list = DeadOrAlive.GenerateDefUse(new List<CodeLine>(block.Code));
-            var result = true;
+            var result = false;
 
             for (var p = block.Code.First; p != null; p = p.Next)
             {
@@ -19,7 +19,7 @@ namespace SimpleLang.Optimizations
                     if (!DeadOrAlive.IsAlive(block, def.Item1, def.Item3)&&(block.Code.Contains(p.Value)))
                     {
                         block.Code.Remove(p);
-                        result = false;
+                        result = true;
                     }
                 }
             }

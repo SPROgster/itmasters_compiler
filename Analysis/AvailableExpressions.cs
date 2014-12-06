@@ -84,6 +84,7 @@ namespace SimpleLang.Analysis
                         BlockDefs[block].Add(Current.Value.First);
                         if (Current.Value.BinOp != BinOpType.None)
                         {
+                            
                             var Element = new Expression(Current.Value.Second, Current.Value.Third, Current.Value.BinOp);
                             AllExprs.Add(Element);
                             if (!BlockDefs[block].Contains(Current.Value.Second) && !BlockDefs[block].Contains(Current.Value.Third))
