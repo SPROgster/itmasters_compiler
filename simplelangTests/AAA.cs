@@ -33,7 +33,7 @@ namespace simplelangTests
             SimpleCompilerMain.PrintCFG(CFG);
             Console.WriteLine(cl.Optimize(CFG.GetBlocks().First.Next.Value));
             SimpleCompilerMain.PrintCFG(CFG);
-            Assert.AreEqual(4, CFG.GetBlocks().First.Next.Value.Code.Count);
+            Assert.AreEqual(6, CFG.GetBlocks().First.Next.Value.Code.Count);
         }
     }
 }

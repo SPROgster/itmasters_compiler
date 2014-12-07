@@ -7,6 +7,7 @@ using SimpleLang.MiddleEnd;
 using SimpleLang.Visitors;
 using SimpleLang.Analysis;
 using SimpleCompiler;
+using System.Collections.Generic;
 
 namespace simplelangTests
 {
@@ -29,10 +30,12 @@ namespace simplelangTests
             gcv.RemoveEmptyLabels();
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
             SimpleCompilerMain.PrintCFG(CFG);
-            Console.WriteLine(DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "i", 0));
-            Console.WriteLine(DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "i", 0));
-            Console.WriteLine(DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "k", 2));
-            Console.WriteLine(DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "k", 2));
+            List<CodeLine> bl = new List<CodeLine>(CFG.GetBlocks().First.Next.Value.Code);
+            for (int i = 0; i < bl.Count; i++)
+            {
+                Console.WriteLine(bl[i]+ " "+ DeadOrAlive.IsDead(CFG.GetBlocks().First.Next.Value, bl[i].First, i));
+            }
+              
             bool alive =
                 DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "i", 0) &&
                 DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "i", 0);

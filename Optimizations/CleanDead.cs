@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SimpleLang.MiddleEnd;
 using SimpleLang.Analysis;
+using System.Linq;
 
 namespace SimpleLang.Optimizations
 {
@@ -13,16 +14,15 @@ namespace SimpleLang.Optimizations
             var result = false;
             List<CodeLine> bl2 = new List<CodeLine>(block.Code);
             List<int> toDelete = new List<int>();
-            for (int i = 0; i < bl2.Count; i++)
-			{
-                bool DeadBefore=!DeadOrAlive.IsAliveBeforeLine(block, bl2[i].First, i) ;
-                bool DeadAfter=!DeadOrAlive.IsAliveAfterLine(block, bl2[i].First, i);
-                if (DeadBefore && DeadAfter)
+            foreach (var item in list.Where(x=>x.Item2.Equals("def")))
+            {
+                if (DeadOrAlive.IsDead(block, item.Item1, item.Item3))
                 {
-                    toDelete.Add(i);
+                    toDelete.Add(item.Item3);
                     result = true;
                 }
-			}
+            }
+            toDelete.Sort();
             toDelete.Reverse();
             foreach (var item in toDelete)
             {
