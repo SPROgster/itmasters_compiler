@@ -21,13 +21,15 @@ namespace SimpleCompiler
         //Функция для вывода заданного графа потока управления
         public static void PrintCFG(ControlFlowGraph cfg)
         {
-            Console.WriteLine();
-            int j = 0; // # блока
+            Console.WriteLine();            
             foreach (BaseBlock block in cfg.GetBlocks())
             {
-                Console.WriteLine("--- Блок {0} ---", j);
-                Console.WriteLine(block);
-                ++j;
+                if (block != cfg.GetStart() && block != cfg.GetEnd())
+                {
+                    Console.WriteLine("--- Блок {0} ---", block.nBlock);
+                    Console.WriteLine(block);
+                    Console.WriteLine("----------------");                    
+                }
             }
         }
 
