@@ -32,7 +32,7 @@ namespace SimpleCompiler
             //Создаём директорию для вывода
             if (!Directory.Exists(BinOutputDirectory))
                 Directory.CreateDirectory(BinOutputDirectory);
-            bool ShouldPrint = cmd.Contains("-print");
+            bool ShouldPrint = cmd.Contains("-p");
             //Получаем список локальных оптимизаций
             LocalOptimization[] LocalOp = AppDomain.CurrentDomain.GetAssemblies().
                 SelectMany(t => t.GetTypes()).
@@ -85,7 +85,11 @@ namespace SimpleCompiler
                             {
                                 Print("Семантический анализ завершён.");
                                 PrintSymbolTable();
-                                PrintCFG(CFG);
+                                PrintCFG(CFG);                                
+                                var spTree = new SpanningTree(CFG);
+                                Console.WriteLine();
+                                Console.WriteLine("Остовное дерево:");
+                                spTree.Print();
                             }
                             //Определяем, какие оптимизации нас попросили применить
                             int[] LOpIndex = null;
