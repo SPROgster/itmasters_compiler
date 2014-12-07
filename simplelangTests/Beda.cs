@@ -29,7 +29,14 @@ namespace simplelangTests
             gcv.RemoveEmptyLabels();
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
             SimpleCompilerMain.PrintCFG(CFG);
-            Assert.IsFalse(DeadOrAlive.IsAlive(CFG.GetBlocks().First.Next.Value, "k", 1));
+            Console.WriteLine(DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "i", 0));
+            Console.WriteLine(DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "i", 0));
+            Console.WriteLine(DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "k", 2));
+            Console.WriteLine(DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "k", 2));
+            bool alive =
+                DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "i", 0) &&
+                DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "i", 0);
+            Assert.IsFalse(alive);
         }
     }
 }

@@ -6,6 +6,8 @@ using SimpleParser;
 using System.IO;
 using SimpleLang.MiddleEnd;
 using SimpleLang.Optimizations;
+using SimpleCompiler;
+using SimpleLang.Analysis;
 
 namespace simplelangTests
 {
@@ -28,8 +30,10 @@ namespace simplelangTests
             gcv.RemoveEmptyLabels();
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
             CleanDead cl = new CleanDead();
-            cl.Optimize(CFG.GetBlocks().First.Next.Value);
-            Assert.AreEqual(5, CFG.GetBlocks().First.Next.Value.Code.Count);
+            SimpleCompilerMain.PrintCFG(CFG);
+            Console.WriteLine(cl.Optimize(CFG.GetBlocks().First.Next.Value));
+            SimpleCompilerMain.PrintCFG(CFG);
+            Assert.AreEqual(4, CFG.GetBlocks().First.Next.Value.Code.Count);
         }
     }
 }

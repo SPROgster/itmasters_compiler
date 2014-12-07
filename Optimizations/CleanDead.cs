@@ -11,19 +11,24 @@ namespace SimpleLang.Optimizations
         {
             var list = DeadOrAlive.GenerateDefUse(new List<CodeLine>(block.Code));
             var result = false;
-
-            for (var p = block.Code.First; p != null; p = p.Next)
-            {
-                foreach (Tuple<string, string, int> def in list)
+            List<CodeLine> bl2 = new List<CodeLine>(block.Code);
+            List<int> toDelete = new List<int>();
+            for (int i = 0; i < bl2.Count; i++)
+			{
+                bool DeadBefore=!DeadOrAlive.IsAliveBeforeLine(block, bl2[i].First, i) ;
+                bool DeadAfter=!DeadOrAlive.IsAliveAfterLine(block, bl2[i].First, i);
+                if (DeadBefore && DeadAfter)
                 {
-                    if (!DeadOrAlive.IsAlive(block, def.Item1, def.Item3)&&(block.Code.Contains(p.Value)))
-                    {
-                        block.Code.Remove(p);
-                        result = true;
-                    }
+                    toDelete.Add(i);
+                    result = true;
                 }
+			}
+            toDelete.Reverse();
+            foreach (var item in toDelete)
+            {
+                bl2.RemoveAt(item);
             }
-
+            block.Code = new LinkedList<CodeLine>(bl2);
             return result;
         }
     }
