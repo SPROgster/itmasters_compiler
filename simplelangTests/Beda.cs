@@ -6,6 +6,7 @@ using System.IO;
 using SimpleLang.MiddleEnd;
 using SimpleLang.Visitors;
 using SimpleLang.Analysis;
+using SimpleCompiler;
 
 namespace simplelangTests
 {
@@ -27,6 +28,7 @@ namespace simplelangTests
             parser.root.Visit(gcv);
             gcv.RemoveEmptyLabels();
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
+            SimpleCompilerMain.PrintCFG(CFG);
             Assert.IsFalse(DeadOrAlive.IsAlive(CFG.GetBlocks().First.Next.Value, "k", 1));
         }
     }

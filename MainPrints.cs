@@ -19,7 +19,7 @@ namespace SimpleCompiler
     public partial class SimpleCompilerMain
     {
         //Функция для вывода заданного графа потока управления
-        private static void PrintCFG(ControlFlowGraph cfg)
+        public static void PrintCFG(ControlFlowGraph cfg)
         {
             Console.WriteLine();
             int j = 0; // # блока
@@ -31,7 +31,7 @@ namespace SimpleCompiler
             }
         }
 
-        private static void PrintCode(BlockNode root)
+        public static void PrintCode(BlockNode root)
         {
             Print("Восстановленный исходный код:");
             var pp = new PrettyPrintVisitor();
@@ -39,14 +39,14 @@ namespace SimpleCompiler
             Console.WriteLine(pp.Text);
         }
 
-        private static void PrintSymbolTable()
+        public static void PrintSymbolTable()
         {
            Print("Таблица символов:");
             foreach (var rec in SymbolTable.vars)
                 Console.WriteLine(rec);
         }
 
-        private static void Print(string msg)
+        public static void Print(string msg)
         {
             Console.WriteLine();
             Console.WriteLine(msg);
