@@ -29,9 +29,9 @@ namespace simplelangTests
             parser.root.Visit(gcv);
             gcv.RemoveEmptyLabels();
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
-            CleanDead cl = new CleanDead();
             SimpleCompilerMain.PrintCFG(CFG);
-            Console.WriteLine(cl.Optimize(CFG.GetBlocks().First.Next.Value));
+            CleanDead cl = new CleanDead();
+            cl.Optimize(CFG.GetBlocks().First.Next.Value);
             SimpleCompilerMain.PrintCFG(CFG);
             Assert.AreEqual(6, CFG.GetBlocks().First.Next.Value.Code.Count);
         }

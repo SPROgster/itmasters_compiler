@@ -7,6 +7,7 @@ using System.IO;
 using SimpleLang.MiddleEnd;
 using SimpleLang.Optimizations;
 using System.Collections.Generic;
+using SimpleCompiler;
 
 namespace simplelangTests
 {
@@ -28,7 +29,9 @@ namespace simplelangTests
             parser.root.Visit(gcv);
             gcv.RemoveEmptyLabels();
             ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
+            SimpleCompilerMain.PrintCFG(CFG);
             Fold.fold(ref gcv.Code);
+            SimpleCompilerMain.PrintCFG(CFG);
             List<CodeLine> myList = new List<CodeLine>(gcv.Code);
             Assert.AreEqual("5",myList[3].Second);
             Assert.AreEqual("-2", myList[4].Second);
