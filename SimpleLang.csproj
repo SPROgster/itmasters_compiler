@@ -62,6 +62,8 @@
     <Compile Include="Analysis\DominatorTree.cs" />
     <Compile Include="Analysis\ReachingDefinitions.cs" />
     <Compile Include="Analysis\DeadOrAlive.cs" />
+    <Compile Include="MainPrints.cs" />
+    <Compile Include="MainStages.cs" />
     <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MiddleEnd\SymbolTable.cs" />

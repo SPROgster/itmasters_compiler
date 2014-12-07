@@ -35,15 +35,7 @@ namespace SimpleLang.Analysis
         public static bool IsAlive(BaseBlock bl, string id, int line)
         {
             List<CodeLine> bl2 = new List<CodeLine>(bl.Code);
-            bool alive;
-            if (id.Length >= 2 && id.Substring(0, 2).Equals("_t"))
-            {
-                alive = false;
-            }
-            else
-            {
-                alive = true;
-            }
+            bool alive = !(id.Length >= 2 && id.Substring(0, 2).Equals("_t"));
 
             for (int i = bl2.Count - 1; i >= 0; i--)
             {

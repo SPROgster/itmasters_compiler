@@ -12,11 +12,7 @@ namespace SimpleLang.MiddleEnd
     {
         static SymbolTable()
         {
-            // Initializing Symbol Table with all data types except for None
-            vars = new List<Tuple<string, CType, SymbolKind>>();
-            foreach (CType value in System.Enum.GetValues(typeof(CType)))
-                if (value != CType.None)
-                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), value, SymbolKind.type));
+            Reset();
         }
 
         public static List<Tuple<string, CType, SymbolKind>> vars;
@@ -53,6 +49,15 @@ namespace SimpleLang.MiddleEnd
                 case "double"   : return CType.Double;
                 default         : return CType.None;
             }
+        }
+
+        public static void Reset()
+        {
+            // Initializing Symbol Table with all data types except for None
+            vars = new List<Tuple<string, CType, SymbolKind>>();
+            foreach (CType value in System.Enum.GetValues(typeof(CType)))
+                if (value != CType.None)
+                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), value, SymbolKind.type));
         }
 
         /// <summary>
