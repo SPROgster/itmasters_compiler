@@ -17,11 +17,6 @@ namespace SimpleLang.Optimizations
         /// <returns> Были ли внесены какие-то изменения </returns>
         public bool Optimize(BaseBlock block)
         {
-            return cseOptimization(block);
-        }
-
-        public static bool cseOptimization(BaseBlock block)
-        {
             bool hasChanges = false;
             // поиск пары общих подвыражений
             for (LinkedListNode<CodeLine> node0 = block.Code.Last; node0 != null; node0 = node0.Previous)
@@ -53,7 +48,7 @@ namespace SimpleLang.Optimizations
                         }
                     }
                 }
-            return hasChanges;
-        }              
+            return hasChanges;            
+        }                   
     }
 }
