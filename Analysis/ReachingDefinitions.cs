@@ -18,7 +18,7 @@ namespace SimpleLang.Analysis
 
         public int Count { get { return Elems.Length; } }
 
-        private BitSet(bool[] elems)
+        public BitSet(bool[] elems)
         {
             Elems = (bool[])elems.Clone();
         }
@@ -101,7 +101,7 @@ namespace SimpleLang.Analysis
             {
                 BlockDef[bl] = new HashSet<int>();
                 foreach (CodeLine cl in bl.Code)
-                    if (cl.Operator == OperatorType.Assign)
+                    if (cl.Operator == OperatorType.Assign && !cl.First.StartsWith("_t"))
                     {
                         if(!VarDef.ContainsKey(cl.First))
                             VarDef[cl.First] = new HashSet<int>();

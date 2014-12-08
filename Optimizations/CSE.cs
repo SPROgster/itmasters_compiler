@@ -28,7 +28,10 @@ namespace SimpleLang.Optimizations
                 for (LinkedListNode<CodeLine> node1 = node0.Next; node1 != null; node1 = node1.Next)
                 {
                     // если нашли...
-                    if (node1.Value.Second == node0.Value.Second && node1.Value.Third == node0.Value.Third && node1.Value.BinOp == node0.Value.BinOp)
+                    if (node1.Value.Second == node0.Value.Second && 
+                        node1.Value.Third == node0.Value.Third && 
+                        node1.Value.BinOp == node0.Value.BinOp && 
+                        node0.Value.BinOp != BinOpType.None)
                     {
                         // ...то проверим, переопределяется ли переменная, присутствующая в общем подвыражении, на пути между общими подвыражениями
                         bool isOpt = true;
