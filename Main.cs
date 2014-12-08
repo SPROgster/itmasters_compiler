@@ -85,11 +85,14 @@ namespace SimpleCompiler
                             {
                                 Print("Семантический анализ завершён.");
                                 PrintSymbolTable();
-                                PrintCFG(CFG);                                
+                                PrintCFG(CFG); 
+                                //
                                 var spTree = new SpanningTree(CFG);
                                 Console.WriteLine();
                                 Console.WriteLine("Остовное дерево:");
                                 spTree.Print();
+                                spTree.PrintEdges();                                                                
+                                //
                             }
                             //Определяем, какие оптимизации нас попросили применить
                             int[] LOpIndex = null;

@@ -38,7 +38,7 @@ namespace SimpleLang.Optimizations
                             }
                         if (isOpt) // не переопределяется
                         {
-                            string tName = SymbolTable.NextTemp();
+                            string tName = NextTemp();
                             Expression expr = new Expression(node0.Value.Second, node0.Value.Third, node0.Value.BinOp);                                                        
                             SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(tName, expr.Type(), SymbolKind.var));
                             hasChanges = isOpt;
@@ -49,6 +49,19 @@ namespace SimpleLang.Optimizations
                     }
                 }
             return hasChanges;            
-        }                   
+        }
+        //
+        static int TempCounter = 0;
+        const string TempName = "_to";
+        /// <summary>
+        /// Возвращает следующую неиспользуемую временную переменную
+        /// </summary>
+        /// <returns>следующая неиспользуемая временная переменная</returns>
+        public static string NextTemp()
+        {
+            while (SymbolTable.Contains(TempName + TempCounter))
+                TempCounter++;
+            return TempName + TempCounter++;
+        }   
     }
 }
