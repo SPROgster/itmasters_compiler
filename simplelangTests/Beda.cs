@@ -71,5 +71,30 @@ namespace simplelangTests
             Assert.IsTrue(resultgen.Equals(rightgen));
             
         }
+        [TestMethod]
+        public void DeadOrAliveBBL_3_0()
+        {
+            string FileName = @"..\..\Test6.txt";
+            string Text = File.ReadAllText(FileName);
+            Scanner scanner = new Scanner();
+            scanner.SetSource(Text, 0);
+            Parser parser = new Parser(scanner);
+            var b = parser.Parse();
+            var sne = new CheckVariablesVisitor();
+            parser.root.Visit(sne);
+            GenCodeVisitor gcv = new GenCodeVisitor();
+            parser.root.Visit(gcv);
+            gcv.RemoveEmptyLabels();
+            ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
+            AliveVarsAlgorithm AVA = new AliveVarsAlgorithm(CFG);
+            var AVAResult = AVA.Apply();
+            foreach (var block in AVAResult.Item1.Keys)
+                if (block != CFG.GetStart() && block != CFG.GetEnd())
+                {
+                    Console.WriteLine(block);
+                    Console.WriteLine("In:\t" + AVAResult.Item1[block]);
+                    Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
+                }
+        }
     }
 }

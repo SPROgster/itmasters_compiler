@@ -1,31 +1,27 @@
-﻿using System;
+﻿using SimpleLang.MiddleEnd;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
-
     public class GenCodeVisitor : AutoVisitor
     {
-        public LinkedList<CodeLine> Code = 
+        public LinkedList<CodeLine> Code =
             new LinkedList<CodeLine>();
 
         private Stack<string> NamesValuesStack = new Stack<string>();
-        private Stack<CType> CTypeValuesStack = new Stack<CType>();                
-        private int LabelCounter = 0;        
-        private const string LabelName = "_l";        
+        private Stack<CType> CTypeValuesStack = new Stack<CType>();
+        private int LabelCounter = 0;
+        private const string LabelName = "_l";
 
         private string NextLabel()
         {
             return LabelName + LabelCounter++;
-        }       
+        }
 
         public override void VisitAssignNode(AssignNode node)
         {
-            if (node.Expr is BinOpNode) 
+            if (node.Expr is BinOpNode)
             {
                 (node.Expr as BinOpNode).Right.Visit(this);
                 (node.Expr as BinOpNode).Left.Visit(this);
@@ -72,7 +68,7 @@ namespace SimpleLang.Visitors
 
             // Какой же тут тип надо получить?
             CType resultType = SymbolTable.OpResultType(CTypeValuesStack.Pop(), CTypeValuesStack.Pop(), binop.Op);
-            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CurName, resultType, SymbolKind.var));
+            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CurName, resultType, SymbolKind.var));
 
             Code.AddLast(new CodeLine(null, CurName,
                 NamesValuesStack.Pop(), NamesValuesStack.Pop(), binop.Op));
@@ -87,9 +83,9 @@ namespace SimpleLang.Visitors
             //Метка для проверки значения счётчика цикла
             string HeaderLabel = NextLabel();
             //Счётчик цикла
-            string CounterVar= SymbolTable.NextTemp();
+            string CounterVar = SymbolTable.NextTemp();
 
-            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CounterVar, CType.Bool, SymbolKind.var));
+            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CounterVar, CType.Bool, SymbolKind.var));
 
             //Находим начальное значение счётчика
             c.Expr.Visit(this);
@@ -127,25 +123,19 @@ namespace SimpleLang.Visitors
             string HeaderLabel = NextLabel();
             string AfterWhileLabel = NextLabel();
 
-            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
+            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
 
             Code.AddLast(new CodeLine(HeaderLabel, null,
                null, null, OperatorType.Nop));
             node.Expr.Visit(this);
 
-            Code.AddLast(new CodeLine(null, CondVariable,
-                NamesValuesStack.Pop(), null, BinOpType.None));
-            Code.AddLast(new CodeLine(null, CondVariable,
-                BodyLabel, null, OperatorType.If));
-            Code.AddLast(new CodeLine(null, AfterWhileLabel,
-               null, null, OperatorType.Goto));
-            Code.AddLast(new CodeLine(BodyLabel, null,
-               null, null, OperatorType.Nop));
+            Code.AddLast(new CodeLine(null, CondVariable, NamesValuesStack.Pop(), null, BinOpType.None));
+            Code.AddLast(new CodeLine(null, CondVariable, BodyLabel, null, OperatorType.If));
+            Code.AddLast(new CodeLine(null, AfterWhileLabel, null, null, OperatorType.Goto));
+            Code.AddLast(new CodeLine(BodyLabel, null, null, null, OperatorType.Nop));
             node.Stat.Visit(this);
-            Code.AddLast(new CodeLine(null, HeaderLabel,
-               null, null, OperatorType.Goto));
-            Code.AddLast(new CodeLine(AfterWhileLabel, null,
-               null, null, OperatorType.Nop));
+            Code.AddLast(new CodeLine(null, HeaderLabel, null, null, OperatorType.Goto));
+            Code.AddLast(new CodeLine(AfterWhileLabel, null, null, null, OperatorType.Nop));
 
             // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
             CTypeValuesStack.Pop();
@@ -157,7 +147,7 @@ namespace SimpleLang.Visitors
             string IfLabel = NextLabel();
             string AfterIfLabel = NextLabel();
 
-            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
+            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
 
             node.Expr.Visit(this);
 
@@ -223,7 +213,6 @@ namespace SimpleLang.Visitors
                 if (elem.Value.Operator == OperatorType.If)
                     if (elem.Value.Second != null && elem.Value.Second == oldName)
                         elem.Value.Second = newName;
-
             }
         }
     }
