@@ -13,21 +13,31 @@ namespace SimpleLang.Optimizations
         public static void optimize(Tuple<Dictionary<BaseBlock, SetAdapter<string>>, Dictionary<BaseBlock, SetAdapter<string>>> ava, 
                                     ControlFlowGraph CFG)
         {
+            // Если программа состоит из одного блока (+1 CFG.GetStart, +1 CFG.GetEnd)
+            // То выходим, т.к. оптимизация межблочная
+            if (ava.Item1.Keys.Count <= 3) 
+                return;
             foreach (var block in ava.Item1.Keys)
                 if (block != CFG.GetStart() && block != CFG.GetEnd())
                 {
-                    for (var codeline_iter = block.Code.First; codeline_iter != null; codeline_iter = codeline_iter.Next)
+                    List<CodeLine> res = block.Code.ToList<CodeLine>(); // creating list to delete from
+                    for (int i = 0; i < res.Count; ++i)
                     {
-                        var codeline = codeline_iter.Value;
+                        var codeline = res[i];
                         var left = codeline.First;
-                        if ((codeline.Second != left) && (codeline.Third != left))
-                        {
-                            if (ava.Item2[block].ToString().IndexOf(left) == -1)
+                        if ((codeline.Operator.ToString() != "Assign")) // If it's not assign - save the codeline
+                            continue;
+                        if (left.StartsWith("_t")) // skip temp variable
+                            continue;
+                        // Maybe there is not third variable in assign node
+                        if ((!codeline.Second.Equals(left)) && ( (codeline.Third == null) || (!codeline.Third.Equals(left)) ))
+                            if (!(ava.Item2[block].Contains(left))) // if left not contains in Out
                             {
-                                block.Code.Remove(codeline_iter.Value);
+                                res.RemoveAt(i); // deleting and moving iterator
+                                --i;
                             }
-                        }
                     }
+                    block.Code = new LinkedList<CodeLine>(res); // back assign
                 }
         }
     }
