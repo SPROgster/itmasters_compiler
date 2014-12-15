@@ -68,5 +68,30 @@ namespace simplelangTests
             BitSet rightin = new BitSet(new bool[] { true, true, true, false, true, true, true });
             Assert.IsTrue(resultin.Equals(rightin));
         }
+        [TestMethod]
+         public void AliveVars_3_1()
+        {
+            string FileName = @"..\..\Test3.txt";
+            string Text = File.ReadAllText(FileName);
+            Scanner scanner = new Scanner();
+            scanner.SetSource(Text, 0);
+            Parser parser = new Parser(scanner);
+            var b = parser.Parse();
+            var sne = new CheckVariablesVisitor();
+            parser.root.Visit(sne);
+            GenCodeVisitor gcv = new GenCodeVisitor();
+            parser.root.Visit(gcv);
+            gcv.RemoveEmptyLabels();
+            ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
+            Console.WriteLine();
+            AliveVarsAlgorithm AVA = new AliveVarsAlgorithm(CFG);
+             var AVAResult = AVA.Apply();
+             SimpleCompilerMain.PrintCFG(CFG);
+             AliveVarsOptimization.optimize(AVAResult, CFG);
+             SimpleCompilerMain.PrintCFG(CFG);
+             List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
+             Assert.AreEqual(2, l[1].Code.Count);//удалило переменную a в первом блоке
+             Assert.AreEqual(0, l[6].Code.Count);//удалило переменную a в блоке if
+        }
     }
 }

@@ -8,7 +8,7 @@ using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Optimizations
 {
-    class AliveVarsOptimization
+    public class AliveVarsOptimization
     {
         public static void optimize(Tuple<Dictionary<BaseBlock, SetAdapter<string>>, Dictionary<BaseBlock, SetAdapter<string>>> ava, 
                                     ControlFlowGraph CFG)
