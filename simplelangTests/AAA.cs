@@ -61,7 +61,10 @@ namespace simplelangTests
             }
             FormulaTransferFunction tf = new FormulaTransferFunction(tupl);
             BitSet input = new BitSet(cont.Count);
-            tf.Transfer(input);
+            BitSet output = tf.Transfer(input);
+            BitSet success = new BitSet(new bool[] { true, false, true, false, false });
+
+            Assert.IsTrue(output.Equals(success));
         }
     }
 }
