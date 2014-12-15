@@ -125,8 +125,7 @@ namespace SimpleLang.Visitors
 
             SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
 
-            Code.AddLast(new CodeLine(HeaderLabel, null,
-               null, null, OperatorType.Nop));
+            Code.AddLast(new CodeLine(HeaderLabel, null, null, null, OperatorType.Nop));
             node.Expr.Visit(this);
 
             Code.AddLast(new CodeLine(null, CondVariable, NamesValuesStack.Pop(), null, BinOpType.None));
