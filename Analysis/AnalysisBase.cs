@@ -199,10 +199,11 @@ namespace SimpleLang.Analysis
                 if (block != Cont.End)
                     In[block] = otherInit;
             bool SomethingChanged = true;
+            var OrderedBlocks = Cont.Blocks.OrderBy(bl => bl.nBlock).ToArray();
             while (SomethingChanged)
             {
                 SomethingChanged = false;
-                foreach (BaseBlock block in Cont.Blocks)
+                foreach (BaseBlock block in OrderedBlocks)
                     if (block != Cont.End)
                     {
                         Out[block] = Cont.Outputs(block).Select(bl => In[bl]).
@@ -239,10 +240,11 @@ namespace SimpleLang.Analysis
                 if(block!=Cont.Start)
                     Out[block] = otherInit;
             bool SomethingChanged = true;
+            var OrderedBlocks = Cont.Blocks.OrderBy(bl => bl.nBlock).ToArray();
             while (SomethingChanged)
             {
                 SomethingChanged = false;
-                foreach(BaseBlock block in Cont.Blocks)
+                foreach(BaseBlock block in OrderedBlocks)
                     if(block!=Cont.Start)
                     {
                         In[block] = Cont.Inputs(block).Select(bl=>Out[bl]).
