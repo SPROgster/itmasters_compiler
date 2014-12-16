@@ -49,6 +49,10 @@ namespace SimpleCompiler
                 t.GetInterfaces().Contains(typeof(GlobalOptimization))).
                 Select(e => (GlobalOptimization)e.GetConstructor(new Type[0]).Invoke(new object[0])).
                 ToArray();
+            //Получаем список методов для запуска анализов
+            MethodInfo[] Analyzes = typeof(SimpleCompilerMain).GetMethods().
+                Where(e => e.IsStatic && e.Name.StartsWith("Run")).
+                ToArray();
             //Приступаем к анализу командной строки
             try
             {
@@ -63,6 +67,9 @@ namespace SimpleCompiler
                     Console.WriteLine("Доступные межблочные оптимизации:");
                     for (int i = 0; i < GlobalOp.Length; ++i)
                         Console.WriteLine(i + " - " + GlobalOp[i].GetType());
+                    Console.WriteLine("Доступные анализы:");
+                    for (int i = 0; i < Analyzes.Length; ++i)
+                        Console.WriteLine(i + " - " + Analyzes[i].Name);
                 }
                 else
                 {
@@ -86,13 +93,6 @@ namespace SimpleCompiler
                                 Print("Семантический анализ завершён.");
                                 PrintSymbolTable();
                                 PrintCFG(CFG); 
-                                //
-                                var spTree = new SpanningTree(CFG);
-                                Console.WriteLine();
-                                Console.WriteLine("Остовное дерево:");
-                                spTree.Print();
-                                spTree.PrintEdges();                                                                
-                                //
                             }
                             //Определяем, какие оптимизации нас попросили применить
                             int[] LOpIndex = null;
@@ -100,13 +100,15 @@ namespace SimpleCompiler
                             for(int i=0;i<cmd.Length;++i)
                                 if(cmd[i]=="-lo")
                                 {
-                                    LOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).ToArray();
+                                    LOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).
+                                        Distinct().ToArray();
                                     ++i;
                                 }
                                 else
                                     if (cmd[i] == "-go")
                                     {
-                                        GOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).ToArray();
+                                        GOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).
+                                            Distinct().ToArray();
                                         ++i;
                                     }
                             //Если надо применять хоть какую-то

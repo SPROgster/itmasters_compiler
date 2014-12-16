@@ -53,5 +53,30 @@ namespace SimpleCompiler
             Console.WriteLine();
             Console.WriteLine(msg);
         }
+
+        /////////////////////////////////////////////////////////////////////////
+
+        public delegate void RunAnalysis(ControlFlowGraph CFG); 
+
+        public static void RunAvailableExpressions(ControlFlowGraph CFG)
+        { }
+
+        public static void RunDeadOrAlive(ControlFlowGraph CFG)
+        { }
+
+        public static void RunDominatorTree(ControlFlowGraph CFG)
+        { }
+
+        public static void RunReachingDefinitions(ControlFlowGraph CFG)
+        { }
+
+        public static void RunSpanningTree(ControlFlowGraph CFG)
+        {
+            var spTree = new SpanningTree(CFG);
+            Console.WriteLine();
+            Console.WriteLine("Остовное дерево:");
+            spTree.Print();
+            spTree.PrintEdges(); 
+        }
     }
 }
