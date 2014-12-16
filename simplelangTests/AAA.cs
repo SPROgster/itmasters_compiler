@@ -17,7 +17,7 @@ namespace simplelangTests
         [TestMethod]
         public void CleanDead_1_5()
         {
-            string FileName = @"..\..\Test2.txt";
+            string FileName = @"..\..\_Texts\Test2.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);

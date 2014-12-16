@@ -91,11 +91,11 @@
     <Compile Include="Visitors\Visitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="_TestTexts\LabelsTest.txt" />
-    <Content Include="_TestTexts\optCseTest.txt" />
-    <Content Include="_TestTexts\ReachingDefsTest.txt" />
-    <Content Include="_TestTexts\SaneTest.txt" />
-    <Content Include="_TestTexts\UnknownTest.txt" />
+    <Content Include="_Texts\LabelsTest.txt" />
+    <Content Include="_Texts\optCseTest.txt" />
+    <Content Include="_Texts\ReachingDefsTest.txt" />
+    <Content Include="_Texts\SaneTest.txt" />
+    <Content Include="_Texts\UnknownTest.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">

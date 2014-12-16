@@ -68,6 +68,13 @@
       <Name>SimpleLang</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="_Texts\Test1.txt" />
+    <Content Include="_Texts\Test2.txt" />
+    <Content Include="_Texts\Test3.txt" />
+    <Content Include="_Texts\Test4.txt" />
+    <Content Include="_Texts\Test5.txt" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
