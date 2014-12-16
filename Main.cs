@@ -63,13 +63,13 @@ namespace SimpleCompiler
                     Console.WriteLine(Help);
                     Console.WriteLine("Доступные внутриблочные оптимизации:");
                     for (int i = 0; i < LocalOp.Length; ++i)
-                        Console.WriteLine(i + " - " + LocalOp[i].GetType());
+                        Console.WriteLine(i + " - " + LocalOp[i].GetType().Name);
                     Console.WriteLine("Доступные межблочные оптимизации:");
                     for (int i = 0; i < GlobalOp.Length; ++i)
-                        Console.WriteLine(i + " - " + GlobalOp[i].GetType());
+                        Console.WriteLine(i + " - " + GlobalOp[i].GetType().Name);
                     Console.WriteLine("Доступные анализы:");
                     for (int i = 0; i < Analyzes.Length; ++i)
-                        Console.WriteLine(i + " - " + Analyzes[i].Name);
+                        Console.WriteLine(i + " - " + Analyzes[i].Name.Substring(3));
                 }
                 else
                 {
@@ -94,24 +94,35 @@ namespace SimpleCompiler
                                 PrintSymbolTable();
                                 PrintCFG(CFG); 
                             }
-                            //Определяем, какие оптимизации нас попросили применить
+                            //Определяем, какие оптимизации и анализы нас попросили применить
                             int[] LOpIndex = null;
                             int[] GOpIndex = null;
-                            for(int i=0;i<cmd.Length;++i)
-                                if(cmd[i]=="-lo")
+                            int[] AIndex = null;
+                            for(int i=1;i<cmd.Length;++i)
+                                if (cmd[i] != "-p")
                                 {
-                                    LOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).
-                                        Distinct().ToArray();
-                                    ++i;
-                                }
-                                else
-                                    if (cmd[i] == "-go")
+                                    var Inds = cmd[i + 1].Select(e => int.Parse(e.ToString())).Distinct();
+                                    switch (cmd[i])
                                     {
-                                        GOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).
-                                            Distinct().ToArray();
-                                        ++i;
+                                        case "-lo":
+                                            LOpIndex = Inds.ToArray();
+                                            ++i;
+                                            break;
+                                        case "-go":
+                                            GOpIndex = Inds.ToArray();
+                                            ++i;
+                                            break;
+                                        case "-a":
+                                            AIndex = Inds.ToArray();
+                                            ++i;
+                                            break;
                                     }
-                            //Если надо применять хоть какую-то
+                                }
+                            //Проверяем, надо ли провести какие-то анализы
+                            if (AIndex != null && ShouldPrint)
+                                foreach (int ind in AIndex)
+                                    Analyzes[ind].Invoke(null, new object[]{CFG});
+                            //Если надо применять хоть какую-то оптимизацию
                             if (GOpIndex != null || LOpIndex != null)
                             {
                                 if (GOpIndex == null)
@@ -155,6 +166,8 @@ namespace SimpleCompiler
             catch (Exception e)
             {
                 Print(e.ToString());
+                Console.Write("Для завершения работы программы нажмите Enter...");
+                Console.ReadLine();
             }
             if(ShouldPrint)
             {
