@@ -1,13 +1,9 @@
-﻿using System;
+﻿using SimpleLang.MiddleEnd;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Optimizations
 {
-    class Fold
+    public class Fold
     {
         // Основная функция свертки
         public static void fold(ref LinkedList<CodeLine> gcv)
@@ -36,7 +32,7 @@ namespace SimpleLang.Optimizations
             for (var elem = gcv.First; elem != null; elem = elem.Next)
             {
                 CodeLine cl = elem.Value;
-                if (cl.Third == null && cl.Operation == BinOpType.None)
+                if (cl.Third == null && cl.BinOp == BinOpType.None)
                 {
                     int second;
                     bool second_int = int.TryParse(cl.Second, out second);
@@ -76,16 +72,16 @@ namespace SimpleLang.Optimizations
                 bool third_int = int.TryParse(cl.Third, out third);
                 if (second_int && third_int)
                 {
-                    if (cl.Operation == BinOpType.Plus)
+                    if (cl.BinOp == BinOpType.Plus)
                         cl.Second = (third + second).ToString();
-                    else if (cl.Operation == BinOpType.Mult)
+                    else if (cl.BinOp == BinOpType.Mult)
                         cl.Second = (third * second).ToString();
-                    else if (cl.Operation == BinOpType.Minus)
+                    else if (cl.BinOp == BinOpType.Minus)
                         cl.Second = (second - third).ToString();
                     else
                         continue;
                     cl.Third = null;
-                    cl.Operation = BinOpType.None;
+                    cl.BinOp = BinOpType.None;
                     has_const = true;
                 }
             }
@@ -98,17 +94,17 @@ namespace SimpleLang.Optimizations
         {
             if (cl.Second == "0")
             {
-                if (cl.Operation == BinOpType.Minus)
+                if (cl.BinOp == BinOpType.Minus)
                     return;
                 else
                     cl.Second = cl.Third;
                 cl.Third = null;
-                cl.Operation = BinOpType.None;
+                cl.BinOp = BinOpType.None;
             }
             if (cl.Third != null && cl.Third == "0")
             {
                 cl.Third = null;
-                cl.Operation = BinOpType.None;
+                cl.BinOp = BinOpType.None;
             }
         }
 
@@ -120,23 +116,23 @@ namespace SimpleLang.Optimizations
             {
                 cl.Second = cl.Third;
                 cl.Third = null;
-                cl.Operation = BinOpType.None;
+                cl.BinOp = BinOpType.None;
             }
             if (cl.Third != null && cl.Third == "1")
             {
                 cl.Third = null;
-                cl.Operation = BinOpType.None;
+                cl.BinOp = BinOpType.None;
             }
             if (cl.Second == "0" || (cl.Third != null && cl.Third == "0"))
             {
                 cl.Second = "0";
                 cl.Third = null;
-                cl.Operation = BinOpType.None;
+                cl.BinOp = BinOpType.None;
             }
         }
-        
+
         // Функция, которая сворачивает алгебраические тождества
-        private  static void FoldSameness(ref LinkedList<CodeLine> gcv)
+        private static void FoldSameness(ref LinkedList<CodeLine> gcv)
         {
             foreach (CodeLine cl in gcv)
             {
@@ -146,26 +142,25 @@ namespace SimpleLang.Optimizations
                 bool third_int = int.TryParse(cl.Third, out third);
                 if (second_int || third_int)
                 {
-                    switch (cl.Operation)
+                    switch (cl.BinOp)
                     {
                         case BinOpType.Plus:
                             checkPlusOrMinus(cl);
                             break;
+
                         case BinOpType.Minus:
                             checkPlusOrMinus(cl);
                             break;
+
                         case BinOpType.Mult:
                             checkMult(cl);
                             break;
+
                         default:
                             break;
                     }
                 }
             }
         }
-
-
-
-
     }
 }

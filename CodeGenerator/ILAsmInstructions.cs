@@ -86,154 +86,156 @@ namespace SimpleLang.CodeGenerator
                 return code;
             }
 
-            switch (line.Operation)
+            switch (line.Operator)
             {
-                // Операция "="
-                case BinOpType.None:
-                    code += pushId(line.Second);
-                    code += popId(line.First);
+                case OperatorType.Assign:
+                    switch (line.BinOp)
+                    {
+                        // Присваивание вида a:=b
+                        case BinOpType.None:
+                            code += pushId(line.Second);
+                            code += popId(line.First);
 
-                    return code;
-                
-                // Операция "goto"
-                case BinOpType.Goto:
+                            return code;
+                        // Операция "+"
+                        case BinOpType.Plus:
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            code += "add" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция "-"
+                        case BinOpType.Minus:
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            code += "sub" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция "/"
+                        case BinOpType.Div:
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            code += "div" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция "*"
+                        case BinOpType.Mult:
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            code += "mul" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция "<"
+                        case BinOpType.Less:
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            code += "clt" + Environment.NewLine;
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция ">"
+                        case BinOpType.Greater:
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            code += "cgt" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция "="
+                        case BinOpType.Equal:
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            code += "ceq" + Environment.NewLine;
+                            code += popId(line.First);
+                            return code;
+
+                        //
+                        //  ВНИМАНИЕ!!! КОСТЫЛЬ!!! ОТ мелкософта
+                        //
+                        // Операция "<="
+                        case BinOpType.LEqual:
+                            // Проверяем на <=
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            // Т.к. в IL нету вычисления <=, то сравниваем на >
+                            code += "cgt" + Environment.NewLine;
+
+                            // Кладем 0
+                            code += pushId("0");
+
+                            // Проверяем на равенство с 0 (Логическое не). Это такой костыль от Мелкософта
+                            code += "ceq" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция ">="
+                        case BinOpType.GEqual:
+                            // Проверяем на >=
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            // Т.к. в IL нету вычисления >=, то сравниваем на <
+                            code += "clt" + Environment.NewLine;
+
+                            // Кладем 0
+                            code += pushId("0");
+
+                            // Проверяем на равенство с 0 (Логическое не). Это такой костыль от Мелкософта
+                            code += "ceq" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        // Операция "<>"
+                        case BinOpType.NEqual:
+                            // Проверяем на неравенство
+                            code += pushId(line.Second);
+                            code += pushId(line.Third);
+
+                            // Т.к. в IL нету вычисления неравенства, то сравниваем на равенство
+                            code += "ceq" + Environment.NewLine;
+
+                            // Кладем 0
+                            code += pushId("0");
+
+                            // Проверяем на равенство с 0 (Логическое не). Это такой костыль от Мелкософта
+                            code += "ceq" + Environment.NewLine;
+
+                            code += popId(line.First);
+                            return code;
+
+                        default:
+                            throw new Exception("Неизвестная новая операция " + line.BinOp.ToString());
+                    }
+
+                case OperatorType.Goto:
                     code += "br " + line.First + Environment.NewLine;
                     return code;
 
-                // Операция "if"
-                case BinOpType.If:
+                case OperatorType.If:
                     code += pushId(line.First);
-
                     code += "brtrue " + line.Second;
                     return code;
-
-                // Операция "+"
-                case BinOpType.Plus:
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    code += "add" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
-                // Операция "-"
-                case BinOpType.Minus:
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    code += "sub" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
-                // Операция "/"
-                case BinOpType.Div:
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    code += "div" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
-                // Операция "*"
-                case BinOpType.Mult:
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    code += "mul" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
-                // Операция "<"
-                case BinOpType.Less:
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    code += "clt" + Environment.NewLine;
-                    code += popId(line.First);
-                    return code;
-
-                // Операция ">"
-                case BinOpType.Greater:
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    code += "cgt" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
-                // Операция "="
-                case BinOpType.Equal:
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    code += "ceq" + Environment.NewLine;
-                    code += popId(line.First);
-                    return code;
-
-                //
-                //  ВНИМАНИЕ!!! КОСТЫЛЬ!!! ОТ мелкософта
-                //
-                // Операция "<="
-                case BinOpType.LEqual:
-                    // Проверяем на <=
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    // Т.к. в IL нету вычисления <=, то сравниваем на >
-                    code += "cgt" + Environment.NewLine;
-
-                    // Кладем 0
-                    code += pushId("0");
-
-                    // Проверяем на равенство с 0 (Логическое не). Это такой костыль от Мелкософта
-                    code += "ceq" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
-                // Операция ">="
-                case BinOpType.GEqual:
-                    // Проверяем на >=
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    // Т.к. в IL нету вычисления >=, то сравниваем на <
-                    code += "clt" + Environment.NewLine;
-
-                    // Кладем 0
-                    code += pushId("0");
-
-                    // Проверяем на равенство с 0 (Логическое не). Это такой костыль от Мелкософта
-                    code += "ceq" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
-                // Операция "<>"
-                case BinOpType.NEqual:
-                    // Проверяем на неравенство
-                    code += pushId(line.Second);
-                    code += pushId(line.Third);
-
-                    // Т.к. в IL нету вычисления неравенства, то сравниваем на равенство
-                    code += "ceq" + Environment.NewLine;
-
-                    // Кладем 0
-                    code += pushId("0");
-
-                    // Проверяем на равенство с 0 (Логическое не). Это такой костыль от Мелкософта
-                    code += "ceq" + Environment.NewLine;
-
-                    code += popId(line.First);
-                    return code;
-
                 default:
-                    throw new Exception("Неизвестная новая операция " + line.Operation.ToString());
+                    throw new Exception("Неизвестный новый оператор " + line.Operator.ToString());
             }
                // Это понадобится позже
                 // call       instance string [mscorlib]System.Int32::ToString()

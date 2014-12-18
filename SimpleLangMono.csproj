@@ -1,81 +1,89 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C95C0195-E90C-4353-9E44-6938D028290D}</ProjectGuid>
+    <ProjectGuid>{12B9D996-7B4A-4EE4-9AD8-2E24EAF3F574}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SimpleLangMono</RootNamespace>
-    <AssemblyName>SimpleLangMono</AssemblyName>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SimpleLang</RootNamespace>
+    <AssemblyName>SimpleLang</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Compile Include="Analysis\AvailableExpressions.cs" />
+    <Compile Include="Analysis\DominatorTree.cs" />
+    <Compile Include="Analysis\ReachingDefinitions.cs" />
+    <Compile Include="Analysis\DeadOrAlive.cs" />
+    <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="MiddleEnd\SymbolTable.cs" />
+    <Compile Include="Optimizations\AliveVarsOptimization.cs" />
+    <Compile Include="Optimizations\CleanDead.cs" />
+    <Compile Include="Optimizations\CSE.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\ILAsm.cs" />
     <Compile Include="CodeGenerator\ILAsmInstructions.cs" />
-    <Compile Include="MiddleEnd\ControlFlowGraph.cs" />
-    <Compile Include="MiddleEnd\ProgramTree.cs" />
-    <Compile Include="MiddleEnd\SymbolTable.cs" />
+    <Compile Include="Optimizations\OptimizationsBase.cs" />
     <Compile Include="Parsers\ParserHelper.cs" />
+    <Compile Include="MiddleEnd\ProgramTree.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parsers\ShiftReduceParserCode.cs" />
     <Compile Include="Parsers\SimpleLex.cs" />
     <Compile Include="Parsers\SimpleYacc.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Analysis\AnalysisBase.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
-    <Compile Include="Visitors\CheckVariablesVisitor.cs" />
+    <Compile Include="Optimizations\Fold.cs" />
     <Compile Include="Visitors\GenCodeVisitor.cs" />
     <Compile Include="Visitors\PrettyPrintVisitor.cs" />
+    <Compile Include="Visitors\CheckVariablesVisitor.cs" />
     <Compile Include="Visitors\VariableRenameVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
-    <Compile Include="Analysis\AbstractBase.cs" />
-    <Compile Include="Analysis\AvailableExpressions.cs" />
-    <Compile Include="Analysis\DeadOrAlive.cs" />
-    <Compile Include="Analysis\ReachingDefinitions.cs" />
-    <Compile Include="Optimizations\CSE.cs" />
-    <Compile Include="Optimizations\Fold.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="CodeGenerator\" />
-    <Folder Include="MiddleEnd\" />
-    <Folder Include="Parsers\" />
-    <Folder Include="Properties\" />
-    <Folder Include="Visitors\" />
-    <Folder Include="_TestTexts\" />
-    <Folder Include="Analysis\" />
-    <Folder Include="Optimizations\" />
+    <Content Include="_TestTexts\LabelsTest.txt" />
+    <Content Include="_TestTexts\optCseTest.txt" />
+    <Content Include="_TestTexts\ReachingDefsTest.txt" />
+    <Content Include="_TestTexts\SaneTest.txt" />
+    <Content Include="_TestTexts\UnknownTest.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="_TestTexts\LabelsTest.txt" />
-    <None Include="_TestTexts\ReachingDefsTest.txt" />
-    <None Include="_TestTexts\SaneTest.txt" />
-    <None Include="_TestTexts\UnknownTest.txt" />
-    <None Include="_TestTexts\optCseTest.txt" />
-  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>
