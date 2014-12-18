@@ -17,18 +17,16 @@ namespace SimpleLang.Optimizations
         /// <returns> Были ли внесены какие-то изменения </returns>
         public bool Optimize(BaseBlock block)
         {
-            return cseOptimization(block);
-        }
-
-        public static bool cseOptimization(BaseBlock block)
-        {
             bool hasChanges = false;
             // поиск пары общих подвыражений
             for (LinkedListNode<CodeLine> node0 = block.Code.Last; node0 != null; node0 = node0.Previous)
                 for (LinkedListNode<CodeLine> node1 = node0.Next; node1 != null; node1 = node1.Next)
                 {
                     // если нашли...
-                    if (node1.Value.Second == node0.Value.Second && node1.Value.Third == node0.Value.Third && node1.Value.BinOp == node0.Value.BinOp)
+                    if (node1.Value.Second == node0.Value.Second && 
+                        node1.Value.Third == node0.Value.Third && 
+                        node1.Value.BinOp == node0.Value.BinOp && 
+                        node0.Value.BinOp != BinOpType.None)
                     {
                         // ...то проверим, переопределяется ли переменная, присутствующая в общем подвыражении, на пути между общими подвыражениями
                         bool isOpt = true;
@@ -40,7 +38,7 @@ namespace SimpleLang.Optimizations
                             }
                         if (isOpt) // не переопределяется
                         {
-                            string tName = SymbolTable.NextTemp();
+                            string tName = NextTemp();
                             Expression expr = new Expression(node0.Value.Second, node0.Value.Third, node0.Value.BinOp);                                                        
                             SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(tName, expr.Type(), SymbolKind.var));
                             hasChanges = isOpt;
@@ -50,7 +48,20 @@ namespace SimpleLang.Optimizations
                         }
                     }
                 }
-            return hasChanges;
-        }              
+            return hasChanges;            
+        }
+        //
+        static int TempCounter = 0;
+        const string TempName = "_to";
+        /// <summary>
+        /// Возвращает следующую неиспользуемую временную переменную
+        /// </summary>
+        /// <returns>следующая неиспользуемая временная переменная</returns>
+        public static string NextTemp()
+        {
+            while (SymbolTable.Contains(TempName + TempCounter))
+                TempCounter++;
+            return TempName + TempCounter++;
+        }   
     }
 }

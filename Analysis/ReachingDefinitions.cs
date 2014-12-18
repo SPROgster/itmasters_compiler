@@ -18,7 +18,7 @@ namespace SimpleLang.Analysis
 
         public int Count { get { return Elems.Length; } }
 
-        private BitSet(bool[] elems)
+        public BitSet(bool[] elems)
         {
             Elems = (bool[])elems.Clone();
         }
@@ -31,21 +31,6 @@ namespace SimpleLang.Analysis
         public void Set(int index, bool value)
         {
             Elems[index] = value;
-        }
-
-        public ISet<bool> Intersect(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f && s).ToArray());
-        }
-
-        public ISet<bool> Union(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f || s).ToArray());
-        }
-
-        public ISet<bool> Subtract(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => s ? false : f).ToArray());
         }
 
         public object Clone()
@@ -82,6 +67,21 @@ namespace SimpleLang.Analysis
         {
             return (BitSet)a.Subtract(b);
         }
+
+        public IndexedSet<int, bool> Intersect(IndexedSet<int, bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f && s).ToArray());
+        }
+
+        public IndexedSet<int, bool> Union(IndexedSet<int, bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f || s).ToArray());
+        }
+
+        public IndexedSet<int, bool> Subtract(IndexedSet<int, bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => s ? false : f).ToArray());
+        }
     }
 
     public class KillGenContext : Context<Tuple<BitSet,BitSet>>
@@ -101,7 +101,7 @@ namespace SimpleLang.Analysis
             {
                 BlockDef[bl] = new HashSet<int>();
                 foreach (CodeLine cl in bl.Code)
-                    if (cl.Operator == OperatorType.Assign)
+                    if (cl.Operator == OperatorType.Assign && !cl.First.StartsWith("_t"))
                     {
                         if(!VarDef.ContainsKey(cl.First))
                             VarDef[cl.First] = new HashSet<int>();

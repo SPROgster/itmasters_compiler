@@ -14,7 +14,7 @@ namespace simplelangTests
         [TestMethod]
         public void GraphBBL_1_0()
         {
-            string FileName = @"..\..\Test3.txt";
+            string FileName = @"..\..\_Texts\Test3.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
