@@ -27,6 +27,12 @@ namespace SimpleCompiler
                 Directory.CreateDirectory(BinOutputDirectory);
             try
             {
+				if (Environment.OSVersion.Platform == System.PlatformID.Unix) 
+				{
+					FileName = FileName.Replace('\\', '/');
+					BinOutputDirectory = BinOutputDirectory.Replace('\\', '/');
+				}
+
                 string Text = File.ReadAllText(FileName);
 
                 Scanner scanner = new Scanner();
