@@ -62,6 +62,12 @@ namespace SimpleLang.Optimizations
             while (SymbolTable.Contains(TempName + TempCounter))
                 TempCounter++;
             return TempName + TempCounter++;
-        }   
+        }
+
+
+        public string GetName()
+        {
+            return "Оптимизация общих подвыражений";
+        }
     }
 }

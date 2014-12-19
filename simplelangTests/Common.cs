@@ -17,7 +17,7 @@ namespace SimpleLangTests
         [TestMethod]
         public void TestSymbolTable()
         {
-            string FileName = @"..\..\_Texts\Test1.txt";
+            string FileName = "../../_Texts/Test1.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
@@ -31,7 +31,7 @@ namespace SimpleLangTests
         [TestMethod]
         public void TestThreeCode()
         {
-            string FileName = @"..\..\_Texts\Test2.txt";
+            string FileName = "../../_Texts/Test2.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);

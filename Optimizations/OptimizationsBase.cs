@@ -16,6 +16,9 @@ namespace SimpleLang.Optimizations
         /// <param name="block"> Оптимизируемый блок </param>
         /// <returns> Были ли внесены какие-то изменения </returns>
         bool Optimize(BaseBlock block);
+
+        //Функция возвращает нормально воспринимаемое человеком название оптимизации
+        string GetName();
     }
 
     public interface GlobalOptimization
@@ -26,5 +29,8 @@ namespace SimpleLang.Optimizations
         /// <param name="block"> ГГраф оптимизируемой программы </param>
         /// <returns> Были ли внесены какие-то изменения </returns>
         bool Optimize(ControlFlowGraph CFG);
+
+        //Функция возвращает нормально воспринимаемое человеком название оптимизации
+        string GetName();
     }
 }

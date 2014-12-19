@@ -17,7 +17,7 @@ namespace simplelangTests
         [TestMethod]
         public void DeadOrAlive_1_1()
         {
-            string FileName = @"..\..\_Texts\Test2.txt";
+            string FileName = "../../_Texts/Test2.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
@@ -45,7 +45,7 @@ namespace simplelangTests
         [TestMethod]
         public void GenKill_2_5()
         {
-            string FileName = @"..\..\_Texts\Test3.txt";
+            string FileName = "../../_Texts/Test3.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
@@ -74,7 +74,7 @@ namespace simplelangTests
         [TestMethod]
         public void DeadOrAliveBBL_3_0()
         {
-            string FileName = @"..\..\_Texts\Test6.txt";
+            string FileName = "../../_Texts/Test6.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);

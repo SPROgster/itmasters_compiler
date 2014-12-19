@@ -7,6 +7,18 @@ using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Analysis
 {
+    public class Pair<T1, T2>
+    {
+        public T1 fst;
+        public T2 snd;
+
+        public Pair(T1 f, T2 s)
+        {
+            fst = f;
+            snd = s;
+        }
+    }
+
     //Множество
     public interface ISet<T>
     {

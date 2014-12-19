@@ -28,6 +28,11 @@ namespace SimpleCompiler
                 {
                     Console.WriteLine("--- Блок {0} ---", block.nBlock);
                     Console.WriteLine(block);
+                    Console.WriteLine();
+                    Console.WriteLine("Input:\t" + String.Join(" ",cfg.GetInputs(block).
+                        Select(e=>e.nBlock.ToString())));
+                    Console.WriteLine("Output:\t" + String.Join(" ", cfg.GetOutputs(block).
+                        Select(e => e.nBlock.ToString())));
                     Console.WriteLine("----------------");                    
                 }
             }
@@ -91,7 +96,29 @@ namespace SimpleCompiler
         {
             Print("Дерево доминаторов:");  
             DominatorsTree DTree = new DominatorsTree(CFG);
-
+            Stack<Pair<DominatorsTree.TreeNode<BaseBlock>,int>> Path =
+                new Stack<Pair<DominatorsTree.TreeNode<BaseBlock>, int>>();
+            Path.Push(new Pair<DominatorsTree.TreeNode<BaseBlock>,int>(DTree.Root,0));
+            int Depth = 0;
+            while(Path.Count>0)
+            {
+                var Top = Path.Peek();
+                if (Top.snd != Top.fst.Items.Count)
+                {
+                    Path.Push(new Pair<DominatorsTree.TreeNode<BaseBlock>, int>(
+                        Top.fst.Items.ElementAt(Top.snd), 0));
+                    Top.snd += 1;
+                    Depth += 1;
+                }
+                else
+                {
+                    for (int i = 0; i < Depth; ++i)
+                        Console.Write("  ");
+                    Console.WriteLine(Top.fst.Value.nBlock);
+                    Path.Pop();
+                    Depth -= 1;
+                }
+            }
         }
 
         public static void RunReachingDefinitions(ControlFlowGraph CFG)
