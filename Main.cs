@@ -18,7 +18,7 @@ namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
-        public static string FileName = @"..\..\_TestTexts\optCseTest.txt";
+        public static string FileName = @"..\..\_TestTexts\SaneTest.txt";
         public static string BinOutputDirectory = @"..\Compiled\";
 
         public static void Main()

@@ -41,13 +41,30 @@ namespace SimpleLang.CodeGenerator
         /// </summary>
         /// <param name="SymbolName">Имя символа</param>
         /// <returns>IL инструкция</returns>
-        public static string pushId(string SymbolName)
+		public static string pushId(string SymbolName)
         {
             IndexType Operand = Local[SymbolName];
 
             // Если истина, то у нас присваивание константе
             if (Operand == null)
-                return "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
+			{
+				ValueParser value = new ValueParser(SymbolName);
+
+				switch (value.type) 
+				{
+				case CType.Bool:
+					return "ldc.i4 " + ((value.bvalue()) ? "1" : "0") + Environment.NewLine;
+
+				case CType.Double:
+					return "ldc." + ILOpType[CType.Double] + " " + SymbolName + Environment.NewLine;
+
+				case CType.Int:
+					return "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
+
+				default:
+					return "ldstr \"" + SymbolName + "\"" + Environment.NewLine;
+				}
+			}
             // Иначе кладем на стек по номеру элемента
             else
                 return "ldloc " + Operand.Item1.ToString() + Environment.NewLine;
@@ -58,7 +75,7 @@ namespace SimpleLang.CodeGenerator
         /// </summary>
         /// <param name="SymbolName">Имя символа</param>
         /// <returns>IL инструкция</returns>
-        public static string popId(string SymbolName)
+		public static string popId(string SymbolName)
         {
             IndexType Operand = Local[SymbolName];
 
@@ -93,14 +110,16 @@ namespace SimpleLang.CodeGenerator
                     {
                         // Присваивание вида a:=b
                         case BinOpType.None:
-                            code += pushId(line.Second);
+							//IndexType Operand = Local[line.First];
+							code += pushId(line.Second);
                             code += popId(line.First);
 
                             return code;
                         // Операция "+"
                         case BinOpType.Plus:
-                            code += pushId(line.Second);
-                            code += pushId(line.Third);
+							//IndexType Operand = Local[line.First];
+							code += pushId(line.Second);
+							code += pushId(line.Third);
 
                             code += "add" + Environment.NewLine;
 
@@ -109,7 +128,7 @@ namespace SimpleLang.CodeGenerator
 
                         // Операция "-"
                         case BinOpType.Minus:
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             code += "sub" + Environment.NewLine;
@@ -119,7 +138,7 @@ namespace SimpleLang.CodeGenerator
 
                         // Операция "/"
                         case BinOpType.Div:
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             code += "div" + Environment.NewLine;
@@ -129,7 +148,7 @@ namespace SimpleLang.CodeGenerator
 
                         // Операция "*"
                         case BinOpType.Mult:
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             code += "mul" + Environment.NewLine;
@@ -139,7 +158,7 @@ namespace SimpleLang.CodeGenerator
 
                         // Операция "<"
                         case BinOpType.Less:
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             code += "clt" + Environment.NewLine;
@@ -148,7 +167,7 @@ namespace SimpleLang.CodeGenerator
 
                         // Операция ">"
                         case BinOpType.Greater:
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             code += "cgt" + Environment.NewLine;
@@ -158,7 +177,7 @@ namespace SimpleLang.CodeGenerator
 
                         // Операция "="
                         case BinOpType.Equal:
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             code += "ceq" + Environment.NewLine;
@@ -171,7 +190,7 @@ namespace SimpleLang.CodeGenerator
                         // Операция "<="
                         case BinOpType.LEqual:
                             // Проверяем на <=
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             // Т.к. в IL нету вычисления <=, то сравниваем на >
@@ -189,7 +208,7 @@ namespace SimpleLang.CodeGenerator
                         // Операция ">="
                         case BinOpType.GEqual:
                             // Проверяем на >=
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             // Т.к. в IL нету вычисления >=, то сравниваем на <
@@ -207,7 +226,7 @@ namespace SimpleLang.CodeGenerator
                         // Операция "<>"
                         case BinOpType.NEqual:
                             // Проверяем на неравенство
-                            code += pushId(line.Second);
+							code += pushId(line.Second);
                             code += pushId(line.Third);
 
                             // Т.к. в IL нету вычисления неравенства, то сравниваем на равенство

@@ -41,9 +41,10 @@ namespace SimpleLang.CodeGenerator
             public ILLocal()
             {
                 ILType.Add(CType.Int, "int32");
-                ILType.Add(CType.Bool, "int32");
+                ILType.Add(CType.Bool, "bool");
                 ILType.Add(CType.Float, "float32");
                 ILType.Add(CType.Double, "float64");
+				ILType.Add(CType.String, "string");
 
                 processLocals();
             }

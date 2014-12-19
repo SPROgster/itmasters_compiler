@@ -56,6 +56,7 @@ namespace SimpleLang.MiddleEnd
                 case "bool"     : return CType.Bool;
                 case "float"    : return CType.Float;
                 case "double"   : return CType.Double;
+				case "string"   : return CType.String;
                 default         : return CType.None;
             }
         }
