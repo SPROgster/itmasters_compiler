@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.CodeGenerator
@@ -34,7 +35,9 @@ namespace SimpleLang.CodeGenerator
 			// Double
 			try
 			{
-				doubleValue = Convert.ToDouble(SymbolName);
+				NumberFormatInfo nfi = new NumberFormatInfo();
+				nfi.NumberDecimalSeparator = ".";
+				doubleValue = Convert.ToDouble(SymbolName, nfi);
 				type = CType.Double;
 				return;
 			}

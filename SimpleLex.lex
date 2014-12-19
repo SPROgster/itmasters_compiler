@@ -42,7 +42,9 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 }
 
 {FLOATNUM} { 
-  yylval.fVal = float.Parse(yytext); 
+  NumberFormatInfo nfi = new NumberFormatInfo();
+  nfi.NumberDecimalSeparator = ".";
+  yylval.fVal = float.Parse(yytext, nfi); 
   return (int)Tokens.FNUM;
 }
 
