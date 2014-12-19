@@ -168,6 +168,7 @@ namespace SimpleCompiler
                 Print(e.ToString());
                 Console.Write("Для завершения работы программы нажмите Enter...");
                 Console.ReadLine();
+                return;
             }
             if(ShouldPrint)
             {
