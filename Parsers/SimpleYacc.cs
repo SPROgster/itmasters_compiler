@@ -3,9 +3,9 @@
 // (see accompanying GPPGcopyright.rtf)
 
 // GPPG version 1.3.6
-// Machine:  BASE-PC
-// DateTime: 23.11.2014 14:17:12
-// UserName: Admin
+// Machine:  sprog-laptop
+// DateTime: 19.12.2014 23:27:36
+// UserName: sprog
 // Input file <SimpleYacc.y>
 
 // options: no-lines gplex

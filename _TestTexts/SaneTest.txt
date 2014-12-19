@@ -1,4 +1,4 @@
 begin
-	var s : string;
-	s := "Hello"
+	var f : float;
+	f := 1.5
 end
