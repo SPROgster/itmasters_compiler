@@ -61,10 +61,9 @@ namespace simplelangTests
              {
                  var CFG = SimpleCompilerMain.BuildCFG(Root);
                  Console.WriteLine();
-                 AliveVarsAlgorithm AVA = new AliveVarsAlgorithm(CFG);
-                 var AVAResult = AVA.Apply();
                  SimpleCompilerMain.PrintCFG(CFG);
-                 AliveVarsOptimization.optimize(AVAResult, CFG);
+                 AliveVarsOptimization a = new AliveVarsOptimization();
+                 a.Optimize( CFG);
                  SimpleCompilerMain.PrintCFG(CFG);
                  List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
                  Assert.AreEqual(2, l[1].Code.Count);//удалило переменную a в первом блоке
