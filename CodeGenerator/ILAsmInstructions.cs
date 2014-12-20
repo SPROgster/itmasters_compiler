@@ -48,8 +48,11 @@ namespace SimpleLang.CodeGenerator
         /// </summary>
         /// <param name="SymbolName">Имя символа</param>
         /// <returns>IL инструкция</returns>
-		public static string pushId(string SymbolName)
+		public static string pushId(string SymbolName, CType result = CType.None)
         {
+			if (result == CType.String)
+				return toString(SymbolName);
+
             IndexType Operand = Local[SymbolName];
 
             // Если истина, то у нас присваивание константе
@@ -66,6 +69,8 @@ namespace SimpleLang.CodeGenerator
 					return "ldc." + ILOpType[CType.Double] + " " + value.dvalue().ToString(CultureInfo.InvariantCulture) + Environment.NewLine;
 
 				case CType.Int:
+					if (result == CType.Double || result == CType.Float)
+						return "ldc." + ILOpType[result] + " " + SymbolName + "." + Environment.NewLine;
 					return "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
 
 				default:
@@ -164,6 +169,11 @@ namespace SimpleLang.CodeGenerator
                 return code;
             }
 
+			IndexType Operand = Local[line.First];
+			if (Operand.Item2 == CType.String && line.Operator == OperatorType.Assign &&
+				!(line.BinOp == BinOpType.None || line.BinOp == BinOpType.Plus))
+				throw new Exception("Supporteg string operations is := and +, not a " + line.BinOp.ToString());
+
             switch (line.Operator)
             {
                 case OperatorType.Assign:
@@ -171,18 +181,19 @@ namespace SimpleLang.CodeGenerator
                     {
                         // Присваивание вида a:=b
                         case BinOpType.None:
-							//IndexType Operand = Local[line.First];
-							code += pushId(line.Second);
+							code += pushId(line.Second, Operand.Item2);
                             code += popId(line.First);
 
                             return code;
                         // Операция "+"
                         case BinOpType.Plus:
-							//IndexType Operand = Local[line.First];
-							code += pushId(line.Second);
-							code += pushId(line.Third);
+							code += pushId(line.Second, Operand.Item2);
+							code += pushId(line.Third, Operand.Item2);
 
-                            code += "add" + Environment.NewLine;
+							if (Operand.Item2 == CType.String)
+								code += "call string string::Concat(string, string)" + Environment.NewLine;
+							else
+								code += "add" + Environment.NewLine;
 
                             code += popId(line.First);
                             return code;
@@ -335,27 +346,6 @@ namespace SimpleLang.CodeGenerator
                  * }
                  * 
                  * */
-
-			/*
-			Печать double
-
-			ldloca.s 1
-			constrained. [mscorlib]System.Double
-			callvirt instance string object::ToString()
-			call void class [mscorlib]System.Console::WriteLine(string)
-
-			*/
-
-			/*
-			String consat
-			IL_0013:  ldloc.2 
-			IL_0014:  ldloca.s 1
-			IL_0016:  constrained. [mscorlib]System.Double
-			IL_001c:  callvirt instance string object::ToString()
-			IL_0021:  call string string::Concat(string, string)
-			IL_0026:  stloc.2 
-			*/
-
         }
     }
 }
