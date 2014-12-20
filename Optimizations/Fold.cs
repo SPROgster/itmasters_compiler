@@ -3,23 +3,37 @@ using System.Collections.Generic;
 
 namespace SimpleLang.Optimizations
 {
-    public class Fold
+    public class Fold : LocalOptimization
     {
-        // Основная функция свертки
-        public static void fold(ref LinkedList<CodeLine> gcv)
+        public string GetName()
         {
-            FoldSameness(ref gcv); // Сворачиваем алг тождества
+            return "Свертка констант и алгебраических тождеств";
+        }
+
+        public bool Optimize(BaseBlock block)
+        {
+            return fold(ref block.Code);
+        }
+
+        // Основная функция свертки
+        public static bool fold(ref LinkedList<CodeLine> gcv)
+        {
+            bool sameness = FoldSameness(ref gcv); // Сворачиваем алг тождества
             // В цикле проходим по таблице трехадресного кода
             // Одна функция сворачивает бинарные операции на константах в правой части
             // Другая функция подставляет инициализации переменной константами
             // В выражения-вхождения данной переменной.
+            bool calc_fold = false;
             while (true)
             {
                 bool hadRightConst = foldRightConst(ref gcv);
                 bool hadRightSemiConst = foldRightSemiConst(ref gcv);
                 if (!hadRightConst && !hadRightSemiConst)
                     break;
+                else
+                    calc_fold = true;
             }
+            return (sameness || calc_fold);
         }
 
         // Функция сворачивающая константы
@@ -89,51 +103,61 @@ namespace SimpleLang.Optimizations
         }
 
         // Функция меняющая трехадресный код
-        // В случае операции умножить и операнда 0
-        private static void checkPlusOrMinus(CodeLine cl)
+        // В случае операции сложения и операнда 0
+        private static bool checkPlusOrMinus(CodeLine cl)
         {
+            bool changed = false;
             if (cl.Second == "0")
             {
                 if (cl.BinOp == BinOpType.Minus)
-                    return;
+                    return changed;
                 else
                     cl.Second = cl.Third;
                 cl.Third = null;
                 cl.BinOp = BinOpType.None;
+                changed = true;
             }
             if (cl.Third != null && cl.Third == "0")
             {
                 cl.Third = null;
                 cl.BinOp = BinOpType.None;
+                changed = true;
             }
+            return changed;
         }
 
         // Функция меняющая трехадресный код
         // В случае операции умножить и операнда 1 или 0
-        private static void checkMult(CodeLine cl)
+        private static bool checkMult(CodeLine cl)
         {
+            bool changed = false;
             if (cl.Second == "1" && cl.Third != null)
             {
                 cl.Second = cl.Third;
                 cl.Third = null;
                 cl.BinOp = BinOpType.None;
+                changed = true;
             }
             if (cl.Third != null && cl.Third == "1")
             {
                 cl.Third = null;
                 cl.BinOp = BinOpType.None;
+                changed = true;
             }
             if (cl.Second == "0" || (cl.Third != null && cl.Third == "0"))
             {
                 cl.Second = "0";
                 cl.Third = null;
                 cl.BinOp = BinOpType.None;
+                changed = true;
             }
+            return changed;
         }
 
         // Функция, которая сворачивает алгебраические тождества
-        private static void FoldSameness(ref LinkedList<CodeLine> gcv)
+        private static bool FoldSameness(ref LinkedList<CodeLine> gcv)
         {
+            bool folded = false;
             foreach (CodeLine cl in gcv)
             {
                 int third = 0;
@@ -142,25 +166,29 @@ namespace SimpleLang.Optimizations
                 bool third_int = int.TryParse(cl.Third, out third);
                 if (second_int || third_int)
                 {
+                    bool iter_changed = false;
                     switch (cl.BinOp)
                     {
                         case BinOpType.Plus:
-                            checkPlusOrMinus(cl);
+                            iter_changed = checkPlusOrMinus(cl);
                             break;
 
                         case BinOpType.Minus:
-                            checkPlusOrMinus(cl);
+                            iter_changed = checkPlusOrMinus(cl);
                             break;
 
                         case BinOpType.Mult:
-                            checkMult(cl);
+                            iter_changed = checkMult(cl);
                             break;
 
                         default:
                             break;
                     }
+                    if (iter_changed)
+                        folded = true;
                 }
             }
+            return folded;
         }
     }
 }
