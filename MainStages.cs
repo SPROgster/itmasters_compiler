@@ -22,7 +22,7 @@ namespace SimpleCompiler
         public static string BinOutputDirectory = "../Compiled/";
 
         //Синтаксический анализ
-        private static BlockNode SyntaxAnalysis(string filename)
+        public static BlockNode SyntaxAnalysis(string filename)
         {
             FileName = filename;
             string Text = File.ReadAllText(filename);
@@ -36,7 +36,7 @@ namespace SimpleCompiler
         }
 
         //Семантический анализ по заданному дереву программы
-        private static bool SemanticAnalysis(BlockNode root)
+        public static bool SemanticAnalysis(BlockNode root)
         {
             SymbolTable.Reset();
             var sne = new CheckVariablesVisitor();
@@ -52,7 +52,7 @@ namespace SimpleCompiler
         }
 
         //Функция для построения графа базовых блоков по синтаксическому дереву
-        private static ControlFlowGraph BuildCFG(BlockNode root)
+        public static ControlFlowGraph BuildCFG(BlockNode root)
         {
             //Генерируем трёхадресный код
             GenCodeVisitor gcv = new GenCodeVisitor();
