@@ -7,25 +7,37 @@ using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Analysis
 {
+    public class Pair<T1, T2>
+    {
+        public T1 fst;
+        public T2 snd;
+
+        public Pair(T1 f, T2 s)
+        {
+            fst = f;
+            snd = s;
+        }
+    }
+
     //Множество
     public interface ISet<T>
     {
-        ISet<T> Intersect(ISet<T> b);
-        ISet<T> Union(ISet<T> b);
-        ISet<T> Subtract(ISet<T> b);
+        T Intersect(T b);
+        T Union(T b);
+        T Subtract(T b);
 
         int Count { get; }
     }
 
     //Множество с доступом по индексу
-    public interface IndexedSet<IndexType, ValueType> : ISet<ValueType>
+    public interface IndexedSet<IndexType, ValueType> : ISet<IndexedSet<IndexType, ValueType>>
     {
         ValueType Get(IndexType index);
         void Set(IndexType index, ValueType value);
     }
 
     //Множество с доступом по индексу
-    public interface ChaoticSet<ValueType> : ISet<ValueType>
+    public interface ChaoticSet<ValueType> : ISet<ChaoticSet<ValueType>>
     {
         void Add(ValueType elem);
         void Remove(ValueType elem);
@@ -33,15 +45,18 @@ namespace SimpleLang.Analysis
     }
 
     //Адаптация HashSet к использованию в алгоритмах
-    public class SetAdapter<T> : HashSet<T>, IEquatable<SetAdapter<T>>, ICloneable
+    public class SetAdapter<T> : HashSet<T>, IEquatable<SetAdapter<T>>, ICloneable, ISet<SetAdapter<T>>
     {
-        private SetAdapter(T[] elems)
-            : base(elems)
-        { }
-
         public SetAdapter(SetAdapter<T> elems)
             : base(elems)
         { }
+
+        public SetAdapter(params T[] elems)
+            : base()
+        {
+            for (int i = 0; i < elems.Length; ++i)
+                this.Add(elems[i]);
+        }
 
         public SetAdapter()
             : base()
@@ -69,17 +84,32 @@ namespace SimpleLang.Analysis
 
         public static SetAdapter<T> Intersect(SetAdapter<T> a, SetAdapter<T> b)
         {
-            return new SetAdapter<T>(a.Intersect(b).ToArray());
+            return a.Intersect(b);
         }
 
         public static SetAdapter<T> Union(SetAdapter<T> a, SetAdapter<T> b)
         {
-            return new SetAdapter<T>(a.Union(b).ToArray());
+            return a.Union(b);
         }
 
         public static SetAdapter<T> Subtract(SetAdapter<T> a, SetAdapter<T> b)
         {
-            return new SetAdapter<T>(a.Except(b).ToArray());
+            return a.Subtract(b);
+        }
+
+        public SetAdapter<T> Intersect(SetAdapter<T> b)
+        {
+            return new SetAdapter<T>((this as HashSet<T>).Intersect(b).ToArray());
+        }
+
+        public SetAdapter<T> Union(SetAdapter<T> b)
+        {
+            return new SetAdapter<T>((this as HashSet<T>).Union(b).ToArray());
+        }
+
+        public SetAdapter<T> Subtract(SetAdapter<T> b)
+        {
+            return new SetAdapter<T>((this as HashSet<T>).Except(b).ToArray());
         }
     }
 
@@ -181,10 +211,11 @@ namespace SimpleLang.Analysis
                 if (block != Cont.End)
                     In[block] = otherInit;
             bool SomethingChanged = true;
+            var OrderedBlocks = Cont.Blocks.OrderBy(bl => bl.nBlock).ToArray();
             while (SomethingChanged)
             {
                 SomethingChanged = false;
-                foreach (BaseBlock block in Cont.Blocks)
+                foreach (BaseBlock block in OrderedBlocks)
                     if (block != Cont.End)
                     {
                         Out[block] = Cont.Outputs(block).Select(bl => In[bl]).
@@ -221,10 +252,11 @@ namespace SimpleLang.Analysis
                 if(block!=Cont.Start)
                     Out[block] = otherInit;
             bool SomethingChanged = true;
+            var OrderedBlocks = Cont.Blocks.OrderBy(bl => bl.nBlock).ToArray();
             while (SomethingChanged)
             {
                 SomethingChanged = false;
-                foreach(BaseBlock block in Cont.Blocks)
+                foreach(BaseBlock block in OrderedBlocks)
                     if(block!=Cont.Start)
                     {
                         In[block] = Cont.Inputs(block).Select(bl=>Out[bl]).

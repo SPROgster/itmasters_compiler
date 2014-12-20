@@ -8,7 +8,13 @@ namespace SimpleLang.MiddleEnd
     public class BaseBlock: ICloneable
     {
         public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
-        
+        public int nBlock { get; set; }        
+
+        public BaseBlock(int n = 0)
+        {
+            this.nBlock = n;
+        }
+
         public void Add(CodeLine val)
         {
             Code.AddLast(val);
@@ -16,7 +22,7 @@ namespace SimpleLang.MiddleEnd
 
         public object Clone()
         {
-            var NewBlock = new BaseBlock();
+            var NewBlock = new BaseBlock(nBlock);
             foreach(var cl in Code)
                 NewBlock.Add((CodeLine)cl.Clone());
             return NewBlock;
@@ -57,13 +63,13 @@ namespace SimpleLang.MiddleEnd
                 }
                 if (Current.Value.Label != null)
                     Labeled[Current.Value.Label] = Current.Value;
-                switch (Current.Value.Operation)
+                switch (Current.Value.Operator)
                 {
-                    case BinOpType.Goto: 
+                    case OperatorType.Goto: 
                         UsedLabels.Add(Current.Value.First);
                         NextIsLeader = true;
                         break;
-                    case BinOpType.If: 
+                    case OperatorType.If: 
                         UsedLabels.Add(Current.Value.Second);
                         NextIsLeader = true;
                         break;
@@ -77,9 +83,9 @@ namespace SimpleLang.MiddleEnd
             Inputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
             Outputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
             Blocks = new LinkedList<BaseBlock>();
-
+            int nBlock = 0;
             //Второй проход - формируем базовые блоки
-            BaseBlock CurrentBlock = new BaseBlock();
+            BaseBlock CurrentBlock = new BaseBlock(nBlock++);
             Blocks.AddLast(CurrentBlock);
             Current = Code.First;
             //Будем сохранять информацию о том, какие блоки помечены метками и из каких блоков осуществляются переходы
@@ -93,20 +99,20 @@ namespace SimpleLang.MiddleEnd
                 if (Current.Next == null || Leaders.Contains(Current.Next.Value))
                 {
                     //Определяемся с тем, связан ли он со следующим
-                    if (Current.Value.Operation == BinOpType.Goto)
+                    if (Current.Value.Operator == OperatorType.Goto)
                     {
                         if (!GotoLabelsDest.ContainsKey(Current.Value.First))
                             GotoLabelsDest[Current.Value.First] = new LinkedList<BaseBlock>();
                         GotoLabelsDest[Current.Value.First].AddLast(CurrentBlock);
                         if (Current.Next != null)
                         {
-                            CurrentBlock = new BaseBlock();
+                            CurrentBlock = new BaseBlock(nBlock++);
                             Blocks.AddLast(CurrentBlock);
                         }
                     }
                     else
                     {
-                        if (Current.Value.Operation == BinOpType.If)
+                        if (Current.Value.Operator == OperatorType.If)
                         {
                             if(!GotoLabelsDest.ContainsKey(Current.Value.Second))
                                 GotoLabelsDest[Current.Value.Second] = new LinkedList<BaseBlock>();
@@ -114,7 +120,7 @@ namespace SimpleLang.MiddleEnd
                         }
                         if (Current.Next != null)
                         {
-                            BaseBlock Tmp = new BaseBlock();
+                            BaseBlock Tmp = new BaseBlock(nBlock++);
                             Outputs[CurrentBlock] = new LinkedList<BaseBlock>();
                             Outputs[CurrentBlock].AddLast(Tmp);
                             Inputs[Tmp] = new LinkedList<BaseBlock>();
@@ -147,13 +153,14 @@ namespace SimpleLang.MiddleEnd
                         Inputs[elem.Value].AddLast(dest);
                     }
             //Создаём фиктивный блок "вход"
-            BaseBlock EndBlock = new BaseBlock();
+            BaseBlock EndBlock = new BaseBlock(int.MinValue);
             Inputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock].AddLast(Blocks.First());
+            Inputs[Blocks.First()].AddLast(EndBlock);
             Blocks.AddFirst(EndBlock);
             //Создаём фиктивный блок "выход"
-            EndBlock = new BaseBlock();
+            EndBlock = new BaseBlock(int.MaxValue);
             Inputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock] = new LinkedList<BaseBlock>();
             foreach(BaseBlock bl in Blocks)
@@ -191,13 +198,17 @@ namespace SimpleLang.MiddleEnd
         public BaseBlock GetEnd()
         {
             return Blocks.Last();
-        }
+        }        
     }
+
+    //Виды операторов, которые могут встретиться в нашем трёхадресном коде
+    public enum OperatorType { Nop, Goto, If, Assign }
 
     public class CodeLine: ICloneable
     {
         public string Label, First, Second, Third;
-        public BinOpType Operation;
+        public BinOpType BinOp;
+        public OperatorType Operator;
 
         public CodeLine(string lab, string fst, string snd, string thrd, BinOpType op)
         {
@@ -205,29 +216,45 @@ namespace SimpleLang.MiddleEnd
             First = fst;
             Second = snd;
             Third = thrd;
-            Operation = op;
+            Operator = OperatorType.Assign;
+            BinOp = op;
+        }
+
+        public CodeLine(string lab, string fst, string snd, string thrd, 
+            OperatorType op, BinOpType bop = BinOpType.None)
+        {
+            Label = lab;
+            First = fst;
+            Second = snd;
+            Third = thrd;
+            Operator = op;
+            BinOp = bop;
         }
 
         public override string ToString()
         {
             string ToReturn = Label + (Label != null ? ": " : " ");
-            switch (Operation)
+            switch (Operator)
             {
-                case BinOpType.If: 
+                case OperatorType.If: 
                     return ToReturn +  "if " + First + " goto " + Second;
 
-                case BinOpType.Goto: 
+                case OperatorType.Goto: 
                     return ToReturn +  "goto " + First;
 
+                case OperatorType.Nop:
+                    return ToReturn + "nop";
+
+                //Присваивание
                 default: 
                     return ToReturn + 
-                        (First != null ? First + " := " + Second + " " + ((Operation == BinOpType.None) ? "" : Operation.ToString()) + " " + Third : "nop");
+                        First + " := " + Second + " " + ((BinOp == BinOpType.None) ? "" : BinOp.ToString()) + " " + Third;
             }
         }
 
         public object Clone()
         {
-            return new CodeLine(Label, First, Second, Third, Operation);
+            return new CodeLine(Label, First, Second, Third, BinOp);
         }
     }
 

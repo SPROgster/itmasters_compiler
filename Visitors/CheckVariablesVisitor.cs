@@ -7,7 +7,7 @@ using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
-    class CheckVariablesVisitor:AutoVisitor
+    public class CheckVariablesVisitor:AutoVisitor
     {
         public List<String> Errors = new List<string>();
         // Flag for adding new vars in VisitIdNode, else - using
