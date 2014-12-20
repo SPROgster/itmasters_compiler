@@ -274,6 +274,27 @@ namespace SimpleLang.CodeGenerator
                  * }
                  * 
                  * */
+
+			/*
+			Печать double
+
+			ldloca.s 1
+			constrained. [mscorlib]System.Double
+			callvirt instance string object::ToString()
+			call void class [mscorlib]System.Console::WriteLine(string)
+
+			*/
+
+			/*
+			String consat
+			IL_0013:  ldloc.2 
+			IL_0014:  ldloca.s 1
+			IL_0016:  constrained. [mscorlib]System.Double
+			IL_001c:  callvirt instance string object::ToString()
+			IL_0021:  call string string::Concat(string, string)
+			IL_0026:  stloc.2 
+			*/
+
         }
     }
 }
