@@ -3,6 +3,7 @@ using SimpleCompiler;
 using SimpleLang.Analysis;
 using SimpleLang.MiddleEnd;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace simplelangTests
@@ -69,6 +70,17 @@ namespace simplelangTests
                         Console.WriteLine("In:\t" + AVAResult.Item1[block]);
                         Console.WriteLine("Out:\t" + AVAResult.Item2[block]);
                     }
+            }
+        }
+        [TestMethod]
+        public void NaturalCycles()
+        {
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
+            if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
+            {
+                var CFG = SimpleCompilerMain.BuildCFG(Root);
+                NaturalCycles n = new NaturalCycles();
+                Console.WriteLine(n.GetLoop(CFG,6,1));
             }
         }
     }
