@@ -216,6 +216,23 @@ namespace SimpleLang.Visitors
             CTypeValuesStack.Pop();
         }
 
+        public override void VisitWriteNode(WriteNode node)
+        {
+            string WriteVariable = SymbolTable.NextTemp();
+
+            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(WriteVariable, CType.String, SymbolKind.var));
+
+            node.Expr.Visit(this);
+
+            Code.AddLast(new CodeLine(null, WriteVariable,
+                         NamesValuesStack.Pop(), null, BinOpType.None));
+            Code.AddLast(new CodeLine(null, WriteVariable,
+                         null, null, OperatorType.Write));
+
+            // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
+            CTypeValuesStack.Pop();
+        }
+
         public void RemoveEmptyLabels()
         {
             RemoveEmptyLabels(Code);

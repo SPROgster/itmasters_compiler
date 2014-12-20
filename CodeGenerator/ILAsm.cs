@@ -34,6 +34,12 @@ namespace SimpleLang.CodeGenerator
             /// </summary>
             private Dictionary<string, IndexType> varsIndex = new Dictionary<string, IndexType>();
             /// <summary>
+            /// Список временных переменных для перевода в строку
+            /// </summary>
+            private Dictionary<CType, IndexType> toStringLocals = new Dictionary<CType, IndexType>();
+
+
+            /// <summary>
             /// Внутреняя часть дерективы со списком локальных переменных
             /// </summary>
             private string localDirectiveList;
@@ -41,9 +47,10 @@ namespace SimpleLang.CodeGenerator
             public ILLocal()
             {
                 ILType.Add(CType.Int, "int32");
-                ILType.Add(CType.Bool, "int32");
+                ILType.Add(CType.Bool, "bool");
                 ILType.Add(CType.Float, "float32");
                 ILType.Add(CType.Double, "float64");
+                ILType.Add(CType.String, "string");
 
                 processLocals();
             }
@@ -95,6 +102,37 @@ namespace SimpleLang.CodeGenerator
                         Console.WriteLine("Отсутствует тип " + id.Item2.ToString() + " для переменной " + id.Item1.ToString());
                     }
                 }
+            }
+
+            /// <summary>
+            /// Добавление временной переменной для перевода в строку
+            /// </summary>
+            /// <returns>Индекс строковой переменной</returns>
+            /// <param name="type">Тип переменной</param>
+            public IndexType toStringTemp(CType type)
+            {
+                if (!toStringLocals.ContainsKey(type))
+                {
+                    IndexType local = new IndexType(varsIndex.Count, type);
+                    varsIndex.Add("toString" + type.ToString(), local);
+                    toStringLocals.Add(type, local);
+
+                    // Добавляем недавно добавленную переменную
+                    // Строка описания локальной переменной при дириктиве .local
+                    string varText = "[" + local.Item1.ToString() + "] "
+                                   + ILType[local.Item2]
+                                   + " toString" + type.ToString();
+
+                    // Если список переменных не пустой, то добавляем запятую
+                    if (varsIndex.Count > 1)
+                        varText = ",\n" + varText;
+
+                    localDirectiveList += varText;
+
+                    return local;
+                }
+                else
+                    return toStringLocals[type];
             }
 
             /// <summary>
@@ -190,7 +228,18 @@ namespace SimpleLang.CodeGenerator
             string outFileNameEXE = outputDir +
                 Path.GetFileNameWithoutExtension(SimpleCompiler.SimpleCompilerMain.FileName)+".exe";
             File.WriteAllText(outFileNameIL, code(CFG));    
-            Process.Start("ilasm.exe", outFileNameIL + " /exe");
+            switch (System.Environment.OSVersion.Platform)
+            {
+                case System.PlatformID.Win32Windows:
+                case System.PlatformID.Win32NT:
+                case System.PlatformID.Win32S:
+                    Process.Start("ilasm.exe", outFileNameIL + " /exe");
+                    break;
+
+                case System.PlatformID.Unix:
+                    Process.Start("ilasm", outFileNameIL + " /exe");
+                    break;
+            }
         }
     }
 
