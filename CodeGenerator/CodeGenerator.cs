@@ -17,7 +17,7 @@ namespace SimpleLang.CodeGenerator
 			// Boolean
 			try
 			{
-				boolValue = Convert.ToBoolean(SymbolName);
+				boolValue = bool.Parse(SymbolName);
 				type = CType.Bool;
 				return;
 			}
@@ -26,7 +26,7 @@ namespace SimpleLang.CodeGenerator
 			// Int
 			try
 			{
-				intValue = Convert.ToInt32(SymbolName);
+				intValue = int.Parse(SymbolName);
 				type = CType.Int;
 				return;
 			}
@@ -35,9 +35,7 @@ namespace SimpleLang.CodeGenerator
 			// Double
 			try
 			{
-				NumberFormatInfo nfi = new NumberFormatInfo();
-				nfi.NumberDecimalSeparator = ".";
-				doubleValue = Convert.ToDouble(SymbolName, nfi);
+				doubleValue = double.Parse(SymbolName);
 				type = CType.Double;
 				return;
 			}

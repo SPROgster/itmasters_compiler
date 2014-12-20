@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using SimpleLang.MiddleEnd;
 
@@ -56,7 +57,10 @@ namespace SimpleLang.CodeGenerator
 					return "ldc.i4 " + ((value.bvalue()) ? "1" : "0") + Environment.NewLine;
 
 				case CType.Double:
-					return "ldc." + ILOpType[CType.Double] + " " + SymbolName + Environment.NewLine;
+					NumberFormatInfo nfi = new NumberFormatInfo();
+					nfi.NumberDecimalSeparator = ".";
+
+					return "ldc." + ILOpType[CType.Double] + " " + value.dvalue().ToString(CultureInfo.InvariantCulture) + Environment.NewLine;
 
 				case CType.Int:
 					return "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
