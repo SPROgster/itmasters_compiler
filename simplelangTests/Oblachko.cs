@@ -18,7 +18,7 @@ namespace simplelangTests
         [TestMethod]
         public void Fold_1_2()
         {
-            string FileName = @"..\..\_Texts\Test5.txt";
+            string FileName = "../../_Texts/Test5.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
@@ -41,7 +41,7 @@ namespace simplelangTests
         [TestMethod]
         public void RDA_2_6()
         {
-            string FileName = @"..\..\_Texts\Test3.txt";
+            string FileName = "../../_Texts/Test3.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
@@ -71,7 +71,7 @@ namespace simplelangTests
         [TestMethod]
          public void AliveVars_3_1()
         {
-            string FileName = @"..\..\_Texts\Test3.txt";
+            string FileName = "../../_Texts/Test3.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);

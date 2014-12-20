@@ -18,8 +18,8 @@ namespace SimpleCompiler
 {
     public partial class SimpleCompilerMain
     {
-        public static string FileName = @"..\..\_TestTexts\optCseTest.txt";
-        public static string BinOutputDirectory = @"..\Compiled\";
+        public static string FileName = "../../_TestTexts/optCseTest.txt";
+        public static string BinOutputDirectory = "../Compiled/";
 
         //Синтаксический анализ
         private static BlockNode SyntaxAnalysis(string filename)

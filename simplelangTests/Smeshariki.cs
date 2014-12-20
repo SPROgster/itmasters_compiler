@@ -15,7 +15,7 @@ namespace simplelangTests
         [TestMethod]
         public void CSE_1_3()
         {
-            string FileName = @"..\..\_Texts\Test4.txt";
+            string FileName = "../../_Texts/Test4.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);

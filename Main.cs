@@ -63,10 +63,10 @@ namespace SimpleCompiler
                     Console.WriteLine(Help);
                     Console.WriteLine("Доступные внутриблочные оптимизации:");
                     for (int i = 0; i < LocalOp.Length; ++i)
-                        Console.WriteLine(i + " - " + LocalOp[i].GetType().Name);
+                        Console.WriteLine(i + " - " + LocalOp[i].GetName());
                     Console.WriteLine("Доступные межблочные оптимизации:");
                     for (int i = 0; i < GlobalOp.Length; ++i)
-                        Console.WriteLine(i + " - " + GlobalOp[i].GetType().Name);
+                        Console.WriteLine(i + " - " + GlobalOp[i].GetName());
                     Console.WriteLine("Доступные анализы:");
                     for (int i = 0; i < Analyzes.Length; ++i)
                         Console.WriteLine(i + " - " + Analyzes[i].Name.Substring(3));
@@ -168,6 +168,7 @@ namespace SimpleCompiler
                 Print(e.ToString());
                 Console.Write("Для завершения работы программы нажмите Enter...");
                 Console.ReadLine();
+                return;
             }
             if(ShouldPrint)
             {
