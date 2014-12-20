@@ -9,13 +9,13 @@ namespace SimpleLang.Analysis
 
     public class NaturalCycles
     {
-        public string GetLoop(ControlFlowGraph CFG, int n, int d)
+        public List<BaseBlock> GetLoop(ControlFlowGraph CFG, int n, int d)
         {
             List<BaseBlock> l = new List<BaseBlock>(CFG.GetBlocks());
             HashSet<int> h = new HashSet<int>();
             h.Add(n);
             DFS(CFG, l[n + 1], d, h);
-            return String.Join(" ", h) ;
+            return l.Where(x=>h.Contains(x.nBlock)).ToList();
         }
         public void DFS(ControlFlowGraph CFG, BaseBlock b, int d, HashSet<int> h)
         {

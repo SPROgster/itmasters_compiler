@@ -80,7 +80,9 @@ namespace simplelangTests
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
                 NaturalCycles n = new NaturalCycles();
-                Console.WriteLine(n.GetLoop(CFG,6,1));
+                var l=n.GetLoop(CFG, 6, 1).Select(x=>x.nBlock).OrderBy(x=>x).ToList();
+                var rightl=new List<int>(new int[] {1,3,4,5,6});
+                Assert.IsTrue(l.SequenceEqual(rightl));
             }
         }
     }
