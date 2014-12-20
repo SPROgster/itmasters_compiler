@@ -8,7 +8,13 @@ namespace SimpleLang.MiddleEnd
     public class BaseBlock: ICloneable
     {
         public LinkedList<CodeLine> Code = new LinkedList<CodeLine>();
-        
+        public int nBlock { get; set; }        
+
+        public BaseBlock(int n = 0)
+        {
+            this.nBlock = n;
+        }
+
         public void Add(CodeLine val)
         {
             Code.AddLast(val);
@@ -16,7 +22,7 @@ namespace SimpleLang.MiddleEnd
 
         public object Clone()
         {
-            var NewBlock = new BaseBlock();
+            var NewBlock = new BaseBlock(nBlock);
             foreach(var cl in Code)
                 NewBlock.Add((CodeLine)cl.Clone());
             return NewBlock;
@@ -77,9 +83,9 @@ namespace SimpleLang.MiddleEnd
             Inputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
             Outputs = new Dictionary<BaseBlock, LinkedList<BaseBlock>>(Leaders.Count);
             Blocks = new LinkedList<BaseBlock>();
-
+            int nBlock = 0;
             //Второй проход - формируем базовые блоки
-            BaseBlock CurrentBlock = new BaseBlock();
+            BaseBlock CurrentBlock = new BaseBlock(nBlock++);
             Blocks.AddLast(CurrentBlock);
             Current = Code.First;
             //Будем сохранять информацию о том, какие блоки помечены метками и из каких блоков осуществляются переходы
@@ -100,7 +106,7 @@ namespace SimpleLang.MiddleEnd
                         GotoLabelsDest[Current.Value.First].AddLast(CurrentBlock);
                         if (Current.Next != null)
                         {
-                            CurrentBlock = new BaseBlock();
+                            CurrentBlock = new BaseBlock(nBlock++);
                             Blocks.AddLast(CurrentBlock);
                         }
                     }
@@ -114,7 +120,7 @@ namespace SimpleLang.MiddleEnd
                         }
                         if (Current.Next != null)
                         {
-                            BaseBlock Tmp = new BaseBlock();
+                            BaseBlock Tmp = new BaseBlock(nBlock++);
                             Outputs[CurrentBlock] = new LinkedList<BaseBlock>();
                             Outputs[CurrentBlock].AddLast(Tmp);
                             Inputs[Tmp] = new LinkedList<BaseBlock>();
@@ -147,14 +153,14 @@ namespace SimpleLang.MiddleEnd
                         Inputs[elem.Value].AddLast(dest);
                     }
             //Создаём фиктивный блок "вход"
-            BaseBlock EndBlock = new BaseBlock();
+            BaseBlock EndBlock = new BaseBlock(int.MinValue);
             Inputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock].AddLast(Blocks.First());
             Inputs[Blocks.First()].AddLast(EndBlock);
             Blocks.AddFirst(EndBlock);
             //Создаём фиктивный блок "выход"
-            EndBlock = new BaseBlock();
+            EndBlock = new BaseBlock(int.MaxValue);
             Inputs[EndBlock] = new LinkedList<BaseBlock>();
             Outputs[EndBlock] = new LinkedList<BaseBlock>();
             foreach(BaseBlock bl in Blocks)
@@ -192,7 +198,7 @@ namespace SimpleLang.MiddleEnd
         public BaseBlock GetEnd()
         {
             return Blocks.Last();
-        }
+        }        
     }
 
     //Виды операторов, которые могут встретиться в нашем трёхадресном коде

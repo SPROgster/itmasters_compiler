@@ -15,13 +15,7 @@ namespace SimpleLang.MiddleEnd
 
         static SymbolTable()
         {
-            // Initializing Symbol Table with all data types except for None
-            vars = new List<Tuple<string, CType, SymbolKind>>();
-            foreach (CType value in System.Enum.GetValues(typeof(CType)))
-                if (value != CType.None)
-                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), CType.None, SymbolKind.type));
-            foreach (string s in KeyWords)
-                vars.Add(new Tuple<string, CType, SymbolKind>(s,CType.None,SymbolKind.keyword));
+            Reset();
         }
 
         public static List<Tuple<string, CType, SymbolKind>> vars;
@@ -56,9 +50,18 @@ namespace SimpleLang.MiddleEnd
                 case "bool"     : return CType.Bool;
                 case "float"    : return CType.Float;
                 case "double"   : return CType.Double;
-				case "string"   : return CType.String;
+                case "string"   : return CType.String;
                 default         : return CType.None;
             }
+        }
+
+        public static void Reset()
+        {
+            // Initializing Symbol Table with all data types except for None
+            vars = new List<Tuple<string, CType, SymbolKind>>();
+            foreach (CType value in System.Enum.GetValues(typeof(CType)))
+                if (value != CType.None)
+                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), value, SymbolKind.type));
         }
 
         /// <summary>
