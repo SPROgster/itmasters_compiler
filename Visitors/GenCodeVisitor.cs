@@ -19,6 +19,37 @@ namespace SimpleLang.Visitors
             return LabelName + LabelCounter++;
         }
 
+        /// <summary>
+        /// Определяет какого типа должен быть результат операции по двум операторам
+        /// </summary>
+        /// <param name="op1">Первый операнд</param>
+        /// <param name="op2">Второй операнд</param>
+        /// <param name="op">Операция</param>
+        /// <returns>CType результата операции</returns>
+        private CType OpResultType(CType op1, CType op2, BinOpType op)
+        {
+            if (op2 == CType.None)
+                return op1;
+
+            if (op == BinOpType.Equal  || op == BinOpType.GEqual || op == BinOpType.Greater ||
+                op == BinOpType.LEqual || op == BinOpType.Less   || op == BinOpType.NEqual)
+                return CType.Bool;
+
+            if ((op1 == CType.String) || (op2 == CType.String))
+                return CType.String;
+
+            if ((op1 == CType.Float) || (op2 == CType.Float))
+                return CType.Float;
+
+            if ((op1 == CType.Int) || (op2 == CType.Int))
+                return CType.Int;
+
+            if ((op1 == CType.Bool) || (op2 == CType.Bool))
+                return CType.Bool;
+
+            return CType.None;
+        }
+
         public override void VisitAssignNode(AssignNode node)
         {
             if (node.Expr is BinOpNode)
@@ -58,6 +89,24 @@ namespace SimpleLang.Visitors
         {
             NamesValuesStack.Push(num.Num.ToString());
             CTypeValuesStack.Push(CType.Int);
+        }
+
+        public override void VisitFloatNumNode(FloatNumNode num)
+        {
+            NamesValuesStack.Push(num.Num.ToString());
+            CTypeValuesStack.Push(CType.Float);
+        }
+
+        public override void VisitBoolNode(BoolNode val)
+        {
+            NamesValuesStack.Push(val.Val.ToString());
+            CTypeValuesStack.Push(CType.Bool);
+        }
+
+        public override void VisitStringNode(StringNode val)
+        {
+            NamesValuesStack.Push(val.Val);
+            CTypeValuesStack.Push(CType.String);
         }
 
         public override void VisitBinOpNode(BinOpNode binop)
@@ -162,6 +211,23 @@ namespace SimpleLang.Visitors
             node.StatIf.Visit(this);
             Code.AddLast(new CodeLine(AfterIfLabel, null,
                null, null, OperatorType.Nop));
+
+            // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
+            CTypeValuesStack.Pop();
+        }
+
+        public override void VisitWriteNode(WriteNode node)
+        {
+            string WriteVariable = SymbolTable.NextTemp();
+
+            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(WriteVariable, CType.String, SymbolKind.var));
+
+            node.Expr.Visit(this);
+
+            Code.AddLast(new CodeLine(null, WriteVariable,
+                         NamesValuesStack.Pop(), null, BinOpType.None));
+            Code.AddLast(new CodeLine(null, WriteVariable,
+                         null, null, OperatorType.Write));
 
             // Снимаем со стеко типов столько же элементов, сколько сняли с стека имен
             CTypeValuesStack.Pop();

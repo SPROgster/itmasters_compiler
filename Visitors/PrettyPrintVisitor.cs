@@ -28,9 +28,17 @@ namespace SimpleLang.Visitors
         {
             Text += id.Name;
         }
-        public override void VisitIntNumNode(IntNumNode num) 
+        public override void VisitFloatNumNode(FloatNumNode num) 
         {
             Text += num.Num.ToString();
+        }
+        public override void VisitBoolNode(BoolNode val)
+        {
+            Text += val.Val.ToString();
+        }
+        public override void VisitStringNode(StringNode val)
+        {
+            Text += val.Val;
         }
         public override void VisitBinOpNode(BinOpNode binop) 
         {

@@ -202,7 +202,7 @@ namespace SimpleLang.MiddleEnd
     }
 
     //Виды операторов, которые могут встретиться в нашем трёхадресном коде
-    public enum OperatorType { Nop, Goto, If, Assign }
+    public enum OperatorType { Nop, Goto, If, Assign, Write }
 
     public class CodeLine: ICloneable
     {
@@ -244,6 +244,9 @@ namespace SimpleLang.MiddleEnd
 
                 case OperatorType.Nop:
                     return ToReturn + "nop";
+
+                case OperatorType.Write:
+                    return ToReturn + "write (" + First + ")";
 
                 //Присваивание
                 default: 
