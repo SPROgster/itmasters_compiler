@@ -1,4 +1,24 @@
 begin
-	var f : float;
-	f := 1.5
+	var s, i, j, k : int;
+	i := 1;
+	k := 2;
+	while (j < 10)
+	begin
+	    k := 3;
+		s := s + i;
+		i := i + i;
+		j := j + 1
+	end;
+	k := j;
+	k := k + s;
+	begin
+		j := j + 1;
+		k := 4
+    end;
+	while (k > 1)
+	begin
+		s := s + 1
+	end;
+	
+	write("s = " + s + "\ni = " + i + "\nj = " + j + "\nk = " + k)
 end
