@@ -33,6 +33,12 @@ namespace SimpleLang.CodeGenerator
             /// Таблица имя переменной - индекс локальной переменной
             /// </summary>
             private Dictionary<string, IndexType> varsIndex = new Dictionary<string, IndexType>();
+			/// <summary>
+			/// Список временных переменных для перевода в строку
+			/// </summary>
+			private Dictionary<CType, IndexType> toStringLocals = new Dictionary<CType, IndexType>();
+
+
             /// <summary>
             /// Внутреняя часть дерективы со списком локальных переменных
             /// </summary>
@@ -97,6 +103,38 @@ namespace SimpleLang.CodeGenerator
                     }
                 }
             }
+
+			/// <summary>
+			/// Добавление временной переменной для перевода в строку
+			/// </summary>
+			/// <returns>Индекс строковой переменной</returns>
+			/// <param name="type">Тип переменной</param>
+			public IndexType toStringTemp(CType type)
+			{
+				if (!toStringLocals.ContainsKey(type))
+				{
+					IndexType local = new IndexType(varsIndex.Count, type);
+					varsIndex.Add("toString" + type.ToString(), local);
+					toStringLocals.Add(type, local);
+
+					// Добавляем недавно добавленную переменную
+					// Строка описания локальной переменной при дириктиве .local
+					string varText =
+							"[" + local.Item1.ToString() + "] " 
+							+ ILType[local.Item2] 
+							+ " toString" + type.ToString();
+
+					// Если список переменных не пустой, то добавляем запятую
+					if (varsIndex.Count > 1)
+						varText = ",\n" + varText;
+
+					localDirectiveList += varText;
+
+					return local;
+				}
+				else
+					return toStringLocals[type];
+			}
 
             /// <summary>
             /// Перегруженная функция индексации

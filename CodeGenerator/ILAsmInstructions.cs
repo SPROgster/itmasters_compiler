@@ -18,8 +18,9 @@ namespace SimpleLang.CodeGenerator
         /// Спецификаторы типов операндов при инструкциях
         /// </summary>
         public static Dictionary<CType, string> ILOpType = new Dictionary<CType, string>();
+		public static Dictionary<CType, string> ILAddressType = new Dictionary<CType, string>();
 
-        public const int MaxStackSize = 2; // Для LEqual и других
+		public const int MaxStackSize = 3; // Для ToString()
 
         /// <summary>
         /// Заполняем значениями спецификаторы типов операндов при инструкциях
@@ -30,6 +31,11 @@ namespace SimpleLang.CodeGenerator
             ILOpType.Add(CType.Bool,    "i4");
             ILOpType.Add(CType.Float,   "r4");
             ILOpType.Add(CType.Double,  "r8");
+
+			ILAddressType.Add(CType.Int, "Int32");
+			ILAddressType.Add(CType.Bool, "Boolean");
+			ILAddressType.Add(CType.Float, "Single");
+			ILAddressType.Add(CType.Double, "Double");
         }
 
         /// <summary>
@@ -51,15 +57,12 @@ namespace SimpleLang.CodeGenerator
 			{
 				ValueParser value = new ValueParser(SymbolName);
 
-				switch (value.type) 
+				switch (value.type)
 				{
 				case CType.Bool:
 					return "ldc.i4 " + ((value.bvalue()) ? "1" : "0") + Environment.NewLine;
 
 				case CType.Double:
-					NumberFormatInfo nfi = new NumberFormatInfo();
-					nfi.NumberDecimalSeparator = ".";
-
 					return "ldc." + ILOpType[CType.Double] + " " + value.dvalue().ToString(CultureInfo.InvariantCulture) + Environment.NewLine;
 
 				case CType.Int:
@@ -88,6 +91,60 @@ namespace SimpleLang.CodeGenerator
 
             return "stloc " + Operand.Item1.ToString() + Environment.NewLine;
         }
+
+		/// <summary>
+		/// Функция переводящая переменную или константу в Строковый тип
+		/// </summary>
+		/// <returns>IL код перевода в строку</returns>
+		/// <param name="SymbolName">Имя символа</param>
+		public static string toString(string SymbolName)
+		{
+			IndexType Operand = Local[SymbolName];
+
+			string code = "";
+
+			if (Operand == null)
+			{
+				ValueParser value = new ValueParser(SymbolName);
+
+				switch (value.type) 
+				{
+				case CType.Bool:
+					code += "ldc.i4." + ((value.bvalue()) ? "1" : "0") + Environment.NewLine;
+					break;
+
+				case CType.Double:
+					code += "ldc." + ILOpType[CType.Double] + " " + value.dvalue().ToString(CultureInfo.InvariantCulture) + Environment.NewLine;
+					break;
+
+				case CType.Int:
+					code += "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
+					break;
+
+				// Float тут быть не может
+				default:
+					return "ldstr \"" + SymbolName + "\"" + Environment.NewLine;
+					break;
+				}
+
+				IndexType tmpVar = Local.toStringTemp(value.type);
+				code += "stloc "  + tmpVar.Item1.ToString() + Environment.NewLine;
+				code += "ldloca " + tmpVar.Item1.ToString() + Environment.NewLine;
+				code += "constrained. [mscorlib]System." + ILAddressType[value.type] + Environment.NewLine;
+				code += "callvirt instance string object::ToString()" + Environment.NewLine;
+			}
+			// Иначе кладем на стек по номеру элемента
+			else
+			{
+				code += "ldloca " + Operand.Item1.ToString() + Environment.NewLine;
+				code += "constrained. [mscorlib]System." + ILAddressType[Operand.Item2] + Environment.NewLine;
+				code += "callvirt instance string object::ToString()" + Environment.NewLine;
+
+				//return "ldloc " + Operand.Item1.ToString() + Environment.NewLine;
+			}
+
+			return code;
+		}
 
         /// <summary>
         /// Генерация одной или несколько IL инструкций по line трехадресному коду
