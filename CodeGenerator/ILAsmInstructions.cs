@@ -329,23 +329,8 @@ namespace SimpleLang.CodeGenerator
                     throw new Exception("Неизвестный новый оператор " + line.Operator.ToString());
             }
                // Это понадобится позже
-                // call       instance string [mscorlib]System.Int32::ToString()
                 // call       void [mscorlib]System.Console::WriteLine(string)
                 // call       void [mscorlib]System.Console::WriteLine(int32)
-
-                /*
-                 * .assembly extern mscorlib {} 
-                 * .assembly hello {}
-                 * .method static public void main() cil managed
-                 * {
-                 *      .entrypoint
-                 *      .maxstack 1 
-                 *      ldstr "Hello world!" 
-                 *      call void [mscorlib]System.Console::WriteLine(class System.String)
-                 *      ret
-                 * }
-                 * 
-                 * */
         }
     }
 }
