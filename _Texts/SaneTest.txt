@@ -18,5 +18,7 @@ begin
 	while (k > 1)
 	begin
 		s := s + 1
-	end
+	end;
+
+	write("s = " + s + "\ni = " + i + "\nj = " + j + "\nk = " + k)
 end

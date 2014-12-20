@@ -5,11 +5,14 @@ using System.Text;
 
 namespace SimpleLang.MiddleEnd
 {
-    public enum SymbolKind { type, var }
-    public enum CType { Int, Float, Double, Bool, None };
+    public enum SymbolKind { type, var, keyword}
+    public enum CType { Int, Float, Double, Bool, String, None };
 
     public static class SymbolTable // Таблица символов
     {
+        public static string[] KeyWords = {"begin", "end", "cycle", "while", "if", "else",
+                                              "write", "var", "true", "false" };
+
         static SymbolTable()
         {
             Reset();
@@ -47,6 +50,7 @@ namespace SimpleLang.MiddleEnd
                 case "bool"     : return CType.Bool;
                 case "float"    : return CType.Float;
                 case "double"   : return CType.Double;
+                case "string"   : return CType.String;
                 default         : return CType.None;
             }
         }
@@ -75,6 +79,9 @@ namespace SimpleLang.MiddleEnd
             if (op == BinOpType.Equal || op == BinOpType.GEqual || op == BinOpType.Greater ||
                 op == BinOpType.LEqual || op == BinOpType.Less || op == BinOpType.NEqual)
                 return CType.Bool;
+
+            if ((op1 == CType.String) || (op2 == CType.String))
+                return CType.String;
 
             if ((op1 == CType.Double) || (op2 == CType.Double))
                 return CType.Double;

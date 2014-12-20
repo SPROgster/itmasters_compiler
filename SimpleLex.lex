@@ -8,8 +8,9 @@ Alpha 	[a-zA-Z_]
 Digit   [0-9] 
 AlphaDigit {Alpha}|{Digit}
 INTNUM  {Digit}+
-REALNUM {INTNUM}\.{INTNUM}
-ID {Alpha}{AlphaDigit}* 
+FLOATNUM {INTNUM}\.{INTNUM}
+ID {Alpha}{AlphaDigit}*
+STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 
 %%
 
@@ -35,9 +36,16 @@ ID {Alpha}{AlphaDigit}*
   return (int)Tokens.INUM; 
 }
 
-{REALNUM} { 
-  yylval.dVal = double.Parse(yytext); 
-  return (int)Tokens.RNUM;
+{STRING} { 
+  yylval.sVal = yytext; 
+  return (int)Tokens.STRING; 
+}
+
+{FLOATNUM} { 
+  NumberFormatInfo nfi = new NumberFormatInfo();
+  nfi.NumberDecimalSeparator = ".";
+  yylval.fVal = float.Parse(yytext, nfi);
+  return (int)Tokens.FNUM;
 }
 
 {ID}  { 
@@ -88,6 +96,8 @@ class ScannerHelper
 	keywords.Add("else",(int)Tokens.ELSE);
 	keywords.Add("while",(int)Tokens.WHILE);
 	keywords.Add("write",(int)Tokens.WRITE);
+	keywords.Add("true",(int)Tokens.TRUE);
+	keywords.Add("false",(int)Tokens.FALSE);
   }
   public static int GetIDToken(string s)
   {
