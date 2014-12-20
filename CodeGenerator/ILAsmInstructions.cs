@@ -130,7 +130,6 @@ namespace SimpleLang.CodeGenerator
                     default:
                         return "ldstr " + SymbolName + Environment.NewLine;
                         //return "ldstr \"" + SymbolName.Substring(1, SymbolName.Length - 2) + "\"" + Environment.NewLine;
-                        break;
                 }
 
                 IndexType tmpVar = Local.toStringTemp(value.type);

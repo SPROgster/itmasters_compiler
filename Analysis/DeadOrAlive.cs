@@ -128,6 +128,7 @@ namespace SimpleLang.Analysis
 
     public class DefUseContext : Context<Tuple<StringSet, StringSet>>
     {
+        //Функция проверяет, что текущий операнд - это идентификатор, ещё не попавший в def
         private bool GoodOperand(BaseBlock block, string s)
         {
             return s != null && (Char.IsLetter(s[0]) || s[0] == '_') && !this[block].Item1.Contains(s);
@@ -141,18 +142,25 @@ namespace SimpleLang.Analysis
                 this[block] = new Tuple<StringSet, StringSet>(new StringSet(), new StringSet());
                 foreach (CodeLine line in block.Code)
                 {
-                    if (line.Operator == OperatorType.Assign)
-                    {
-                        if (GoodOperand(block, line.Second))
-                            this[block].Item2.Add(line.Second);
-                        if (GoodOperand(block, line.Third))
-                            this[block].Item2.Add(line.Third);
-                        this[block].Item1.Add(line.First);
-                    }
-                    else
-                        if (line.Operator == OperatorType.If)
+                    //Использование переменной может встретиться в присваивании, условном операторе и операторе вывода
+                    switch (line.Operator)
+                    { 
+                        case OperatorType.Assign:
+                            if (GoodOperand(block, line.Second))
+                                this[block].Item2.Add(line.Second);
+                            if (GoodOperand(block, line.Third))
+                                this[block].Item2.Add(line.Third);
+                            this[block].Item1.Add(line.First);
+                            break;
+                        case OperatorType.If:
                             if (GoodOperand(block, line.First))
                                 this[block].Item2.Add(line.First);
+                            break;
+                        case OperatorType.Write:
+                            if (GoodOperand(block, line.First))
+                                this[block].Item2.Add(line.First);
+                            break;
+                    }                       
                 }
             }
         }
