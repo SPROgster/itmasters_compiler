@@ -177,7 +177,8 @@ namespace SimpleLang.CodeGenerator
             }
 
 			IndexType Operand = Local[line.First];
-			if (Operand.Item2 == CType.String && line.Operator == OperatorType.Assign &&
+			if (line.Operator == OperatorType.Assign &&
+				Operand.Item2 == CType.String && line.Operator == OperatorType.Assign &&
 				!(line.BinOp == BinOpType.None || line.BinOp == BinOpType.Plus))
 				throw new Exception("Supported string operations is := and +, not a " + line.BinOp.ToString());
 
