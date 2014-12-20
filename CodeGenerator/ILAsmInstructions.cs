@@ -128,7 +128,8 @@ namespace SimpleLang.CodeGenerator
 
 				// Float тут быть не может
 				default:
-					return "ldstr \"" + SymbolName + "\"" + Environment.NewLine;
+					return "ldstr " + SymbolName + Environment.NewLine;
+					//return "ldstr \"" + SymbolName.Substring(1, SymbolName.Length - 2) + "\"" + Environment.NewLine;
 					break;
 				}
 
@@ -331,6 +332,12 @@ namespace SimpleLang.CodeGenerator
                     code += pushId(line.First);
                     code += "brtrue " + line.Second;
                     return code;
+
+				case OperatorType.Write:
+					code += pushId(line.First);
+					code += "call void [mscorlib]System.Console::WriteLine(string)" + Environment.NewLine;
+					return code;
+
                 default:
                     throw new Exception("Неизвестный новый оператор " + line.Operator.ToString());
             }
