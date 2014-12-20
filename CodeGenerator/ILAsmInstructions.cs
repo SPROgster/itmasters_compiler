@@ -141,6 +141,12 @@ namespace SimpleLang.CodeGenerator
 			// Иначе кладем на стек по номеру элемента
 			else
 			{
+				if (Operand.Item2 == CType.String)
+				{
+					code += "ldloc " + Operand.Item1.ToString() + Environment.NewLine;
+					return code;
+				}
+
 				code += "ldloca " + Operand.Item1.ToString() + Environment.NewLine;
 				code += "constrained. [mscorlib]System." + ILAddressType[Operand.Item2] + Environment.NewLine;
 				code += "callvirt instance string object::ToString()" + Environment.NewLine;
@@ -172,7 +178,7 @@ namespace SimpleLang.CodeGenerator
 			IndexType Operand = Local[line.First];
 			if (Operand.Item2 == CType.String && line.Operator == OperatorType.Assign &&
 				!(line.BinOp == BinOpType.None || line.BinOp == BinOpType.Plus))
-				throw new Exception("Supporteg string operations is := and +, not a " + line.BinOp.ToString());
+				throw new Exception("Supported string operations is := and +, not a " + line.BinOp.ToString());
 
             switch (line.Operator)
             {
