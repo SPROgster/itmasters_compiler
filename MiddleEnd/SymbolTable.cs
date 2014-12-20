@@ -77,6 +77,9 @@ namespace SimpleLang.MiddleEnd
                 op == BinOpType.LEqual || op == BinOpType.Less || op == BinOpType.NEqual)
                 return CType.Bool;
 
+			if ((op1 == CType.String) || (op2 == CType.String))
+				return CType.String;
+
             if ((op1 == CType.Double) || (op2 == CType.Double))
                 return CType.Double;
 
