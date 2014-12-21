@@ -31,8 +31,8 @@ namespace SimpleLang.Analysis
         /// <returns>CType выражения</returns>
         public CType Type()
         {
-            CType arg1Type = SymbolTable.vars[SymbolTable.IndexOfIdent(Op1)].Item2;
-            CType arg2Type = SymbolTable.vars[SymbolTable.IndexOfIdent(Op2)].Item2;
+            CType arg1Type = SymbolTable.vars[Op1].Item1;
+            CType arg2Type = SymbolTable.vars[Op2].Item1;
             return SymbolTable.OpResultType(arg1Type, arg2Type, Operation);
         }
 

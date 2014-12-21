@@ -5,6 +5,7 @@ using SimpleScanner;
 using SimpleParser;
 using System.IO;
 using SimpleLang.MiddleEnd;
+using SimpleCompiler;
 
 namespace simplelangTests
 {
@@ -14,19 +15,12 @@ namespace simplelangTests
         [TestMethod]
         public void GraphBBL_1_0()
         {
-            string FileName = @"..\..\Test3.txt";
-            string Text = File.ReadAllText(FileName);
-            Scanner scanner = new Scanner();
-            scanner.SetSource(Text, 0);
-            Parser parser = new Parser(scanner);
-            var b = parser.Parse();
-            var sne = new CheckVariablesVisitor();
-            parser.root.Visit(sne);
-            GenCodeVisitor gcv = new GenCodeVisitor();
-            parser.root.Visit(gcv);
-            gcv.RemoveEmptyLabels();
-            ControlFlowGraph CFG = new ControlFlowGraph(gcv.Code);
-            Assert.AreEqual(10, CFG.GetBlocks().Count);
+             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
+             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
+             {
+                 var CFG = SimpleCompilerMain.BuildCFG(Root);
+                 Assert.AreEqual(10, CFG.GetBlocks().Count);
+             }
         }
     }
 }

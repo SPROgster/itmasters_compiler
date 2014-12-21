@@ -33,21 +33,6 @@ namespace SimpleLang.Analysis
             Elems[index] = value;
         }
 
-        public ISet<bool> Intersect(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f && s).ToArray());
-        }
-
-        public ISet<bool> Union(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f || s).ToArray());
-        }
-
-        public ISet<bool> Subtract(ISet<bool> b)
-        {
-            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => s ? false : f).ToArray());
-        }
-
         public object Clone()
         {
             return new BitSet(Elems);
@@ -81,6 +66,21 @@ namespace SimpleLang.Analysis
         public static BitSet Subtract(BitSet a, BitSet b)
         {
             return (BitSet)a.Subtract(b);
+        }
+
+        public IndexedSet<int, bool> Intersect(IndexedSet<int, bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f && s).ToArray());
+        }
+
+        public IndexedSet<int, bool> Union(IndexedSet<int, bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => f || s).ToArray());
+        }
+
+        public IndexedSet<int, bool> Subtract(IndexedSet<int, bool> b)
+        {
+            return new BitSet(Elems.Zip(((BitSet)b).Elems, (f, s) => s ? false : f).ToArray());
         }
     }
 

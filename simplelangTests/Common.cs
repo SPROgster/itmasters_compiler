@@ -17,13 +17,13 @@ namespace SimpleLangTests
         [TestMethod]
         public void TestSymbolTable()
         {
-            string FileName = @"..\..\Test1.txt";
+            string FileName = "../../_Texts/Test1.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
             Parser parser = new Parser(scanner);
             var b = parser.Parse();
-            var sne = new CheckVariablesVisitor();
+            var sne = new CheckSemanticsVisitor();
             parser.root.Visit(sne);
             Assert.AreEqual(true,SymbolTable.Contains("i"), "В таблице символов не содержится переменная i");
             Assert.AreEqual(true,SymbolTable.Contains("k"), "В таблице символов не содержится переменная i");
@@ -31,13 +31,13 @@ namespace SimpleLangTests
         [TestMethod]
         public void TestThreeCode()
         {
-            string FileName = @"..\..\Test2.txt";
+            string FileName = "../../_Texts/Test2.txt";
             string Text = File.ReadAllText(FileName);
             Scanner scanner = new Scanner();
             scanner.SetSource(Text, 0);
             Parser parser = new Parser(scanner);
             var b = parser.Parse();
-            var sne = new CheckVariablesVisitor();
+            var sne = new CheckSemanticsVisitor();
             parser.root.Visit(sne);
             GenCodeVisitor gcv = new GenCodeVisitor();
             parser.root.Visit(gcv);

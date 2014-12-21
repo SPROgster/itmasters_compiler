@@ -1,0 +1,12 @@
+begin
+	var i,j,m:int;
+	i:=1;
+	j:=2;
+	m:=3;
+	i:=m-1;
+	while(i>j)
+	begin
+		i:=m;
+		j:=i-1
+	end
+end

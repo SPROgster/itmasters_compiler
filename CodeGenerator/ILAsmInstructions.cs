@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using SimpleLang.MiddleEnd;
 
@@ -17,8 +18,9 @@ namespace SimpleLang.CodeGenerator
         /// Спецификаторы типов операндов при инструкциях
         /// </summary>
         public static Dictionary<CType, string> ILOpType = new Dictionary<CType, string>();
+        public static Dictionary<CType, string> ILAddressType = new Dictionary<CType, string>();
 
-        public const int MaxStackSize = 2; // Для LEqual и других
+        public const int MaxStackSize = 3; // Для ToString()
 
         /// <summary>
         /// Заполняем значениями спецификаторы типов операндов при инструкциях
@@ -29,6 +31,11 @@ namespace SimpleLang.CodeGenerator
             ILOpType.Add(CType.Bool,    "i4");
             ILOpType.Add(CType.Float,   "r4");
             ILOpType.Add(CType.Double,  "r8");
+
+            ILAddressType.Add(CType.Int, "Int32");
+            ILAddressType.Add(CType.Bool, "Boolean");
+            ILAddressType.Add(CType.Float, "Single");
+            ILAddressType.Add(CType.Double, "Double");
         }
 
         /// <summary>
@@ -41,13 +48,35 @@ namespace SimpleLang.CodeGenerator
         /// </summary>
         /// <param name="SymbolName">Имя символа</param>
         /// <returns>IL инструкция</returns>
-        public static string pushId(string SymbolName)
+        public static string pushId(string SymbolName, CType result = CType.None)
         {
+            if (result == CType.String)
+                return toString(SymbolName);
+
             IndexType Operand = Local[SymbolName];
 
             // Если истина, то у нас присваивание константе
             if (Operand == null)
-                return "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
+            {
+                ValueParser value = new ValueParser(SymbolName);
+
+                switch (value.type)
+                {
+                    case CType.Bool:
+                        return "ldc.i4 " + ((value.bvalue()) ? "1" : "0") + Environment.NewLine;
+
+                    case CType.Double:
+                        return "ldc." + ILOpType[CType.Double] + " " + value.dvalue().ToString(CultureInfo.InvariantCulture) + Environment.NewLine;
+
+                    case CType.Int:
+                        if (result == CType.Double || result == CType.Float)
+                            return "ldc." + ILOpType[result] + " " + SymbolName + "." + Environment.NewLine;
+                        return "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
+
+                    default:
+                        return "ldstr \"" + SymbolName + "\"" + Environment.NewLine;
+                    }
+                }
             // Иначе кладем на стек по номеру элемента
             else
                 return "ldloc " + Operand.Item1.ToString() + Environment.NewLine;
@@ -69,6 +98,66 @@ namespace SimpleLang.CodeGenerator
         }
 
         /// <summary>
+        /// Функция переводящая переменную или константу в Строковый тип
+        /// </summary>
+        /// <returns>IL код перевода в строку</returns>
+        /// <param name="SymbolName">Имя символа</param>
+        public static string toString(string SymbolName)
+        {
+            IndexType Operand = Local[SymbolName];
+
+            string code = "";
+
+            if (Operand == null)
+            {
+                ValueParser value = new ValueParser(SymbolName);
+
+                switch (value.type)
+                {
+                    case CType.Bool:
+                        code += "ldc.i4." + ((value.bvalue()) ? "1" : "0") + Environment.NewLine;
+                        break;
+
+                    case CType.Double:
+                        code += "ldc." + ILOpType[CType.Double] + " " + value.dvalue().ToString(CultureInfo.InvariantCulture) + Environment.NewLine;
+                        break;
+
+                    case CType.Int:
+                        code += "ldc." + ILOpType[CType.Int] + " " + SymbolName + Environment.NewLine;
+                        break;
+
+                    // Float тут быть не может
+                    default:
+                        return "ldstr " + SymbolName + Environment.NewLine;
+                        //return "ldstr \"" + SymbolName.Substring(1, SymbolName.Length - 2) + "\"" + Environment.NewLine;
+                }
+
+                IndexType tmpVar = Local.toStringTemp(value.type);
+                code += "stloc "  + tmpVar.Item1.ToString() + Environment.NewLine;
+                code += "ldloca " + tmpVar.Item1.ToString() + Environment.NewLine;
+                code += "constrained. [mscorlib]System." + ILAddressType[value.type] + Environment.NewLine;
+                code += "callvirt instance string object::ToString()" + Environment.NewLine;
+            }
+            // Иначе кладем на стек по номеру элемента
+            else
+            {
+                if (Operand.Item2 == CType.String)
+                {
+                    code += "ldloc " + Operand.Item1.ToString() + Environment.NewLine;
+                    return code;
+                }
+
+                code += "ldloca " + Operand.Item1.ToString() + Environment.NewLine;
+                code += "constrained. [mscorlib]System." + ILAddressType[Operand.Item2] + Environment.NewLine;
+                code += "callvirt instance string object::ToString()" + Environment.NewLine;
+
+                //return "ldloc " + Operand.Item1.ToString() + Environment.NewLine;
+            }
+
+            return code;
+        }
+
+        /// <summary>
         /// Генерация одной или несколько IL инструкций по line трехадресному коду
         /// </summary>
         /// <param name="line">Строка трехадресного кода</param>
@@ -86,6 +175,12 @@ namespace SimpleLang.CodeGenerator
                 return code;
             }
 
+            IndexType Operand = Local[line.First];
+            if (line.Operator == OperatorType.Assign &&
+                Operand.Item2 == CType.String && line.Operator == OperatorType.Assign &&
+                !(line.BinOp == BinOpType.None || line.BinOp == BinOpType.Plus))
+                throw new Exception("Supported string operations is := and +, not a " + line.BinOp.ToString());
+
             switch (line.Operator)
             {
                 case OperatorType.Assign:
@@ -93,16 +188,19 @@ namespace SimpleLang.CodeGenerator
                     {
                         // Присваивание вида a:=b
                         case BinOpType.None:
-                            code += pushId(line.Second);
+                            code += pushId(line.Second, Operand.Item2);
                             code += popId(line.First);
 
                             return code;
                         // Операция "+"
                         case BinOpType.Plus:
-                            code += pushId(line.Second);
-                            code += pushId(line.Third);
+                            code += pushId(line.Second, Operand.Item2);
+                            code += pushId(line.Third, Operand.Item2);
 
-                            code += "add" + Environment.NewLine;
+                            if (Operand.Item2 == CType.String)
+                                code += "call string string::Concat(string, string)" + Environment.NewLine;
+                            else
+                                code += "add" + Environment.NewLine;
 
                             code += popId(line.First);
                             return code;
@@ -234,27 +332,15 @@ namespace SimpleLang.CodeGenerator
                     code += pushId(line.First);
                     code += "brtrue " + line.Second;
                     return code;
+
+                case OperatorType.Write:
+                    code += pushId(line.First);
+                    code += "call void [mscorlib]System.Console::WriteLine(string)" + Environment.NewLine;
+                    return code;
+
                 default:
                     throw new Exception("Неизвестный новый оператор " + line.Operator.ToString());
             }
-               // Это понадобится позже
-                // call       instance string [mscorlib]System.Int32::ToString()
-                // call       void [mscorlib]System.Console::WriteLine(string)
-                // call       void [mscorlib]System.Console::WriteLine(int32)
-
-                /*
-                 * .assembly extern mscorlib {} 
-                 * .assembly hello {}
-                 * .method static public void main() cil managed
-                 * {
-                 *      .entrypoint
-                 *      .maxstack 1 
-                 *      ldstr "Hello world!" 
-                 *      call void [mscorlib]System.Console::WriteLine(class System.String)
-                 *      ret
-                 * }
-                 * 
-                 * */
         }
     }
 }

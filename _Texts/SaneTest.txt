@@ -1,5 +1,7 @@
 begin
 	var s, i, j, k : int;
+	var bb: bool;
+	bb := true;
 	i := 1;
 	k := 2;
 	while (j < 10)
@@ -18,5 +20,7 @@ begin
 	while (k > 1)
 	begin
 		s := s + 1
-	end
+	end;
+
+	write("s = " + s + "\ni = " + i + "\nj = " + j + "\nk = " + k)
 end

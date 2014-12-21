@@ -7,7 +7,7 @@ using SimpleLang.MiddleEnd;
 
 namespace SimpleLang.Visitors
 {
-    public class CheckVariablesVisitor:AutoVisitor
+    public class CheckSemanticsVisitor:AutoVisitor
     {
         public List<String> Errors = new List<string>();
         // Flag for adding new vars in VisitIdNode, else - using
@@ -43,6 +43,19 @@ namespace SimpleLang.Visitors
             else
                 if (!SymbolTable.Contains(id.Name))
                     Errors.Add("Переменная " + id.Name + " не была описана ранее");
+        }
+
+        public override void VisitBinOpNode(BinOpNode binop)
+        {
+            base.VisitBinOpNode(binop);
+            if(binop.Type==CType.None)
+                Errors.Add(String.Format("Несовместимые типы операндов в выражении {0}",binop.ToString()));
+        }
+
+        public override void VisitAssignNode(AssignNode a)
+        {
+            base.VisitAssignNode(a);
+
         }
     }
 }

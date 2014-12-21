@@ -31,5 +31,11 @@ namespace SimpleLang.Optimizations
             block.Code = new LinkedList<CodeLine>(bl2);
             return result;
         }
+
+
+        public string GetName()
+        {
+            return "Удаление мёртвого кода";
+        }
     }
 }

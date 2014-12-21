@@ -1,22 +1,29 @@
-﻿using System;
+﻿using SimpleLang.Analysis;
+using SimpleLang.MiddleEnd;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using SimpleLang.Analysis;
-using SimpleLang.MiddleEnd;
-
 namespace SimpleLang.Optimizations
 {
-    class AliveVarsOptimization
+    public class AliveVarsOptimization : GlobalOptimization
     {
-        public static void optimize(Tuple<Dictionary<BaseBlock, SetAdapter<string>>, Dictionary<BaseBlock, SetAdapter<string>>> ava, 
-                                    ControlFlowGraph CFG)
+        public string GetName()
         {
+            return "Удаление мертвых переменных между блоками";
+        }
+
+        public bool Optimize(ControlFlowGraph CFG)
+        {
+            AliveVarsAlgorithm AVA = new AliveVarsAlgorithm(CFG);
+            var ava = AVA.Apply();
+            //Tuple<Dictionary<BaseBlock, SetAdapter<string>>, Dictionary<BaseBlock, SetAdapter<string>>> ava = null;
             // Если программа состоит из одного блока (+1 CFG.GetStart, +1 CFG.GetEnd)
             // То выходим, т.к. оптимизация межблочная
-            if (ava.Item1.Keys.Count <= 3) 
-                return;
+            bool ifchangesmth = false;
+            if (ava.Item1.Keys.Count <= 3)
+                return ifchangesmth;
             foreach (var block in ava.Item1.Keys)
                 if (block != CFG.GetStart() && block != CFG.GetEnd())
                 {
@@ -30,15 +37,17 @@ namespace SimpleLang.Optimizations
                         if (left.StartsWith("_t")) // skip temp variable
                             continue;
                         // Maybe there is not third variable in assign node
-                        if ((!codeline.Second.Equals(left)) && ( (codeline.Third == null) || (!codeline.Third.Equals(left)) ))
+                        if ((!codeline.Second.Equals(left)) && ((codeline.Third == null) || (!codeline.Third.Equals(left))))
                             if (!(ava.Item2[block].Contains(left))) // if left not contains in Out
                             {
                                 res.RemoveAt(i); // deleting and moving iterator
                                 --i;
+                                ifchangesmth = true;
                             }
                     }
                     block.Code = new LinkedList<CodeLine>(res); // back assign
                 }
+            return ifchangesmth;
         }
     }
 }

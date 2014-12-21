@@ -21,11 +21,13 @@ namespace SimpleCompiler
         public static string Help = @"
 Запуск программы: simplelang.exe <имя_компилируемого_файла> [<опции>]
 Доступные опции:
-    -p - выводить содержимое структур внутреннего представления, получаемых в процессе компиляции
+    -p [<имя_файла>] - выводить содержимое структур внутреннего представления, получаемых в процессе компиляции
     -lo <список_номеров_без_пробелов> - применить заданные внутриблочные (локальные) оптимизации
     -go <список_номеров_без_пробелов> - применить заданные межблочные (глобальные) оптимизации
     -a <список_номеров_без_пробелов> - провести заданный анализ программы
 ";
+
+        private static StreamWriter Output = null;
 
         public static void Main(string[] cmd)
         {
@@ -33,6 +35,16 @@ namespace SimpleCompiler
             if (!Directory.Exists(BinOutputDirectory))
                 Directory.CreateDirectory(BinOutputDirectory);
             bool ShouldPrint = cmd.Contains("-p");
+            if (ShouldPrint)
+            {
+                int ind = Array.IndexOf(cmd, "-p");
+                //Если после ключа -p есть имя файла
+                if (ind + 1 != cmd.Length && !cmd[ind + 1].StartsWith("-"))
+                {
+                    Output = new StreamWriter(cmd[ind + 1]);
+                    Console.SetOut(Output);
+                }
+            }
             //Получаем список локальных оптимизаций
             LocalOptimization[] LocalOp = AppDomain.CurrentDomain.GetAssemblies().
                 SelectMany(t => t.GetTypes()).
@@ -49,6 +61,10 @@ namespace SimpleCompiler
                 t.GetInterfaces().Contains(typeof(GlobalOptimization))).
                 Select(e => (GlobalOptimization)e.GetConstructor(new Type[0]).Invoke(new object[0])).
                 ToArray();
+            //Получаем список методов для запуска анализов
+            MethodInfo[] Analyzes = typeof(SimpleCompilerMain).GetMethods().
+                Where(e => e.IsStatic && e.Name.StartsWith("Run")).
+                ToArray();
             //Приступаем к анализу командной строки
             try
             {
@@ -59,10 +75,13 @@ namespace SimpleCompiler
                     Console.WriteLine(Help);
                     Console.WriteLine("Доступные внутриблочные оптимизации:");
                     for (int i = 0; i < LocalOp.Length; ++i)
-                        Console.WriteLine(i + " - " + LocalOp[i].GetType());
+                        Console.WriteLine(i + " - " + LocalOp[i].GetName());
                     Console.WriteLine("Доступные межблочные оптимизации:");
                     for (int i = 0; i < GlobalOp.Length; ++i)
-                        Console.WriteLine(i + " - " + GlobalOp[i].GetType());
+                        Console.WriteLine(i + " - " + GlobalOp[i].GetName());
+                    Console.WriteLine("Доступные анализы:");
+                    for (int i = 0; i < Analyzes.Length; ++i)
+                        Console.WriteLine(i + " - " + Analyzes[i].Name.Substring(3));
                 }
                 else
                 {
@@ -86,30 +105,36 @@ namespace SimpleCompiler
                                 Print("Семантический анализ завершён.");
                                 PrintSymbolTable();
                                 PrintCFG(CFG); 
-                                //
-                                var spTree = new SpanningTree(CFG);
-                                Console.WriteLine();
-                                Console.WriteLine("Остовное дерево:");
-                                spTree.Print();
-                                spTree.PrintEdges();                                                                
-                                //
                             }
-                            //Определяем, какие оптимизации нас попросили применить
+                            //Определяем, какие оптимизации и анализы нас попросили применить
                             int[] LOpIndex = null;
                             int[] GOpIndex = null;
-                            for(int i=0;i<cmd.Length;++i)
-                                if(cmd[i]=="-lo")
+                            int[] AIndex = null;
+                            for(int i=1;i<cmd.Length;++i)
+                                if (cmd[i] != "-p")
                                 {
-                                    LOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).ToArray();
-                                    ++i;
-                                }
-                                else
-                                    if (cmd[i] == "-go")
+                                    var Inds = cmd[i + 1].Select(e => int.Parse(e.ToString())).Distinct();
+                                    switch (cmd[i])
                                     {
-                                        GOpIndex = cmd[i + 1].Select(e => int.Parse(e.ToString())).ToArray();
-                                        ++i;
+                                        case "-lo":
+                                            LOpIndex = Inds.ToArray();
+                                            ++i;
+                                            break;
+                                        case "-go":
+                                            GOpIndex = Inds.ToArray();
+                                            ++i;
+                                            break;
+                                        case "-a":
+                                            AIndex = Inds.ToArray();
+                                            ++i;
+                                            break;
                                     }
-                            //Если надо применять хоть какую-то
+                                }
+                            //Проверяем, надо ли провести какие-то анализы
+                            if (AIndex != null && ShouldPrint)
+                                foreach (int ind in AIndex)
+                                    Analyzes[ind].Invoke(null, new object[]{CFG});
+                            //Если надо применять хоть какую-то оптимизацию
                             if (GOpIndex != null || LOpIndex != null)
                             {
                                 if (GOpIndex == null)
@@ -153,11 +178,12 @@ namespace SimpleCompiler
             catch (Exception e)
             {
                 Print(e.ToString());
+                PrintEnd();
+                return;
             }
             if(ShouldPrint)
             {
-                Console.Write("Для завершения работы программы нажмите Enter...");
-                Console.ReadLine();
+                PrintEnd();
             }
         }
 
