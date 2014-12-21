@@ -53,6 +53,20 @@ namespace SimpleCompiler
                 Console.WriteLine(rec);
         }
 
+        public static void PrintEnd()
+        {
+            if (Output != null)
+            {
+                Output.Close();
+                StreamWriter Std = new StreamWriter(Console.OpenStandardOutput(),
+                    System.Text.Encoding.GetEncoding(866));
+                Std.AutoFlush = true;
+                Console.SetOut(Std);
+            }
+            Console.Write("Для завершения работы программы нажмите Enter...");
+            Console.ReadLine();
+        }
+
         public static void Print(string msg)
         {
             Console.WriteLine();

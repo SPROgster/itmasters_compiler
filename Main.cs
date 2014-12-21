@@ -21,11 +21,13 @@ namespace SimpleCompiler
         public static string Help = @"
 Запуск программы: simplelang.exe <имя_компилируемого_файла> [<опции>]
 Доступные опции:
-    -p - выводить содержимое структур внутреннего представления, получаемых в процессе компиляции
+    -p [<имя_файла>] - выводить содержимое структур внутреннего представления, получаемых в процессе компиляции
     -lo <список_номеров_без_пробелов> - применить заданные внутриблочные (локальные) оптимизации
     -go <список_номеров_без_пробелов> - применить заданные межблочные (глобальные) оптимизации
     -a <список_номеров_без_пробелов> - провести заданный анализ программы
 ";
+
+        private static StreamWriter Output = null;
 
         public static void Main(string[] cmd)
         {
@@ -33,6 +35,16 @@ namespace SimpleCompiler
             if (!Directory.Exists(BinOutputDirectory))
                 Directory.CreateDirectory(BinOutputDirectory);
             bool ShouldPrint = cmd.Contains("-p");
+            if (ShouldPrint)
+            {
+                int ind = Array.IndexOf(cmd, "-p");
+                //Если после ключа -p есть имя файла
+                if (ind + 1 != cmd.Length && !cmd[ind + 1].StartsWith("-"))
+                {
+                    Output = new StreamWriter(cmd[ind + 1]);
+                    Console.SetOut(Output);
+                }
+            }
             //Получаем список локальных оптимизаций
             LocalOptimization[] LocalOp = AppDomain.CurrentDomain.GetAssemblies().
                 SelectMany(t => t.GetTypes()).
@@ -166,14 +178,12 @@ namespace SimpleCompiler
             catch (Exception e)
             {
                 Print(e.ToString());
-                Console.Write("Для завершения работы программы нажмите Enter...");
-                Console.ReadLine();
+                PrintEnd();
                 return;
             }
             if(ShouldPrint)
             {
-                Console.Write("Для завершения работы программы нажмите Enter...");
-                Console.ReadLine();
+                PrintEnd();
             }
         }
 
