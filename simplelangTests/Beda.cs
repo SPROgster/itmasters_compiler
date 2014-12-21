@@ -21,10 +21,10 @@ namespace simplelangTests
                 SimpleCompilerMain.PrintCFG(CFG,true);
                 Console.WriteLine();
                 Console.WriteLine("Анализ на живучесть");
-                List<CodeLine> bl = new List<CodeLine>(CFG.GetBlocks().First.Next.Value.Code);
+                List<CodeLine> bl = new List<CodeLine>(CFG.BlockAt(1).Code);
                 for (int i = 0; i < bl.Count; i++)
                 {
-                    Console.WriteLine(bl[i] + " " + DeadOrAlive.IsDead(CFG.GetBlocks().First.Next.Value, bl[i].First, i));
+                    Console.WriteLine(bl[i] + " " + DeadOrAlive.IsDead(CFG.BlockAt(1), bl[i].First, i));
                 }
                 Assert.IsTrue(DeadOrAlive.IsDead(CFG.BlockAt(1), "i", 0));
             }
