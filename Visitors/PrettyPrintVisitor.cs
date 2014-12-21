@@ -32,6 +32,10 @@ namespace SimpleLang.Visitors
         {
             Text += num.Num.ToString();
         }
+        public override void VisitIntNumNode(IntNumNode num)
+        {
+            Text += num.Num.ToString();
+        }
         public override void VisitBoolNode(BoolNode val)
         {
             Text += val.Val.ToString();
