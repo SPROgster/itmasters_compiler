@@ -17,7 +17,7 @@ namespace simplelangTests
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
                 SimpleCompilerMain.PrintCFG(CFG,true);
                 CleanDead cl = new CleanDead();
-                cl.Optimize(CFG.GetBlocks().First.Next.Value);
+                cl.Optimize(CFG.BlockAt(1));
                 SimpleCompilerMain.PrintCFG(CFG,true);
                 Assert.AreEqual(5, CFG.BlockAt(1).Code.Count);
             }

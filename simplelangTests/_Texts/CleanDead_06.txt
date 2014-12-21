@@ -1,0 +1,12 @@
+begin
+	var i,k: int;
+	i := 1;
+	i := 1;
+	i := i+1;
+	i := 6;
+	k := 2;
+	i:=k+2;
+	i:=6;
+	if (i>k)
+			k:=0
+end

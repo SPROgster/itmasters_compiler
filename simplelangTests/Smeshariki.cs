@@ -15,14 +15,14 @@ namespace simplelangTests
         [TestMethod]
         public void CSE_04()
         {
-             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test4.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/CSE_04.txt");
              if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
              {
                  var CFG = SimpleCompilerMain.BuildCFG(Root);
                  CSE cse = new CSE();
-                 SimpleCompilerMain.PrintCFG(CFG);
+                 SimpleCompilerMain.PrintCFG(CFG,true);
                  cse.Optimize(CFG.GetBlocks().First.Next.Value);
-                 SimpleCompilerMain.PrintCFG(CFG);
+                 SimpleCompilerMain.PrintCFG(CFG,true);
                  string f = CFG.GetBlocks().First.Next.Value.Code.First.Value.First;
                  Assert.IsTrue(f.StartsWith("_t"));
                  Assert.IsTrue(CFG.GetBlocks().First.Next.Value.Code.First.Value.Second.Equals("b"));

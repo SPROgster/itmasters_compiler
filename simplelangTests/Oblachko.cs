@@ -18,22 +18,24 @@ namespace simplelangTests
         [TestMethod]
         public void Fold_03()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test5.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Fold_03.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
                 SimpleCompilerMain.PrintCFG(CFG);
-                Fold.fold(ref CFG.GetBlocks().First.Value.Code);
+                Fold f=new Fold();
+                f.Optimize(CFG.GetBlocks().First.Next.Value);
                 SimpleCompilerMain.PrintCFG(CFG);
-                //Assert.AreEqual("5", myList[3].Second);
-                //Assert.AreEqual("-2", myList[4].Second);
-                //Assert.AreEqual("4", myList[5].Second);
+                List<CodeLine> l = new List<CodeLine>(CFG.BlockAt(1).Code);
+                Assert.AreEqual("5", l[3].Second);
+                Assert.AreEqual("-2", l[4].Second);
+                Assert.AreEqual("4", l[5].Second);
             }
         }
         [TestMethod]
         public void RDA_12()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/RDA_12.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
@@ -56,7 +58,7 @@ namespace simplelangTests
         [TestMethod]
         public void AliveVars_14()
         {
-             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/AliveVars_14.txt");
              if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
              {
                  var CFG = SimpleCompilerMain.BuildCFG(Root);

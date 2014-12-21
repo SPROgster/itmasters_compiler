@@ -15,7 +15,7 @@ namespace simplelangTests
         [TestMethod]
         public void GraphBBL_01()
         {
-             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/GraphBBL_01.txt");
              if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
              {
                  var CFG = SimpleCompilerMain.BuildCFG(Root);
