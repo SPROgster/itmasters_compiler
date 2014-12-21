@@ -19,37 +19,6 @@ namespace SimpleLang.Visitors
             return LabelName + LabelCounter++;
         }
 
-        /// <summary>
-        /// Определяет какого типа должен быть результат операции по двум операторам
-        /// </summary>
-        /// <param name="op1">Первый операнд</param>
-        /// <param name="op2">Второй операнд</param>
-        /// <param name="op">Операция</param>
-        /// <returns>CType результата операции</returns>
-        private CType OpResultType(CType op1, CType op2, BinOpType op)
-        {
-            if (op2 == CType.None)
-                return op1;
-
-            if (op == BinOpType.Equal  || op == BinOpType.GEqual || op == BinOpType.Greater ||
-                op == BinOpType.LEqual || op == BinOpType.Less   || op == BinOpType.NEqual)
-                return CType.Bool;
-
-            if ((op1 == CType.String) || (op2 == CType.String))
-                return CType.String;
-
-            if ((op1 == CType.Float) || (op2 == CType.Float))
-                return CType.Float;
-
-            if ((op1 == CType.Int) || (op2 == CType.Int))
-                return CType.Int;
-
-            if ((op1 == CType.Bool) || (op2 == CType.Bool))
-                return CType.Bool;
-
-            return CType.None;
-        }
-
         public override void VisitAssignNode(AssignNode node)
         {
             if (node.Expr is BinOpNode)
@@ -132,8 +101,7 @@ namespace SimpleLang.Visitors
             string HeaderLabel = NextLabel();
             //Счётчик цикла
             string CounterVar = SymbolTable.NextTemp();
-
-            SymbolTable.vars.Add(CounterVar, new Tuple<CType, SymbolKind>(CType.Bool, SymbolKind.var));
+            SymbolTable.vars.Add(CounterVar, new Tuple<CType, SymbolKind>(CType.Int, SymbolKind.var));
 
             //Находим начальное значение счётчика
             c.Expr.Visit(this);
@@ -143,6 +111,7 @@ namespace SimpleLang.Visitors
                 NamesValuesStack.Pop(), null, BinOpType.None));
             //Временная переменная для хранения результата сравнения
             string CompTemp = SymbolTable.NextTemp();
+            SymbolTable.vars.Add(CompTemp, new Tuple<CType, SymbolKind>(CType.Bool, SymbolKind.var));
             //Надо ли выполнять тело?
             Code.AddLast(new CodeLine(HeaderLabel, CompTemp,
                 CounterVar, "0", BinOpType.LEqual));
