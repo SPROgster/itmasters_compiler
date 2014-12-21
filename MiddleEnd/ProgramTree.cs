@@ -17,7 +17,7 @@ namespace SimpleLang.MiddleEnd
 
     public abstract class ExprNode : Node // базовый класс для всех выражений
     {
-        public abstract CType GetType();
+        public abstract CType Type { get; }
     }
 
     public class IdNode : ExprNode
@@ -30,9 +30,9 @@ namespace SimpleLang.MiddleEnd
             v.VisitIdNode(this);
         }
 
-        public override CType GetType()
+        public override CType Type
         {
-            return SymbolTable.vars[Name].Item1;
+            get { return SymbolTable.vars[Name].Item1; }
         }
 
         public override string ToString()
@@ -51,9 +51,9 @@ namespace SimpleLang.MiddleEnd
             v.VisitIntNumNode(this);
         }
 
-        public override CType GetType()
+        public override CType Type
         {
-            return CType.Int;
+            get { return CType.Int; }
         }
 
         public override string ToString()
@@ -72,9 +72,9 @@ namespace SimpleLang.MiddleEnd
             v.VisitFloatNumNode(this);
         }
 
-        public override CType GetType()
+        public override CType Type
         {
-            return CType.Float;
+            get { return CType.Float; }
         }
 
         public override string ToString()
@@ -93,9 +93,9 @@ namespace SimpleLang.MiddleEnd
             v.VisitBoolNode(this);
         }
 
-        public override CType GetType()
+        public override CType Type
         {
-            return CType.Bool;
+            get { return CType.Bool; }
         }
 
         public override string ToString()
@@ -114,9 +114,9 @@ namespace SimpleLang.MiddleEnd
             v.VisitStringNode(this);
         }
 
-        public override CType GetType()
+        public override CType Type
         {
-            return CType.String;
+            get { return CType.String; }
         }
 
         public override string ToString()
@@ -143,14 +143,17 @@ namespace SimpleLang.MiddleEnd
             v.VisitBinOpNode(this);
         }
 
-        public override CType GetType()
+        public override CType Type
         {
-            CType Op1 = Left.GetType();
-            CType Op2 = Right.GetType();
-            if (Op1 == CType.String || Op2 == CType.String)
-                return CType.String;
-            else
-                return Op1==Op2 ? Op1 : CType.None;
+            get
+            {
+                CType Op1 = Left.Type;
+                CType Op2 = Right.Type;
+                if (Op1 == CType.String || Op2 == CType.String)
+                    return CType.String;
+                else
+                    return Op1 == Op2 ? Op1 : CType.None;
+            }
         }
 
         public override string ToString()
