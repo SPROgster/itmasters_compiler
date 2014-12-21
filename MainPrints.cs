@@ -19,21 +19,33 @@ namespace SimpleCompiler
     public partial class SimpleCompilerMain
     {
         //Функция для вывода заданного графа потока управления
-        public static void PrintCFG(ControlFlowGraph cfg)
+        public static void PrintCFG(ControlFlowGraph cfg, bool justCode = false)
         {
-            Print("Граф потока управления:");           
-            foreach (BaseBlock block in cfg.GetBlocks())
+            if (!justCode)
             {
-                if (block != cfg.GetStart() && block != cfg.GetEnd())
+                Print("Граф потока управления:");
+                foreach (BaseBlock block in cfg.GetBlocks())
                 {
-                    Console.WriteLine("--- Блок {0} ---", block.nBlock);
-                    Console.WriteLine(block);
-                    Console.WriteLine();
-                    Console.WriteLine("Input:\t" + String.Join(" ",cfg.GetInputs(block).
-                        Select(e=>e.nBlock.ToString())));
-                    Console.WriteLine("Output:\t" + String.Join(" ", cfg.GetOutputs(block).
-                        Select(e => e.nBlock.ToString())));
-                    Console.WriteLine("----------------");                    
+                    if (block != cfg.GetStart() && block != cfg.GetEnd())
+                    {
+                        Console.WriteLine("--- Блок {0} ---", block.nBlock);
+                        Console.WriteLine(block);
+                        Console.WriteLine();
+                        Console.WriteLine("Input:\t" + String.Join(" ", cfg.GetInputs(block).
+                            Select(e => e.nBlock.ToString())));
+                        Console.WriteLine("Output:\t" + String.Join(" ", cfg.GetOutputs(block).
+                            Select(e => e.nBlock.ToString())));
+                        Console.WriteLine("----------------");
+                    }
+                }
+            }
+            else
+            {
+                Print("Трёхадресный код:");
+                foreach (BaseBlock block in cfg.GetBlocks())
+                {
+                    if (block != cfg.GetStart() && block != cfg.GetEnd())
+                        Console.WriteLine(block);
                 }
             }
         }
