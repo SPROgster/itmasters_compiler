@@ -40,7 +40,20 @@ namespace simplelangTests
                         Console.WriteLine("In:\t" + AEAResult.Item1[block]);
                         Console.WriteLine("Out:\t" + AEAResult.Item2[block]);
                     }
-                Assert.AreEqual(1,AEAResult.Item2[CFG.BlockAt(1)].Count);
+                SetAdapter<Expression> e = new SetAdapter<Expression>();
+                Expression e2 = new Expression("m","1",BinOpType.Minus);
+                e.Add(e2);
+                Assert.IsTrue(e.Equals(AEAResult.Item2[CFG.BlockAt(1)]));
+            }
+        }
+        [TestMethod]
+        public void DominatorTree_25()
+        {
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/AvailableExprs_15.txt");
+            if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
+            {
+                var CFG = SimpleCompilerMain.BuildCFG(Root);
+                SimpleCompilerMain.RunDominatorTree(CFG);
             }
         }
     }

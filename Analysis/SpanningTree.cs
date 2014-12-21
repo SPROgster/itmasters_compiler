@@ -11,7 +11,7 @@ namespace SimpleLang.Analysis
     public class SpanningTree
     {
         ControlFlowGraph gr;
-        HashSet<BaseBlock> spTree;
+        public HashSet<BaseBlock> spTree;
         // ребро дерева
         public class Edge
         {
