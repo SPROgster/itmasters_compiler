@@ -24,11 +24,7 @@ namespace simplelangTests
                 {
                     Console.WriteLine(bl[i] + " " + DeadOrAlive.IsDead(CFG.GetBlocks().First.Next.Value, bl[i].First, i));
                 }
-
-                bool alive =
-                    DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "i", 0) &&
-                    DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "i", 0);
-                Assert.IsFalse(alive);
+                Assert.IsTrue(DeadOrAlive.IsDead(CFG.BlockAt(1), "i", 0));
             }
         }
 

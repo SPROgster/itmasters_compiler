@@ -187,7 +187,15 @@ namespace SimpleLang.MiddleEnd
         {
             return Blocks;
         }
-
+        public List<BaseBlock> GetListBlocks()
+        {
+            return new List<BaseBlock>(Blocks);
+        }
+        public BaseBlock BlockAt(int elem)
+        {
+            List<BaseBlock> l = new List<BaseBlock>(Blocks);
+            return l[elem];
+        }
         //Возвращает блок "вход"
         public BaseBlock GetStart()
         {

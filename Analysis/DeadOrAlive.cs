@@ -39,10 +39,7 @@ namespace SimpleLang.Analysis
         public static bool IsDead(BaseBlock bl, string id, int line)
         {
             List<CodeLine> bl2 = new List<CodeLine>(bl.Code);
-            bool alivebefore = true;
-            bool aliveafter = true;
-            //bool alivebefore = !(id.Length >= 2 && id.Substring(0, 2).Equals("_t"));
-            //bool aliveafter = !(id.Length >= 2 && id.Substring(0, 2).Equals("_t"));
+            bool aliveafter = !(id.Length >= 2 && id.Substring(0, 2).Equals("_t"));
             for (int i = bl2.Count - 1; i > line; i--)
             {
                 if (bl2[i].Third != null && bl2[i].Third.Equals(id))
@@ -63,69 +60,12 @@ namespace SimpleLang.Analysis
                     {
                         aliveafter = false;
                     }
-                    
-                }
-            }
-            if (bl2[line].First != null && bl2[line].First.Equals(id))
-            {
-                alivebefore = false;
-            }
-            return !aliveafter && !alivebefore;
-        }
 
-        public static bool IsAliveBeforeLine(BaseBlock bl, string id, int line)
-        {
-            List<CodeLine> bl2 = new List<CodeLine>(bl.Code);
-            bool alive = !(id.Length >= 2 && id.Substring(0, 2).Equals("_t"));
-            for (int i = bl2.Count - 1; i >= 0; i--)
-            {
-                if (bl2[i].Third != null && bl2[i].Third.Equals(id))
-                {
-                    alive = true;
-                }
-                if (bl2[i].Second != null && bl2[i].Second.Equals(id))
-                {
-                    alive = true;
-                }
-                if (bl2[i].First != null && bl2[i].First.Equals(id))
-                {
-                    alive = false;
-                }
-                if (i == line)
-                {
-                    return alive;
                 }
             }
-            return alive;
-        }
-
-        public static bool IsAliveAfterLine(BaseBlock bl, string id, int line)
-        {
-            List<CodeLine> bl2 = new List<CodeLine>(bl.Code);
-            bool alive = !(id.Length >= 2 && id.Substring(0, 2).Equals("_t"));
-            for (int i = bl2.Count - 1; i >= 0; i--)
-            {
-                if (i == line)
-                {
-                    return alive;
-                }
-                if (bl2[i].Third != null && bl2[i].Third.Equals(id))
-                {
-                    alive = true;
-                }
-                if (bl2[i].Second != null && bl2[i].Second.Equals(id))
-                {
-                    alive = true;
-                }
-                if (bl2[i].First != null && bl2[i].First.Equals(id))
-                {
-                    alive = false;
-                }
-            }
-            return alive;
+            return !aliveafter;
         }
     }
-
     public class DefUseContext : Context<Tuple<StringSet, StringSet>>
     {
         //Функция проверяет, что текущий операнд - это идентификатор, ещё не попавший в def
