@@ -12,34 +12,32 @@ namespace simplelangTests
     public class Beda
     {
         [TestMethod]
-        public void DeadOrAlive_1_1()
+        public void DeadOrAlive_02()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test2.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/DeadOrAlive_02.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
-                SimpleCompilerMain.PrintCFG(CFG);
-                List<CodeLine> bl = new List<CodeLine>(CFG.GetBlocks().First.Next.Value.Code);
+                SimpleCompilerMain.PrintCFG(CFG,true);
+                Console.WriteLine();
+                Console.WriteLine("Анализ на живучесть");
+                List<CodeLine> bl = new List<CodeLine>(CFG.BlockAt(1).Code);
                 for (int i = 0; i < bl.Count; i++)
                 {
-                    Console.WriteLine(bl[i] + " " + DeadOrAlive.IsDead(CFG.GetBlocks().First.Next.Value, bl[i].First, i));
+                    Console.WriteLine(bl[i] + " " + DeadOrAlive.IsDead(CFG.BlockAt(1), bl[i].First, i));
                 }
-
-                bool alive =
-                    DeadOrAlive.IsAliveBeforeLine(CFG.GetBlocks().First.Next.Value, "i", 0) &&
-                    DeadOrAlive.IsAliveAfterLine(CFG.GetBlocks().First.Next.Value, "i", 0);
-                Assert.IsFalse(alive);
+                Assert.IsTrue(DeadOrAlive.IsDead(CFG.BlockAt(1), "i", 0));
             }
         }
 
         [TestMethod]
-        public void GenKill_2_5()
+        public void GenKill_11()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/GenKill_11.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
-                SimpleCompilerMain.PrintCFG(CFG);
+                SimpleCompilerMain.PrintCFG(CFG,true);
                 KillGenContext egc = new KillGenContext(CFG);
                 foreach (var item in CFG.GetBlocks())
                 {
@@ -48,16 +46,16 @@ namespace simplelangTests
                     Console.WriteLine(egc.Kill(item).ToString().Replace("True", "1").Replace("False", "0"));
                     Console.WriteLine();
                 }
-                BitSet resultgen = egc.Gen(CFG.GetBlocks().First.Next.Value);
+                BitSet resultgen = egc.Gen(CFG.BlockAt(1));
                 BitSet rightgen = new BitSet(new bool[] { true, true, true, false, false, false, false });
                 Assert.IsTrue(resultgen.Equals(rightgen));
             }
         }
 
         [TestMethod]
-        public void DeadOrAliveBBL_3_0()
+        public void DeadOrAliveBBL_13()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test6.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/DeadOrAliveBBL_13.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
@@ -73,16 +71,15 @@ namespace simplelangTests
             }
         }
         [TestMethod]
-        public void NaturalCycles()
+        public void NaturalCycles_29()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/NaturalCycles_29.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
                 NaturalCycles n = new NaturalCycles();
                 var l=n.GetLoop(CFG, 6, 1).Select(x=>x.nBlock).OrderBy(x=>x).ToList();
-                var rightl=new List<int>(new int[] {1,3,4,5,6});
-                Assert.IsTrue(l.SequenceEqual(rightl));
+                Assert.IsTrue(l.SequenceEqual(new int[] { 1, 3, 4, 5, 6 }));
             }
         }
     }

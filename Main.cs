@@ -104,6 +104,7 @@ namespace SimpleCompiler
                             {
                                 Print("Семантический анализ завершён.");
                                 PrintSymbolTable();
+                                PrintCFG(CFG, true); 
                                 PrintCFG(CFG); 
                             }
                             //Определяем, какие оптимизации и анализы нас попросили применить

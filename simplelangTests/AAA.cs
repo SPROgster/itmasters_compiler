@@ -9,17 +9,17 @@ namespace simplelangTests
     public class AAA
     {
         [TestMethod]
-        public void CleanDead_1_5()
+        public void CleanDead_06()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test2.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/CleanDead_06.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
-                SimpleCompilerMain.PrintCFG(CFG);
+                SimpleCompilerMain.PrintCFG(CFG,true);
                 CleanDead cl = new CleanDead();
-                cl.Optimize(CFG.GetBlocks().First.Next.Value);
-                SimpleCompilerMain.PrintCFG(CFG);
-                Assert.AreEqual(6, CFG.GetBlocks().First.Next.Value.Code.Count);
+                cl.Optimize(CFG.BlockAt(1));
+                SimpleCompilerMain.PrintCFG(CFG,true);
+                Assert.AreEqual(5, CFG.BlockAt(1).Code.Count);
             }
         }
     }
