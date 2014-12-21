@@ -18,7 +18,7 @@ namespace SimpleLang.MiddleEnd
             Reset();
         }
 
-        public static List<Tuple<string, CType, SymbolKind>> vars;
+        public static Dictionary<string,Tuple<CType, SymbolKind>> vars;
 
         public static void Add(string name, CType type, SymbolKind kind)
         {
@@ -29,17 +29,12 @@ namespace SimpleLang.MiddleEnd
             //    else
             //        throw new SemanticException("Тип " + name + " уже определён");
             //else
-            vars.Add(new Tuple<string, CType, SymbolKind>(name, type, kind));
-        }
-
-        public static int IndexOfIdent(string id)
-        {
-            return vars.FindIndex(e => e.Item1 == id);
+            vars.Add(name, new Tuple<CType, SymbolKind>(type, kind));
         }
 
         public static bool Contains(string id)
         {
-            return IndexOfIdent(id) >= 0;
+            return vars.ContainsKey(id);
         }
 
         public static CType ParseType(string name)
@@ -58,10 +53,11 @@ namespace SimpleLang.MiddleEnd
         public static void Reset()
         {
             // Initializing Symbol Table with all data types except for None
-            vars = new List<Tuple<string, CType, SymbolKind>>();
+            vars = new Dictionary<string, Tuple<CType, SymbolKind>>();
             foreach (CType value in System.Enum.GetValues(typeof(CType)))
                 if (value != CType.None)
-                    vars.Add(new Tuple<string, CType, SymbolKind>(System.Enum.GetName(typeof(CType), value), value, SymbolKind.type));
+                    vars.Add(System.Enum.GetName(typeof(CType), value),
+                        new Tuple<CType, SymbolKind>(value, SymbolKind.type));
         }
 
         /// <summary>

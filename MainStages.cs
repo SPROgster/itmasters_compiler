@@ -39,7 +39,7 @@ namespace SimpleCompiler
         public static bool SemanticAnalysis(BlockNode root)
         {
             SymbolTable.Reset();
-            var sne = new CheckVariablesVisitor();
+            var sne = new CheckSemanticsVisitor();
             root.Visit(sne);
             if (sne.Errors.Count > 0)
             {

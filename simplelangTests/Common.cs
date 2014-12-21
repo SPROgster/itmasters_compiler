@@ -23,7 +23,7 @@ namespace SimpleLangTests
             scanner.SetSource(Text, 0);
             Parser parser = new Parser(scanner);
             var b = parser.Parse();
-            var sne = new CheckVariablesVisitor();
+            var sne = new CheckSemanticsVisitor();
             parser.root.Visit(sne);
             Assert.AreEqual(true,SymbolTable.Contains("i"), "В таблице символов не содержится переменная i");
             Assert.AreEqual(true,SymbolTable.Contains("k"), "В таблице символов не содержится переменная i");
@@ -37,7 +37,7 @@ namespace SimpleLangTests
             scanner.SetSource(Text, 0);
             Parser parser = new Parser(scanner);
             var b = parser.Parse();
-            var sne = new CheckVariablesVisitor();
+            var sne = new CheckSemanticsVisitor();
             parser.root.Visit(sne);
             GenCodeVisitor gcv = new GenCodeVisitor();
             parser.root.Visit(gcv);

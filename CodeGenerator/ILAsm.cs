@@ -74,7 +74,7 @@ namespace SimpleLang.CodeGenerator
                 localDirectiveList = "";
 
                 var Types = from ids in MiddleEnd.SymbolTable.vars
-                            where ids.Item3 == SymbolKind.var
+                            where ids.Value.Item2 == SymbolKind.var
                             select ids;
 
                 foreach (var id in Types)
@@ -83,7 +83,7 @@ namespace SimpleLang.CodeGenerator
                     try
                     {
                         // Строка описания локальной переменной при дириктиве .local
-                        string varText = "[" + i.ToString() + "] " + ILType[id.Item2] + " " + id.Item1;
+                        string varText = "[" + i.ToString() + "] " + ILType[id.Value.Item1] + " " + id.Key;
 
                         // Добавление запятой, в случае, если это не первый элемент
                         if (i > 0)
@@ -93,13 +93,13 @@ namespace SimpleLang.CodeGenerator
                         localDirectiveList += varText;
 
                         // А так же запомнить индекс переменной и тип
-                        varsIndex.Add(id.Item1, new IndexType(i++, id.Item2));
+                        varsIndex.Add(id.Key, new IndexType(i++, id.Value.Item1));
                     }
                     catch (KeyNotFoundException)
                     {
                         // Если мы попали сюда, что все очень плохо. Такого типа переменной не существует или же мы наткнулись на None
                         //  Поидее мы дожны сгенерировать исключение, но нам и этого достаточно
-                        Console.WriteLine("Отсутствует тип " + id.Item2.ToString() + " для переменной " + id.Item1.ToString());
+                        Console.WriteLine("Отсутствует тип " + id.Value.Item1.ToString() + " для переменной " + id.Key);
                     }
                 }
             }

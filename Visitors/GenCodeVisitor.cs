@@ -77,12 +77,11 @@ namespace SimpleLang.Visitors
         public override void VisitIdNode(IdNode id)
         {
             // Определяем тип переменной
-            int idx = SymbolTable.IndexOfIdent(id.Name);
-            if (idx < 0)
+            if (!SymbolTable.Contains(id.Name))
                 throw new Exception("Невозможно определить тип переменной " + id.Name + " , возможно она не описана в var");
 
             NamesValuesStack.Push(id.Name);
-            CTypeValuesStack.Push(SymbolTable.vars[idx].Item2);
+            CTypeValuesStack.Push(SymbolTable.vars[id.Name].Item1);
         }
 
         public override void VisitIntNumNode(IntNumNode num)
@@ -117,7 +116,7 @@ namespace SimpleLang.Visitors
 
             // Какой же тут тип надо получить?
             CType resultType = SymbolTable.OpResultType(CTypeValuesStack.Pop(), CTypeValuesStack.Pop(), binop.Op);
-            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CurName, resultType, SymbolKind.var));
+            SymbolTable.vars.Add(CurName,new Tuple<CType, SymbolKind>(resultType, SymbolKind.var));
 
             Code.AddLast(new CodeLine(null, CurName,
                 NamesValuesStack.Pop(), NamesValuesStack.Pop(), binop.Op));
@@ -134,7 +133,7 @@ namespace SimpleLang.Visitors
             //Счётчик цикла
             string CounterVar = SymbolTable.NextTemp();
 
-            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CounterVar, CType.Bool, SymbolKind.var));
+            SymbolTable.vars.Add(CounterVar, new Tuple<CType, SymbolKind>(CType.Bool, SymbolKind.var));
 
             //Находим начальное значение счётчика
             c.Expr.Visit(this);
@@ -172,7 +171,7 @@ namespace SimpleLang.Visitors
             string HeaderLabel = NextLabel();
             string AfterWhileLabel = NextLabel();
 
-            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
+            SymbolTable.vars.Add(CondVariable,new Tuple<CType, SymbolKind>(CType.Bool, SymbolKind.var));
 
             Code.AddLast(new CodeLine(HeaderLabel, null, null, null, OperatorType.Nop));
             node.Expr.Visit(this);
@@ -195,7 +194,7 @@ namespace SimpleLang.Visitors
             string IfLabel = NextLabel();
             string AfterIfLabel = NextLabel();
 
-            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(CondVariable, CType.Bool, SymbolKind.var));
+            SymbolTable.vars.Add(CondVariable,new Tuple<CType, SymbolKind>(CType.Bool, SymbolKind.var));
 
             node.Expr.Visit(this);
 
@@ -220,7 +219,7 @@ namespace SimpleLang.Visitors
         {
             string WriteVariable = SymbolTable.NextTemp();
 
-            SymbolTable.vars.Add(new Tuple<string,CType,SymbolKind>(WriteVariable, CType.String, SymbolKind.var));
+            SymbolTable.vars.Add(WriteVariable,new Tuple<CType,SymbolKind>(CType.String, SymbolKind.var));
 
             node.Expr.Visit(this);
 

@@ -86,7 +86,7 @@
     <Compile Include="Optimizations\Fold.cs" />
     <Compile Include="Visitors\GenCodeVisitor.cs" />
     <Compile Include="Visitors\PrettyPrintVisitor.cs" />
-    <Compile Include="Visitors\CheckVariablesVisitor.cs" />
+    <Compile Include="Visitors\CheckSemanticsVisitor.cs" />
     <Compile Include="Visitors\VariableRenameVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
   </ItemGroup>

@@ -16,7 +16,9 @@ namespace SimpleLang.MiddleEnd
     }
 
     public abstract class ExprNode : Node // базовый класс для всех выражений
-    {}
+    {
+        public abstract CType GetType();
+    }
 
     public class IdNode : ExprNode
     {
@@ -26,6 +28,16 @@ namespace SimpleLang.MiddleEnd
         public override void Visit(Visitor v)
         {
             v.VisitIdNode(this);
+        }
+
+        public override CType GetType()
+        {
+            return SymbolTable.vars[Name].Item1;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 
@@ -38,6 +50,16 @@ namespace SimpleLang.MiddleEnd
         {
             v.VisitIntNumNode(this);
         }
+
+        public override CType GetType()
+        {
+            return CType.Int;
+        }
+
+        public override string ToString()
+        {
+            return Num.ToString();
+        }
     }
 
     public class FloatNumNode : ExprNode
@@ -48,6 +70,16 @@ namespace SimpleLang.MiddleEnd
         public override void Visit(Visitor v)
         {
             v.VisitFloatNumNode(this);
+        }
+
+        public override CType GetType()
+        {
+            return CType.Float;
+        }
+
+        public override string ToString()
+        {
+            return Num.ToString();
         }
     }
 
@@ -60,6 +92,16 @@ namespace SimpleLang.MiddleEnd
         {
             v.VisitBoolNode(this);
         }
+
+        public override CType GetType()
+        {
+            return CType.Bool;
+        }
+
+        public override string ToString()
+        {
+            return Val.ToString();
+        }
     }
 
     public class StringNode : ExprNode
@@ -70,6 +112,16 @@ namespace SimpleLang.MiddleEnd
         public override void Visit(Visitor v)
         {
             v.VisitStringNode(this);
+        }
+
+        public override CType GetType()
+        {
+            return CType.String;
+        }
+
+        public override string ToString()
+        {
+            return Val;
         }
     }
 
@@ -89,6 +141,21 @@ namespace SimpleLang.MiddleEnd
         public override void Visit(Visitor v)
         {
             v.VisitBinOpNode(this);
+        }
+
+        public override CType GetType()
+        {
+            CType Op1 = Left.GetType();
+            CType Op2 = Right.GetType();
+            if (Op1 == CType.String || Op2 == CType.String)
+                return CType.String;
+            else
+                return Op1==Op2 ? Op1 : CType.None;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("({0} {1} {2})", Left.ToString(), Op, Right.ToString());
         }
     }
 

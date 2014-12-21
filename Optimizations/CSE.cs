@@ -40,7 +40,7 @@ namespace SimpleLang.Optimizations
                         {
                             string tName = NextTemp();
                             Expression expr = new Expression(node0.Value.Second, node0.Value.Third, node0.Value.BinOp);                                                        
-                            SymbolTable.vars.Add(new Tuple<string, CType, SymbolKind>(tName, expr.Type(), SymbolKind.var));
+                            SymbolTable.vars.Add(tName,new Tuple<CType, SymbolKind>(expr.Type(), SymbolKind.var));
                             hasChanges = isOpt;
                             block.Code.AddAfter(node0, new CodeLine(node0.Value.Label, node0.Value.First, tName, null, BinOpType.None));
                             node0.Value.First = tName;

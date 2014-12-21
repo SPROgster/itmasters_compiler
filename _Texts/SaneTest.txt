@@ -1,5 +1,7 @@
 begin
 	var s, i, j, k : int;
+	var bb: bool;
+	bb := true;
 	i := 1;
 	k := 2;
 	while (j < 10)
