@@ -43,11 +43,14 @@ namespace SimpleLang.Analysis
         //
         HashSet<Edge> edges;
         //
+        int blockCounter;
+        //
         public SpanningTree(ControlFlowGraph gr)
         {
             this.gr = gr;
             this.spTree = new HashSet<BaseBlock>();
             this.edges = new HashSet<Edge>();
+            this.blockCounter = 0;
             // поиск в глубину
             foreach (BaseBlock u in gr.GetBlocks().Where(bl => !this.spTree.Contains(bl) && bl != gr.GetStart() && bl != gr.GetEnd()))
                 DFS_Visit(u);
@@ -59,9 +62,11 @@ namespace SimpleLang.Analysis
         void DFS_Visit(BaseBlock u)
         {
             spTree.Add(u);
+            int old_nBlock = u.nBlock;
+            u.nBlock = blockCounter++;
             foreach (var child in this.gr.GetOutputs(u).Where(bl => !this.spTree.Contains(bl) && bl != this.gr.GetStart() && bl != this.gr.GetEnd()))
             {
-                this.edges.Add(new Edge(u.nBlock, child.nBlock));
+                this.edges.Add(new Edge(old_nBlock, child.nBlock));
                 DFS_Visit(child);
             }
         }
@@ -80,6 +85,11 @@ namespace SimpleLang.Analysis
         {
             foreach (var e in this.edges)
                 Console.WriteLine(e);
+        }
+        //
+        public ControlFlowGraph Graph
+        {
+            get { return this.gr; }
         }
         // возвращает набор ребер
         public HashSet<Edge> Edges()
