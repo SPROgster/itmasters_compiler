@@ -9,7 +9,7 @@ namespace simplelangTests
     public class AAA
     {
         [TestMethod]
-        public void CleanDead_1_5()
+        public void CleanDead_06()
         {
             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test2.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))

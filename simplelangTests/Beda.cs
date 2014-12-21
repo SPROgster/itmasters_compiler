@@ -12,7 +12,7 @@ namespace simplelangTests
     public class Beda
     {
         [TestMethod]
-        public void DeadOrAlive_1_1()
+        public void DeadOrAlive_02()
         {
             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test2.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
@@ -33,7 +33,7 @@ namespace simplelangTests
         }
 
         [TestMethod]
-        public void GenKill_2_5()
+        public void GenKill_11()
         {
             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
@@ -55,7 +55,7 @@ namespace simplelangTests
         }
 
         [TestMethod]
-        public void DeadOrAliveBBL_3_0()
+        public void DeadOrAliveBBL_13()
         {
             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test6.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
@@ -73,7 +73,7 @@ namespace simplelangTests
             }
         }
         [TestMethod]
-        public void NaturalCycles()
+        public void NaturalCycles_29()
         {
             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))

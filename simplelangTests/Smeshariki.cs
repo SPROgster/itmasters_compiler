@@ -13,7 +13,7 @@ namespace simplelangTests
     public class Smeshariki
     {
         [TestMethod]
-        public void CSE_1_3()
+        public void CSE_04()
         {
              BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test4.txt");
              if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))

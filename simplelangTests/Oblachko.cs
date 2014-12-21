@@ -16,7 +16,7 @@ namespace simplelangTests
     public class Oblachko
     {
         [TestMethod]
-        public void Fold_1_2()
+        public void Fold_03()
         {
             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test5.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
@@ -31,7 +31,7 @@ namespace simplelangTests
             }
         }
         [TestMethod]
-        public void RDA_2_6()
+        public void RDA_12()
         {
             BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
@@ -54,7 +54,7 @@ namespace simplelangTests
             }
         }
         [TestMethod]
-         public void AliveVars_3_1()
+        public void AliveVars_14()
         {
              BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
              if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))

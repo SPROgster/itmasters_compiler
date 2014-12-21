@@ -13,7 +13,7 @@ namespace simplelangTests
     public class Titanic
     {
         [TestMethod]
-        public void GraphBBL_1_0()
+        public void GraphBBL_01()
         {
              BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
              if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
