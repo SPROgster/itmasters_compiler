@@ -122,27 +122,44 @@ namespace SimpleCompiler
         {
             Print("Дерево доминаторов:");  
             DominatorsTree DTree = new DominatorsTree(CFG);
-            Stack<Pair<DominatorsTree.TreeNode<BaseBlock>,int>> Path =
-                new Stack<Pair<DominatorsTree.TreeNode<BaseBlock>, int>>();
-            Path.Push(new Pair<DominatorsTree.TreeNode<BaseBlock>,int>(DTree.Root,0));
-            int Depth = 0;
-            while(Path.Count>0)
+            //Stack<Pair<DominatorsTree.TreeNode<BaseBlock>,int>> Path =
+            //    new Stack<Pair<DominatorsTree.TreeNode<BaseBlock>, int>>();
+            //Path.Push(new Pair<DominatorsTree.TreeNode<BaseBlock>,int>(DTree.Root,0));
+            //int Depth = 0;
+            //while(Path.Count>0)
+            //{
+            //    var Top = Path.Peek();
+            //    if (Top.snd != Top.fst.Items.Count)
+            //    {
+            //        Path.Push(new Pair<DominatorsTree.TreeNode<BaseBlock>, int>(
+            //            Top.fst.Items.ElementAt(Top.snd), 0));
+            //        Top.snd += 1;
+            //        Depth += 1;
+            //    }
+            //    else
+            //    {
+            //        for (int i = 0; i < Depth; ++i)
+            //            Console.Write("  ");
+            //        Console.WriteLine(Top.fst.Value.nBlock);
+            //        Path.Pop();
+            //        Depth -= 1;
+            //    }
+            //}
+            Stack<DominatorsTree.TreeNode<BaseBlock>> Path =
+                new Stack<DominatorsTree.TreeNode<BaseBlock>>();
+            Path.Push(DTree.Root);
+            while (Path.Count > 0)
             {
-                var Top = Path.Peek();
-                if (Top.snd != Top.fst.Items.Count)
+                var Top = Path.Pop();
+                if(Top.Items.Count>0)
                 {
-                    Path.Push(new Pair<DominatorsTree.TreeNode<BaseBlock>, int>(
-                        Top.fst.Items.ElementAt(Top.snd), 0));
-                    Top.snd += 1;
-                    Depth += 1;
-                }
-                else
-                {
-                    for (int i = 0; i < Depth; ++i)
-                        Console.Write("  ");
-                    Console.WriteLine(Top.fst.Value.nBlock);
-                    Path.Pop();
-                    Depth -= 1;
+                    Console.Write("{0} => ",Top.Value.nBlock);
+                    foreach(var it in Top.Items)
+                    {
+                        Console.Write("{0} ",it.Value.nBlock);
+                        Path.Push(it);
+                    }
+                    Console.WriteLine();
                 }
             }
         }

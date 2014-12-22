@@ -16,14 +16,22 @@ namespace SimpleLang.Analysis
         {
             var Dominators = (new DominatorsAlgorithm(cfg)).Apply().Item2;
             var DirectDominators = new Dictionary<BaseBlock, TreeNode<BaseBlock>>();
+            //По вершине дереаа доминаторов для каждого блока
+            foreach (BaseBlock bl in cfg.GetBlocks())
+                DirectDominators[bl] = new TreeNode<BaseBlock>(bl);
             //Находим непосредственных доминаторов после того, как уже нашли всех
             foreach (BaseBlock block in Dominators.Keys)
-                DirectDominators[block] = new TreeNode<BaseBlock>(block);
-            foreach (BaseBlock block in Dominators.Keys)
-                foreach (BaseBlock dblock in
-                    Dominators.Where(e => e.Key != block && Dominators[block].Contains(e.Key)).Select(e => e.Value).
-                    Aggregate(new BlockSet(), (a, b) => BlockSet.Union(BlockSet.Subtract(a, b), BlockSet.Subtract(b, a))))
-                    DirectDominators[dblock].AddItem(DirectDominators[block]);
+            {
+                //Проходим по всем доминаторам текущего блока
+                foreach (BaseBlock dblock in Dominators[block].Where(e=>e!=block))
+                    //Если он не является доминатором остальных элементов
+                    if (Dominators[block].Where(e => e != block && e != dblock).All(e => !Dominators[e].Contains(dblock)))
+                    {
+                        //Считаем его непосредственным доминатором
+                        DirectDominators[dblock].Items.AddLast(DirectDominators[block]);
+                        break;
+                    }
+            }
             Root = DirectDominators[cfg.GetStart()];
         }
 
