@@ -58,6 +58,8 @@ namespace SimpleLang.MiddleEnd
                 if (value != CType.None)
                     vars.Add(System.Enum.GetName(typeof(CType), value),
                         new Tuple<CType, SymbolKind>(value, SymbolKind.type));
+            foreach (string s in KeyWords)
+                vars.Add(s,new Tuple<CType, SymbolKind>(CType.None,SymbolKind.keyword));
         }
 
         /// <summary>
