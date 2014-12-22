@@ -40,13 +40,20 @@ namespace simplelangTests
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
-                SpanningTree spTree = new SpanningTree(CFG);
-                List<int> l=new List<int>();
-                foreach (BaseBlock block in spTree.spTree)
+               // SimpleCompilerMain.PrintCFG(CFG);
+                var l=CFG.GetListBlocks();
+                foreach (var item in l)
                 {
-                    l.Add(block.nBlock);
+                    Console.WriteLine(item.nBlock + " " + l.IndexOf(item));
                 }
-                Assert.IsTrue(l[3] == 7);//проверяем перенумеровали или нет
+                SpanningTree spTree = new SpanningTree(CFG);
+                //SimpleCompilerMain.PrintCFG(CFG);
+                foreach (var item in l)
+                {
+                    Console.WriteLine(item.nBlock+ " " + l.IndexOf(item) );
+                }
+                Assert.IsTrue(l[7].nBlock == 6);//проверяем перенумеровали или нет
+                Assert.IsTrue(l[8].nBlock == 3);
             }
         }
     }
