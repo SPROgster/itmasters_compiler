@@ -44,12 +44,5 @@ namespace SimpleLang.Visitors
                 if (!SymbolTable.Contains(id.Name))
                     Errors.Add("Переменная " + id.Name + " не была описана ранее");
         }
-
-        public override void VisitBinOpNode(BinOpNode binop)
-        {
-            base.VisitBinOpNode(binop);
-           // if (SymbolTable.OpResultType(binop.Left,binop.Right,binop.Op) = CType.None)
-              //  Errors.Add(String.Format("Несовместимые типы операндов в выражении {0}",binop.ToString()));
-        }
     }
 }
