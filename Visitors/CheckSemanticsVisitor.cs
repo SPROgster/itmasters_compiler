@@ -48,14 +48,8 @@ namespace SimpleLang.Visitors
         public override void VisitBinOpNode(BinOpNode binop)
         {
             base.VisitBinOpNode(binop);
-            if(binop.Type==CType.None)
-                Errors.Add(String.Format("Несовместимые типы операндов в выражении {0}",binop.ToString()));
-        }
-
-        public override void VisitAssignNode(AssignNode a)
-        {
-            base.VisitAssignNode(a);
-
+           // if (SymbolTable.OpResultType(binop.Left,binop.Right,binop.Op) = CType.None)
+              //  Errors.Add(String.Format("Несовместимые типы операндов в выражении {0}",binop.ToString()));
         }
     }
 }
