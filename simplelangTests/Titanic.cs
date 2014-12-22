@@ -7,6 +7,7 @@ using System.IO;
 using SimpleLang.MiddleEnd;
 using SimpleCompiler;
 using SimpleLang.Analysis;
+using System.Collections.Generic;
 
 namespace simplelangTests
 {
@@ -49,11 +50,30 @@ namespace simplelangTests
         [TestMethod]
         public void DominatorTree_25()
         {
-            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/AvailableExprs_15.txt");
+            BlockNode Root = SimpleCompilerMain.SyntaxAnalysis("../../_Texts/Test3.txt");
             if (Root != null && SimpleCompilerMain.SemanticAnalysis(Root))
             {
                 var CFG = SimpleCompilerMain.BuildCFG(Root);
+                DominatorsTree DTree = new DominatorsTree(CFG);
+                Stack<DominatorsTree.TreeNode<BaseBlock>> Path =new Stack<DominatorsTree.TreeNode<BaseBlock>>();
+                Dictionary<int,HashSet<int>> d = new  Dictionary<int,HashSet<int>>();
+                Path.Push(DTree.Root);
+                while (Path.Count > 0)
+                {
+                    var Top = Path.Pop();
+                    if (Top.Items.Count > 0)
+                    {
+                        d[Top.Value.nBlock] = new HashSet<int>();
+                        foreach (var it in Top.Items)
+                        {
+                            d[Top.Value.nBlock].Add(it.Value.nBlock);
+                            Path.Push(it);
+                        }
+                    }
+                }
                 SimpleCompilerMain.RunDominatorTree(CFG);
+                Assert.IsTrue(d[3].Contains(4) && d[3].Contains(5) && d[3].Contains(6));
+
             }
         }
     }

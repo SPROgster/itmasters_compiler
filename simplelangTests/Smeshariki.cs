@@ -52,8 +52,7 @@ namespace simplelangTests
                 {
                     Console.WriteLine(item.nBlock+ " " + l.IndexOf(item) );
                 }
-                Assert.IsTrue(l[7].nBlock == 6);//проверяем перенумеровали или нет
-                Assert.IsTrue(l[8].nBlock == 3);
+                Assert.IsTrue(l[7].nBlock == 6 && l[8].nBlock == 3);//проверяем перенумеровали или нет
             }
         }
     }
