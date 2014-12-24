@@ -1,10 +1,12 @@
 begin
   var a,b,c:int;
+  a:=2;
+  b:=1;
   cycle 2*a
     b:=a*b;
-  while (a>b)
+  while (b>a)
   begin
-    a:=a-1;
-    write(a)
+    b:=b-1;
+    write(b)
   end
 end

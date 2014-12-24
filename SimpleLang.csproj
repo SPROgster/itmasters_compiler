@@ -92,7 +92,7 @@
     <Compile Include="Visitors\Visitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="_Texts\LabelsTest.txt" />
+    <Content Include="_Texts\SimpleProgram.txt" />
     <Content Include="_Texts\optCseTest.txt" />
     <Content Include="_Texts\ReachingDefsTest.txt" />
     <Content Include="_Texts\SaneTest.txt" />

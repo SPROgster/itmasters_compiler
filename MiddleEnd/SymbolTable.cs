@@ -71,8 +71,8 @@ namespace SimpleLang.MiddleEnd
         /// <returns>CType результата операции</returns>
         public static CType OpResultType(CType op1, CType op2, BinOpType op)
         {
-            if (op2 == CType.None)
-                return op1;
+            if (op1 == CType.None || op2 == CType.None)
+                return CType.None;
 
             if (op == BinOpType.Equal || op == BinOpType.GEqual || op == BinOpType.Greater ||
                 op == BinOpType.LEqual || op == BinOpType.Less || op == BinOpType.NEqual)
